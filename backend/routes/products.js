@@ -46,7 +46,7 @@ router.post(
         price: Number(req.body.price),
         stock: Number(req.body.stock),
         image: req.file
-          ? `http://localhost:5000/uploads/${req.file.filename}`
+          ? `${process.env.BASE_URL}/uploads/${req.file.filename}`
           : ''
       });
 
@@ -77,7 +77,7 @@ router.put(
 
       // if new image uploaded
       if (req.file) {
-        updateData.image = `http://localhost:5000/uploads/${req.file.filename}`;
+        updateData.image = `${process.env.BASE_URL}/uploads/${req.file.filename}`;
       }
 
       const updatedProduct = await Product.findByIdAndUpdate(

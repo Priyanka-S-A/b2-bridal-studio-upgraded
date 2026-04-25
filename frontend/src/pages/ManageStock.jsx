@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-
+const API = import.meta.env.VITE_API_URL;
 const ManageStock = () => {
   const [stocks, setStocks] = useState([]);
   const [selectedStock, setSelectedStock] = useState(null); // ✅ NEW
@@ -16,7 +16,7 @@ const ManageStock = () => {
   // 📥 Fetch data
   const fetchStock = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/stock');
+      const res = await axios.get(`${API}/api/stock`);
       setStocks(res.data);
     } catch (err) {
       console.error(err);
@@ -34,7 +34,7 @@ const ManageStock = () => {
       return;
     }
 
-    await axios.post('http://localhost:5000/api/stock', form);
+    await axios.post(`${API}/api/stock`, form);
 
     setForm({
       productName: '',
@@ -51,7 +51,7 @@ const ManageStock = () => {
 
     if (!qty) return alert('Enter quantity');
 
-    await axios.post(`http://localhost:5000/api/stock/${id}/use`, {
+    await axios.post(`${API}/api/stock/${id}/use`, {
       usedQuantity: Number(qty)
     });
 
@@ -61,7 +61,7 @@ const ManageStock = () => {
 
   // ❌ Delete
   const handleDelete = async (id) => {
-    await axios.delete(`http://localhost:5000/api/stock/${id}`);
+    await axios.delete(`${API}/api/stock/${id}`);
     fetchStock();
   };
 

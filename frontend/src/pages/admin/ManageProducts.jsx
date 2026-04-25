@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Plus, Trash2, Edit2, Save, X } from 'lucide-react';
-
+const API = import.meta.env.VITE_API_URL;
 const ManageProducts = () => {
   const [products, setProducts] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
@@ -16,7 +16,7 @@ const ManageProducts = () => {
 
   const fetchProducts = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/products');
+      const res = await axios.get(`${API}/api/products`);
       setProducts(res.data);
     } catch (err) {
       console.error("Fetch error:", err);
@@ -44,13 +44,13 @@ const ManageProducts = () => {
     try {
       if (currentProduct._id) {
         await axios.put(
-          `http://localhost:5000/api/products/${currentProduct._id}`,
+          `${API}/api/products/${currentProduct._id}`,
           formData,
           { headers: { Authorization: `Bearer ${token}` } }
         );
       } else {
         await axios.post(
-          'http://localhost:5000/api/products',
+          `${API}/api/products`,
           formData,
           { headers: { Authorization: `Bearer ${token}` } }
         );
@@ -79,7 +79,7 @@ const ManageProducts = () => {
     const token = localStorage.getItem('adminToken');
 
     try {
-      await axios.delete(`http://localhost:5000/api/products/${id}`, {
+      await axios.delete(`${API}/api/products/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
 

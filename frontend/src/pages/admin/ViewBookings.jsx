@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Calendar, User, ShoppingBag } from 'lucide-react';
-
+const API = import.meta.env.VITE_API_URL;
 const ViewBookings = () => {
   const [bills, setBills] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -11,7 +11,7 @@ const ViewBookings = () => {
     const fetchBills = async () => {
       const token = localStorage.getItem('adminToken');
       try {
-        const res = await axios.get('http://localhost:5000/api/billing', {
+        const res = await axios.get(`${API}/api/billing`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setBills(res.data);

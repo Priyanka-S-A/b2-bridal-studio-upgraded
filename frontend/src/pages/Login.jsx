@@ -4,6 +4,8 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { fadeUp, staggerContainer } from '../animations/variants';
 
+const API = import.meta.env.VITE_API_URL;
+
 const Login = () => {
   const [form, setForm] = useState({ email: '', password: '' });
   const [showPw, setShowPw] = useState(false);
@@ -13,7 +15,7 @@ const Login = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await axios.post('http://localhost:5000/api/customer/login', form);
+      const res = await axios.post(`${API}/api/customer/login`, form);
       localStorage.setItem('user', JSON.stringify(res.data.user));
       alert('Login successful');
       window.location.href = '/';

@@ -3,7 +3,7 @@ import { ShoppingCart, Plus, Trash2, FileText, CheckCircle, Printer, Download, X
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
-const API = 'http://localhost:5000';
+const API = import.meta.env.VITE_API_URL;
 
 /* ─── helpers ────────────────────────────────────────────────── */
 const token = () => localStorage.getItem('adminToken');

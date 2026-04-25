@@ -3,7 +3,7 @@ import { motion, useScroll, useSpring } from 'framer-motion';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { fadeUp, staggerContainer } from '../animations/variants';
 
-const API = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API = import.meta.env.VITE_API_URL;
 
 /* ─── Simple Markdown-ish renderer ───────────────────────── */
 const renderContent = (content) => {

@@ -4,6 +4,8 @@ import { useParams, Link } from 'react-router-dom';
 import { motion, useInView, AnimatePresence } from 'framer-motion';
 import { fadeUp, staggerContainer, slideUp } from '../animations/variants';
 
+const API = import.meta.env.VITE_API_URL;
+
 const COURSE_IMAGES = {
   beautician: '/images/bridal4.jpeg',
   fashion: '/images/fashion.jpeg',
@@ -89,7 +91,7 @@ const Courses = () => {
   const isInView = useInView(ref, { once: true, margin: '-5%' });
 
   useEffect(() => {
-    axios.get('http://localhost:5000/api/courses').then(res => setDbCourses(res.data)).catch(() => { });
+    axios.get(`${API}/api/courses`).then(res => setDbCourses(res.data)).catch(() => { });
   }, []);
 
   const categoryData = category ? {

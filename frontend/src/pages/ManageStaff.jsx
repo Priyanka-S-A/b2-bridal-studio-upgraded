@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-
+const API = import.meta.env.VITE_API_URL;
 const ManageStaff = () => {
   const [staffList, setStaffList] = useState([]);
 
@@ -13,7 +13,7 @@ const ManageStaff = () => {
 
   // 📥 Fetch staff
   const fetchStaff = async () => {
-    const res = await axios.get('http://localhost:5000/api/staff');
+    const res = await axios.get(`${API}/api/staff`);
     setStaffList(res.data);
   };
 
@@ -54,7 +54,7 @@ const ManageStaff = () => {
     // ✅ VALIDATION CHECK
     if (!validateForm()) return;
 
-    await axios.post('http://localhost:5000/api/staff', form);
+    await axios.post(`${API}/api/staff`, form);
 
     setForm({
       name: '',
@@ -68,7 +68,7 @@ const ManageStaff = () => {
 
   // ❌ Delete staff
   const handleDelete = async (id) => {
-    await axios.delete(`http://localhost:5000/api/staff/${id}`);
+    await axios.delete(`${API}/api/staff/${id}`);
     fetchStaff();
   };
 

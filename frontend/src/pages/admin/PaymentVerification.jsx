@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 
-const API = 'http://localhost:5000';
+const API = import.meta.env.VITE_API_URL;
 
 const statusBadge = (status) => {
   const styles = {

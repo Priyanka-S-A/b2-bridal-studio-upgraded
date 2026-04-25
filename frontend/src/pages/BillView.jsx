@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
-const API = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API = import.meta.env.VITE_API_URL;
 
 const BillView = () => {
   const { id } = useParams();

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Search, ShoppingCart, Calendar, Clock, Check, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
-
+const API = import.meta.env.VITE_API_URL;
 const groupServicesByCategory = (data) => {
   if (!Array.isArray(data)) return []; // safety
 
@@ -222,7 +222,7 @@ const Services = () => {
   useEffect(() => {
     const fetchServices = async () => {
   try {
-    const res = await axios.get('http://localhost:5000/api/services');
+    const res = await axios.get(`${API}/api/services`);
     setServices(groupServicesByCategory(res.data));
   } catch (err) {
     console.error('Failed to fetch services', err);

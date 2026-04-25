@@ -3,7 +3,7 @@ import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { fadeUp, staggerContainer } from '../animations/variants';
-
+const API = import.meta.env.VITE_API_URL;
 const Register = () => {
   const [form, setForm] = useState({ name: '', email: '', phone: '', password: '' });
   const [showPw, setShowPw] = useState(false);
@@ -13,7 +13,7 @@ const Register = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await axios.post('http://localhost:5000/api/customer/register', form);
+      const res = await axios.post(`${API}/api/customer/register`, form);
       localStorage.setItem('user', JSON.stringify(res.data.user));
       alert('Registered successfully');
       window.location.href = '/';

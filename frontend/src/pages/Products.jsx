@@ -3,7 +3,7 @@ import axios from 'axios';
 import { motion } from 'framer-motion';
 import { fadeUp, staggerContainer } from '../animations/variants';
 import { useCart } from '../context/CartContext';
-
+const API = import.meta.env.VITE_API_URL;
 const DEMO_PRODUCTS = [
   { _id: 'p1', name: 'Bridal Makeup Kit Pro', category: 'Makeup', price: 4999, image: 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=600&q=80' },
   { _id: 'p2', name: 'Silk Thread Jhumka Set', category: 'Jewellery', price: 799, image: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=600&q=80' },
@@ -20,7 +20,7 @@ const Products = () => {
   const { addToCart, items, openCart } = useCart();
 
   useEffect(() => {
-    axios.get('http://localhost:5000/api/products')
+    axios.get(`${API}/api/products`)
       .then(res => setProducts(res.data.length > 0 ? res.data : DEMO_PRODUCTS))
       .catch(() => setProducts(DEMO_PRODUCTS));
   }, []);

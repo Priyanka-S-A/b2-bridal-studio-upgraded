@@ -3,7 +3,7 @@ import { motion, useInView, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { fadeUp, staggerContainer } from '../animations/variants';
 
-const API = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API = import.meta.env.VITE_API_URL;
 
 const FilterPill = ({ label, active, onClick }) => (
   <button

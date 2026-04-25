@@ -14,13 +14,13 @@ const Attendance = () => {
 
   // 📥 Fetch staff
   const fetchStaff = async () => {
-    const res = await axios.get('http://localhost:5000/api/staff');
+    const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/staff`);
     setStaffList(res.data);
   };
 
   // 📥 Fetch attendance
   const fetchAttendance = async () => {
-    const res = await axios.get('http://localhost:5000/api/attendance');
+    const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/attendance`);
     setRecords(res.data);
   };
 
@@ -36,7 +36,7 @@ const Attendance = () => {
       return;
     }
 
-    await axios.post('http://localhost:5000/api/attendance', form);
+    await axios.post(`${import.meta.env.VITE_API_URL}/api/attendance`, form);
 
     setForm({
       staffId: '',

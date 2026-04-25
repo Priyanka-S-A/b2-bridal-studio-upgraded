@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Plus, Trash2, Edit2, Save, X } from 'lucide-react';
-
+const API = import.meta.env.VITE_API_URL;
 const ManageCourses = () => {
   const [courses, setCourses] = useState([]);
   const [newCourse, setNewCourse] = useState({
@@ -17,7 +17,7 @@ const ManageCourses = () => {
   // 🔥 FETCH COURSES
   const fetchCourses = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/courses');
+      const res = await axios.get(`${API}/api/courses`);
       setCourses(res.data);
     } catch (err) {
       console.error(err);
@@ -34,7 +34,7 @@ const ManageCourses = () => {
       const token = localStorage.getItem("adminToken");
 
       await axios.post(
-        'http://localhost:5000/api/courses',
+        `${API}/api/courses`,
         {
           ...newCourse,
           learnings: newCourse.learnings.split(',')
@@ -59,7 +59,7 @@ const ManageCourses = () => {
     try {
       const token = localStorage.getItem("adminToken");
 
-      await axios.delete(`http://localhost:5000/api/courses/${id}`, {
+      await axios.delete(`${API}/api/courses/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -89,7 +89,7 @@ const ManageCourses = () => {
       const token = localStorage.getItem("adminToken");
 
       await axios.put(
-        `http://localhost:5000/api/courses/${editingId}`,
+        `${API}/api/courses/${editingId}`,
         {
           ...editData,
           learnings: editData.learnings.split(',')

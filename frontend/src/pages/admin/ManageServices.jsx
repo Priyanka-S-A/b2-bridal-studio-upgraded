@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Plus, Trash2, Edit2, Save, X, PlusCircle } from 'lucide-react';
-
+const API = import.meta.env.VITE_API_URL;
 const ManageServices = () => {
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -18,7 +18,7 @@ const ManageServices = () => {
 
   const fetchServices = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/services');
+      const res = await axios.get(`${API}/api/services`);
       setServices(res.data);
     } catch (err) {
       setError('Failed to fetch services.');
@@ -45,9 +45,9 @@ const ManageServices = () => {
 
     try {
       if (currentService._id) {
-        await axios.put(`http://localhost:5000/api/services/${currentService._id}`, payload, config);
+        await axios.put(`${API}/api/services/${currentService._id}`, payload, config);
       } else {
-        await axios.post('http://localhost:5000/api/services', payload, config);
+        await axios.post(`${API}/api/services`, payload, config);
       }
       setIsEditing(false);
       fetchServices();
@@ -60,7 +60,7 @@ const ManageServices = () => {
     if (!window.confirm('Are you sure you want to delete this service?')) return;
     const token = localStorage.getItem('adminToken');
     try {
-      await axios.delete(`http://localhost:5000/api/services/${id}`, {
+      await axios.delete(`${API}/api/services/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       fetchServices();

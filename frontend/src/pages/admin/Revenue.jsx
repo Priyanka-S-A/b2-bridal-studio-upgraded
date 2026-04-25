@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { TrendingUp, Wifi, WifiOff, ExternalLink, Trash2 } from 'lucide-react';
-
-const API = 'http://localhost:5000';
+const API = import.meta.env.VITE_API_URL;
 
 const Revenue = () => {
   const [entries, setEntries] = useState([]);
