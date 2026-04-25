@@ -1,0 +1,65 @@
+const express = require('express');
+const mongoose = require('mongoose');
+const cors = require('cors');
+const dotenv = require('dotenv');
+
+dotenv.config();
+
+const app = express();
+const PORT = process.env.PORT || 5000;
+
+app.use(cors());
+app.use(express.json());
+
+// ✅ VERY IMPORTANT (serve uploaded images)
+app.use('/uploads', express.static('uploads'));
+
+
+// MongoDB connection
+mongoose.connect(process.env.MONGODB_URI)
+  .then(async () => {
+    console.log('MongoDB connected');
+
+    // Auto-seed default users
+    try {
+      const User = require('./models/User');
+      const bcrypt = require('bcryptjs');
+
+      const ownerExists = await User.findOne({ role: 'owner' });
+      if (!ownerExists) {
+        const hashedOwner = await bcrypt.hash('owner123', 10);
+        await User.create({ username: 'owner', password: hashedOwner, role: 'owner' });
+        console.log('[Seed] Created default owner (owner / owner123)');
+      }
+
+      const staffExists = await User.findOne({ role: 'staff' });
+      if (!staffExists) {
+        const hashedStaff = await bcrypt.hash('staff123', 10);
+        await User.create({ username: 'staff', password: hashedStaff, role: 'staff' });
+        console.log('[Seed] Created default staff (staff / staff123)');
+      }
+    } catch (seedErr) {
+      console.error('[Seed] Error seeding default users:', seedErr.message);
+    }
+  })
+  .catch(err => console.error('MongoDB connection error:', err));
+
+
+// Routes
+app.use('/api/auth', require('./routes/auth'));
+app.use('/api/customer', require('./routes/customerAuth'));
+app.use('/api/courses', require('./routes/courses'));
+app.use('/api/services', require('./routes/services'));
+app.use('/api/products', require('./routes/products'));
+app.use('/api/billing', require('./routes/billing'));
+app.use('/api/revenue', require('./routes/revenue'));
+app.use('/api/stock', require('./routes/stock'));
+app.use('/api/attendance', require('./routes/attendance'));
+app.use('/api/staff', require('./routes/staff'));
+app.use('/api/blogs', require('./routes/blogs'));
+app.use('/api/bookings', require('./routes/bookings'));
+
+
+app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
+
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

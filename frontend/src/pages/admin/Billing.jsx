@@ -1,0 +1,447 @@
+import React, { useState, useEffect, useCallback } from 'react';
+import { ShoppingCart, Plus, Trash2, FileText, CheckCircle, Printer, Download, X } from 'lucide-react';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
+
+const API = 'http://localhost:5000';
+
+/* ─── helpers ────────────────────────────────────────────────── */
+const token = () => localStorage.getItem('adminToken');
+const authHeaders = () => ({ Authorization: `Bearer ${token()}` });
+
+export default function Billing() {
+  /* catalogue */
+  const [services, setServices] = useState([]);
+  const [products, setProducts] = useState([]);
+  const [loadingCat, setLoadingCat] = useState(false);
+
+  /* current selection */
+  const [category, setCategory] = useState('services'); // 'services' | 'products'
+  const [selectedItem, setSelectedItem] = useState('');
+  const [qty, setQty] = useState(1);
+
+  /* bill */
+  const [billItems, setBillItems] = useState([]);
+  const [source, setSource] = useState('offline');
+  const [paymentMethod, setPaymentMethod] = useState('cash');
+  const [customer, setCustomer] = useState('Walk-in');
+
+  /* ui state */
+  const [generating, setGenerating] = useState(false);
+  const [successBill, setSuccessBill] = useState(null); // { bill, revenueCreated }
+  const [error, setError] = useState('');
+
+  /* ─── fetch catalogue ──────────────────────────────────────── */
+  const fetchCatalogue = useCallback(async () => {
+    setLoadingCat(true);
+    try {
+      const [sRes, pRes] = await Promise.all([
+        fetch(`${API}/api/services`),
+        fetch(`${API}/api/products`),
+      ]);
+      setServices(await sRes.json());
+      setProducts(await pRes.json());
+    } catch {
+      setError('Failed to load catalogue. Is the server running?');
+    } finally {
+      setLoadingCat(false);
+    }
+  }, []);
+
+  useEffect(() => { fetchCatalogue(); }, [fetchCatalogue]);
+
+  /* ─── current catalogue list ───────────────────────────────── */
+  const catalogueItems = category === 'services'
+    ? services.flatMap(svc =>
+        svc.options && svc.options.length > 0
+          ? svc.options.map(opt => ({ id: `${svc._id}-${opt._id}`, name: `${svc.name} — ${opt.name}`, price: opt.price, itemType: 'service' }))
+          : svc.price ? [{ id: svc._id, name: svc.name, price: svc.price, itemType: 'service' }] : []
+      )
+    : products.map(p => ({ id: p._id, name: p.name, price: p.price, itemType: 'product' }));
+
+  /* ─── add item to bill ─────────────────────────────────────── */
+  const handleAddItem = () => {
+    if (!selectedItem) return;
+    const found = catalogueItems.find(i => i.id === selectedItem);
+    if (!found) return;
+
+    setBillItems(prev => {
+      const existing = prev.findIndex(i => i.id === found.id);
+      if (existing !== -1) {
+        const updated = [...prev];
+        updated[existing] = { ...updated[existing], quantity: updated[existing].quantity + qty };
+        return updated;
+      }
+      return [...prev, { ...found, quantity: qty }];
+    });
+    setSelectedItem('');
+    setQty(1);
+  };
+
+  /* ─── remove item ──────────────────────────────────────────── */
+  const removeItem = (id) => setBillItems(prev => prev.filter(i => i.id !== id));
+
+  /* ─── totals ───────────────────────────────────────────────── */
+  const total = billItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
+
+  /* ─── generate bill ────────────────────────────────────────── */
+  const handleGenerateBill = async () => {
+    if (billItems.length === 0) { setError('Add at least one item before generating a bill.'); return; }
+    setError('');
+    setGenerating(true);
+    try {
+      const payload = {
+        items: billItems.map(i => ({ name: i.name, price: i.price, quantity: i.quantity, itemType: i.itemType })),
+        total,
+        source,
+        paymentMethod,
+        customer: customer.trim() || 'Walk-in',
+      };
+
+      const res = await fetch(`${API}/api/billing/offline`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...authHeaders() },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Server error');
+      }
+
+      const data = await res.json();
+      
+      // If it's the old API response format (just the bill) or new format { success, bill, revenueCreated }
+      const bill = data.bill || data;
+      const revenueCreated = data.revenueCreated !== false;
+
+      setSuccessBill({ bill, revenueCreated });
+      generatePDF(bill);
+      setBillItems([]);
+      setCustomer('Walk-in');
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setGenerating(false);
+    }
+  };
+
+  /* ─── PDF generation ───────────────────────────────────────── */
+  const generatePDF = (bill) => {
+    const doc = new jsPDF();
+
+    // Black header
+    doc.setFillColor(0, 0, 0);
+    doc.rect(0, 0, 210, 42, 'F');
+    doc.setTextColor(201, 162, 39);
+    doc.setFontSize(22);
+    doc.setFont('helvetica', 'bold');
+    doc.text('B2 Bridal Studio', 105, 18, { align: 'center' });
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(180, 160, 120);
+    doc.text('Premium Beauty & Artistry', 105, 27, { align: 'center' });
+    doc.setTextColor(140, 130, 110);
+    doc.text('Offline Bill', 105, 35, { align: 'center' });
+
+    // Bill meta
+    doc.setTextColor(60, 60, 60);
+    doc.setFontSize(10);
+    const billNo = bill._id.slice(-8).toUpperCase();
+    const billDate = new Date(bill.date || bill.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+    doc.text(`Bill #${billNo}`, 15, 54);
+    doc.text(`Date: ${billDate}`, 15, 62);
+    doc.text(`Source: ${bill.source}`, 15, 70);
+    doc.text(`Payment: ${bill.paymentMethod}`, 15, 78);
+    doc.text(`Customer: ${bill.customer || 'Walk-in'}`, 120, 54);
+
+    // Items table
+    const tableData = bill.items.map((item, i) => [
+      i + 1,
+      item.name,
+      item.quantity || 1,
+      `Rs.${item.price.toFixed(2)}`,
+      `Rs.${(item.price * (item.quantity || 1)).toFixed(2)}`,
+    ]);
+
+    autoTable(doc, {
+      startY: 80,
+      head: [['#', 'Item', 'Qty', 'Price', 'Amount']],
+      body: tableData,
+      theme: 'grid',
+      headStyles: { fillColor: [20, 20, 20], textColor: [201, 162, 39], fontStyle: 'bold', fontSize: 9 },
+      bodyStyles: { fontSize: 9, textColor: [50, 50, 50] },
+      alternateRowStyles: { fillColor: [250, 248, 244] },
+      margin: { left: 15, right: 15 },
+    });
+
+    const finalY = doc.lastAutoTable.finalY + 8;
+    doc.setFillColor(248, 246, 242);
+    doc.rect(120, finalY, 75, 18, 'F');
+    doc.setFontSize(13);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(20, 20, 20);
+    doc.text(`Total: Rs.${bill.total.toFixed(2)}`, 193, finalY + 12, { align: 'right' });
+
+    // Footer
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'italic');
+    doc.setTextColor(160, 160, 160);
+    doc.text('Thank you for choosing B2 Bridal Studio', 105, 282, { align: 'center' });
+
+    doc.save(`B2-Bill-${billNo}.pdf`);
+  };
+
+  const handlePrint = (bill) => {
+    const printWin = window.open(`/bill/${bill._id}`, '_blank');
+    if (printWin) printWin.focus();
+  };
+
+  /* ─── render ───────────────────────────────────────────────── */
+  return (
+    <div className="p-4 md:p-6 max-w-5xl mx-auto">
+      {/* Page header */}
+      <div className="mb-6">
+        <h2 className="text-2xl font-bold admin-heading">Offline Billing</h2>
+        <p className="text-sm text-gray-400 mt-1">B2 Bridal Studio — Generate walk-in bills instantly</p>
+      </div>
+
+      {/* Success/Warning banner */}
+      {successBill && (
+        <div className={`mb-6 border rounded-xl p-4 flex items-start gap-3 ${successBill.revenueCreated ? 'bg-green-50 border-green-200' : 'bg-yellow-50 border-yellow-200'}`}>
+          <CheckCircle className={`${successBill.revenueCreated ? 'text-green-500' : 'text-yellow-500'} mt-0.5 shrink-0`} size={20} />
+          <div className="flex-1">
+            <p className={`font-semibold ${successBill.revenueCreated ? 'text-green-800' : 'text-yellow-800'}`}>
+              {successBill.revenueCreated ? 'Bill generated successfully!' : 'Bill generated, but revenue update failed'}
+            </p>
+            <p className={`text-sm mt-0.5 ${successBill.revenueCreated ? 'text-green-600' : 'text-yellow-700'}`}>
+              Bill #{successBill.bill._id.slice(-8).toUpperCase()} — {successBill.revenueCreated ? 'Revenue updated.' : 'Revenue entry was not created due to an error.'}
+            </p>
+            <div className="flex gap-3 mt-3 flex-wrap">
+              <a
+                href={`/bill/${successBill.bill._id}`}
+                target="_blank"
+                rel="noreferrer"
+                className="admin-btn-primary"
+              >
+                <FileText size={14} /> View Bill
+              </a>
+              <button
+                onClick={() => generatePDF(successBill.bill)}
+                className="admin-btn-secondary"
+              >
+                <Download size={14} /> Download PDF
+              </button>
+              <button
+                onClick={() => handlePrint(successBill.bill)}
+                className="admin-btn-secondary"
+              >
+                <Printer size={14} /> Print
+              </button>
+              <button onClick={() => setSuccessBill(null)} className="ml-auto text-gray-400 hover:text-gray-600">
+                <X size={18} />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Error banner */}
+      {error && (
+        <div className="mb-4 bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3 flex justify-between items-center">
+          {error}
+          <button onClick={() => setError('')}><X size={16} /></button>
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+        {/* ── LEFT: Item picker ─────────────────────────────── */}
+        <div className="space-y-4">
+
+          {/* Bill info */}
+          <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 space-y-4">
+            <h3 className="font-semibold text-gray-800 text-sm uppercase tracking-wider">Bill Details</h3>
+
+            <div>
+              <label className="block text-xs font-medium text-gray-500 mb-1">Customer Name</label>
+              <input
+                id="billing-customer"
+                type="text"
+                value={customer}
+                onChange={e => setCustomer(e.target.value)}
+                placeholder="Walk-in"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-medium text-gray-500 mb-1">Source</label>
+              <select
+                id="billing-source"
+                value={source}
+                onChange={e => setSource(e.target.value)}
+                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 bg-white"
+              >
+                <option value="offline">Offline</option>
+                <option value="online">Online</option>
+              </select>
+            </div>
+
+            <div className="mt-4">
+              <label className="block text-xs font-medium text-gray-500 mb-1">Payment Method</label>
+              <select
+                id="billing-payment-method"
+                value={paymentMethod}
+                onChange={e => setPaymentMethod(e.target.value)}
+                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 bg-white"
+              >
+                <option value="cash">Cash</option>
+                <option value="upi">UPI</option>
+                <option value="card">Card</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Category + item picker */}
+          <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 space-y-4">
+            <h3 className="font-semibold text-gray-800 text-sm uppercase tracking-wider">Add Items</h3>
+
+            {/* Category tabs */}
+            <div className="flex gap-2">
+              {['services', 'products'].map(cat => (
+                <button
+                  key={cat}
+                  id={`billing-cat-${cat}`}
+                  onClick={() => { setCategory(cat); setSelectedItem(''); }}
+                  className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors capitalize ${
+                    category === cat
+                      ? 'bg-black text-amber-400'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+
+            {/* Item dropdown */}
+            {loadingCat ? (
+              <div className="text-center py-4 text-sm text-gray-400">Loading catalogue…</div>
+            ) : (
+              <select
+                id="billing-item-select"
+                value={selectedItem}
+                onChange={e => setSelectedItem(e.target.value)}
+                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 bg-white"
+              >
+                <option value="">— Select {category === 'services' ? 'a service' : 'a product'} —</option>
+                {catalogueItems.map(item => (
+                  <option key={item.id} value={item.id}>
+                    {item.name} — ₹{item.price}
+                  </option>
+                ))}
+              </select>
+            )}
+
+            {/* Quantity */}
+            <div className="flex items-center gap-3">
+              <div className="flex-1">
+                <label className="block text-xs font-medium text-gray-500 mb-1">Quantity</label>
+                <input
+                  id="billing-qty"
+                  type="number"
+                  min={1}
+                  value={qty}
+                  onChange={e => setQty(Math.max(1, Number(e.target.value)))}
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
+                />
+              </div>
+              <button
+                id="billing-add-btn"
+                onClick={handleAddItem}
+                disabled={!selectedItem}
+                className="admin-btn-primary mt-5"
+              >
+                <Plus size={16} /> Add
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* ── RIGHT: Bill preview ───────────────────────────── */}
+        <div className="bg-white rounded-xl border border-gray-100 shadow-sm flex flex-col">
+          {/* Bill header */}
+          <div className="bg-black text-center py-5 rounded-t-xl">
+            <p className="text-amber-400 font-bold tracking-widest text-sm uppercase">B2 Bridal Studio</p>
+            <p className="text-amber-200/50 text-xs mt-0.5">Offline Bill Preview</p>
+          </div>
+
+          {/* Items list */}
+          <div className="flex-1 p-5">
+            {billItems.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-12 text-gray-300">
+                <ShoppingCart size={40} strokeWidth={1.2} />
+                <p className="text-sm mt-3">No items added yet</p>
+                <p className="text-xs mt-1">Select a category and add items</p>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {billItems.map(item => (
+                  <div key={item.id} className="flex items-center justify-between py-2.5 border-b border-gray-50 group">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-800 truncate">{item.name}</p>
+                      <p className="text-xs text-gray-400 mt-0.5">
+                        ₹{item.price} × {item.quantity}
+                        <span className="ml-2 px-1.5 py-0.5 rounded bg-gray-100 text-gray-500 capitalize">{item.itemType}</span>
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-3 ml-3">
+                      <span className="font-bold text-gray-900 text-sm whitespace-nowrap">₹{(item.price * item.quantity).toLocaleString()}</span>
+                      <button
+                        onClick={() => removeItem(item.id)}
+                        className="text-gray-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
+                      >
+                        <Trash2 size={15} />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Total + generate */}
+          <div className="border-t border-gray-100 p-5">
+            <div className="flex justify-between items-center mb-4">
+              <span className="text-sm font-medium text-gray-500">Total</span>
+              <span className="text-2xl font-bold text-gray-900">₹{total.toLocaleString()}</span>
+            </div>
+            <div className="flex items-center justify-between text-xs text-gray-400 mb-4">
+              <span>Source: <strong className="text-gray-600 capitalize">{source}</strong> | Payment: <strong className="text-gray-600 capitalize">{paymentMethod}</strong></span>
+              <span>Customer: <strong className="text-gray-600">{customer || 'Walk-in'}</strong></span>
+            </div>
+            <button
+              id="billing-generate-btn"
+              onClick={handleGenerateBill}
+              disabled={billItems.length === 0 || generating}
+              className="w-full py-3.5 bg-amber-500 text-black font-bold rounded-xl text-sm hover:bg-amber-400 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
+            >
+              {generating ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
+                  Generating…
+                </>
+              ) : (
+                <>
+                  <FileText size={16} />
+                  Generate Bill
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
