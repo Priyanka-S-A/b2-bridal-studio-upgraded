@@ -51,8 +51,7 @@ const Navbar = () => {
     // Use window.location to ensure full reset and routing back to home
     window.location.href = '/';
   };
-  const [coursesOpen, setCoursesOpen] = useState(false);
-  const [mobileCoursesOpen, setMobileCoursesOpen] = useState(false);
+
   const dropdownRef = useRef(null);
   const dropdownTimeout = useRef(null);
   const { itemCount, openCart } = useCart();
