@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { fadeUp, staggerContainer } from '../animations/variants';
 
@@ -8,9 +8,17 @@ const UPI_ID = 'b2bridalstudio@upi';
 
 const Payment = () => {
   const navigate = useNavigate();
-  const { items, subtotal, gst, total } = useCart();
+  const location = useLocation();
+  const { items: cartItems, subtotal: cartSubtotal, gst: cartGst, total: cartTotal } = useCart();
 
-  // Redirect if cart is empty
+  // Support both Cart flow and Direct Service flow
+  const serviceData = location.state?.serviceData;
+  const items = cartItems.length > 0 ? cartItems : (serviceData?.items || []);
+  const subtotal = cartItems.length > 0 ? cartSubtotal : (serviceData?.subtotal || 0);
+  const gst = cartItems.length > 0 ? cartGst : (serviceData?.gst || 0);
+  const total = cartItems.length > 0 ? cartTotal : (serviceData?.total || 0);
+
+  // Redirect if both are empty
   if (items.length === 0) {
     return (
       <div style={{ background: '#000', minHeight: '100vh' }} className="flex items-center justify-center">

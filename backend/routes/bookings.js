@@ -29,10 +29,10 @@ const upload = multer({
 // POST /api/bookings — Create a new booking
 router.post('/', upload.single('paymentProof'), async (req, res) => {
   try {
-    const { name, phone, upiId, transactionId, branch, items, total, dateTime, userId } = req.body;
+    const { name, phone, upiId, transactionId, branch, items, total, dateTime, userId, email } = req.body;
 
     const booking = new Booking({
-      userId,
+      userId: email || userId,
       name,
       phone,
       upiId,

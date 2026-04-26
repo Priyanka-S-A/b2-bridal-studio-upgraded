@@ -277,11 +277,13 @@ const Services = () => {
       alert('Please select services before proceeding.');
       return;
     }
-    // Store service cart items in localStorage for the payment flow
-    localStorage.setItem('b2_cart', JSON.stringify(
-      cart.map(item => ({ ...item, quantity: 1 }))
-    ));
-    navigate('/payment');
+    const serviceData = {
+      items: cart.map(item => ({ ...item, quantity: 1 })),
+      subtotal,
+      gst,
+      total
+    };
+    navigate('/payment', { state: { serviceData } });
   };
 
   return (

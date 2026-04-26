@@ -47,6 +47,7 @@ const ConfirmBooking = () => {
       formData.append('transactionId', form.transactionId);
       formData.append('branch', form.branch);
       formData.append('userId', user?.email || '');
+      formData.append('email', user?.email || '');
       formData.append('total', total);
       formData.append('dateTime', new Date().toISOString());
       formData.append('items', JSON.stringify(items.map(i => ({
