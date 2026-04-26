@@ -27,6 +27,32 @@ const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [coursesOpen, setCoursesOpen] = useState(false);
   const [mobileCoursesOpen, setMobileCoursesOpen] = useState(false);
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const [user, setUser] = useState(null);
+  
+  useEffect(() => {
+    const loadUser = () => {
+      const stored = localStorage.getItem('user');
+      setUser(stored ? JSON.parse(stored) : null);
+    };
+    loadUser();
+    window.addEventListener('storage', loadUser);
+    window.addEventListener('userStateChange', loadUser);
+    return () => {
+      window.removeEventListener('storage', loadUser);
+      window.removeEventListener('userStateChange', loadUser);
+    };
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    window.dispatchEvent(new Event('userStateChange'));
+    setProfileDropdownOpen(false);
+    // Use window.location to ensure full reset and routing back to home
+    window.location.href = '/';
+  };
+  const [coursesOpen, setCoursesOpen] = useState(false);
+  const [mobileCoursesOpen, setMobileCoursesOpen] = useState(false);
   const dropdownRef = useRef(null);
   const dropdownTimeout = useRef(null);
   const { itemCount, openCart } = useCart();
@@ -203,18 +229,60 @@ const Navbar = () => {
                 )}
               </button>
 
-              <Link
-                to="/login"
-                className="font-cinzel text-[0.7rem] tracking-[0.15em] uppercase px-4 py-2 transition-all duration-300"
-                style={{ color: 'rgba(248,245,240,0.7)', border: '1px solid rgba(248,245,240,0.15)' }}
-                onMouseEnter={e => { e.currentTarget.style.color = '#FFD700'; e.currentTarget.style.borderColor = 'rgba(255,195,0,0.4)'; }}
-                onMouseLeave={e => { e.currentTarget.style.color = 'rgba(248,245,240,0.7)'; e.currentTarget.style.borderColor = 'rgba(248,245,240,0.15)'; }}
-              >
-                Login
-              </Link>
-              <Link to="/register" className="btn-gold text-[0.7rem] py-2 px-5">
-                Enroll Now
-              </Link>
+              {user ? (
+                <div className="relative">
+                  <button 
+                    onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
+                    className="w-10 h-10 rounded-full flex items-center justify-center font-cinzel text-lg font-bold"
+                    style={{ background: 'rgba(255,195,0,0.1)', border: '1px solid rgba(255,195,0,0.3)', color: '#FFD700' }}
+                  >
+                    {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
+                  </button>
+
+                  <AnimatePresence>
+                    {profileDropdownOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 10 }}
+                        className="absolute right-0 mt-3 py-2 w-48 rounded-sm"
+                        style={{
+                          background: 'rgba(10,8,2,0.96)',
+                          border: '1px solid rgba(255,195,0,0.2)',
+                          backdropFilter: 'blur(20px)',
+                          boxShadow: '0 20px 60px rgba(0,0,0,0.6)',
+                        }}
+                      >
+                        <div className="px-4 py-2 border-b" style={{ borderColor: 'rgba(255,195,0,0.1)' }}>
+                          <p className="font-inter text-sm text-white truncate">{user.name}</p>
+                          <p className="font-inter text-xs text-gray-400 truncate">{user.email}</p>
+                        </div>
+                        <Link to="/profile" onClick={() => setProfileDropdownOpen(false)} className="block px-4 py-3 font-cinzel text-[0.7rem] tracking-[0.1em] uppercase text-white hover:bg-white/5 transition-colors">
+                          My Profile
+                        </Link>
+                        <button onClick={handleLogout} className="w-full text-left px-4 py-3 font-cinzel text-[0.7rem] tracking-[0.1em] uppercase text-red-400 hover:bg-white/5 transition-colors">
+                          Logout
+                        </button>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              ) : (
+                <>
+                  <Link
+                    to="/login"
+                    className="font-cinzel text-[0.7rem] tracking-[0.15em] uppercase px-4 py-2 transition-all duration-300"
+                    style={{ color: 'rgba(248,245,240,0.7)', border: '1px solid rgba(248,245,240,0.15)' }}
+                    onMouseEnter={e => { e.currentTarget.style.color = '#FFD700'; e.currentTarget.style.borderColor = 'rgba(255,195,0,0.4)'; }}
+                    onMouseLeave={e => { e.currentTarget.style.color = 'rgba(248,245,240,0.7)'; e.currentTarget.style.borderColor = 'rgba(248,245,240,0.15)'; }}
+                  >
+                    Login
+                  </Link>
+                  <Link to="/register" className="btn-gold text-[0.7rem] py-2 px-5">
+                    Enroll Now
+                  </Link>
+                </>
+              )}
             </div>
 
             {/* Mobile: Cart + Hamburger */}
@@ -321,10 +389,21 @@ const Navbar = () => {
               )}
             </div>
           ))}
-          <div className="mt-8 flex flex-col gap-3 pb-8">
-            <Link to="/login" className="btn-outline-gold text-center text-xs py-3" onClick={() => setMenuOpen(false)}>Login</Link>
-            <Link to="/register" className="btn-gold text-center text-xs py-3" onClick={() => setMenuOpen(false)}>Enroll Now</Link>
-          </div>
+            {user ? (
+              <div className="mt-8 flex flex-col gap-3 pb-8 border-t pt-4" style={{ borderColor: 'rgba(255,195,0,0.1)' }}>
+                <div className="px-2 mb-2">
+                  <p className="font-cinzel text-sm text-gold-gradient">{user.name}</p>
+                  <p className="font-inter text-xs text-gray-500">{user.email}</p>
+                </div>
+                <Link to="/profile" className="btn-outline-gold text-center text-xs py-3" onClick={() => setMenuOpen(false)}>My Profile</Link>
+                <button onClick={() => { setMenuOpen(false); handleLogout(); }} className="btn-gold text-center text-xs py-3" style={{ background: '#ef4444', color: '#fff', borderColor: '#ef4444' }}>Logout</button>
+              </div>
+            ) : (
+              <div className="mt-8 flex flex-col gap-3 pb-8">
+                <Link to="/login" className="btn-outline-gold text-center text-xs py-3" onClick={() => setMenuOpen(false)}>Login</Link>
+                <Link to="/register" className="btn-gold text-center text-xs py-3" onClick={() => setMenuOpen(false)}>Enroll Now</Link>
+              </div>
+            )}
         </div>
       </motion.div>
 

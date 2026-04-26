@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { fadeUp, staggerContainer } from '../animations/variants';
 
-const API = import.meta.env.VITE_API_URL;
+const API = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 const Login = () => {
+  const navigate = useNavigate();
+  const navigate = useNavigate();
   const [form, setForm] = useState({ email: '', password: '' });
   const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -17,8 +19,11 @@ const Login = () => {
     try {
       const res = await axios.post(`${API}/api/customer/login`, form);
       localStorage.setItem('user', JSON.stringify(res.data.user));
-      alert('Login successful');
-      window.location.href = '/';
+      
+      // Dispatch custom event to notify Navbar of login
+      window.dispatchEvent(new Event('userStateChange'));
+      
+      navigate('/profile');
     } catch (err) {
       alert(err.response?.data?.error || 'Login failed');
     } finally {

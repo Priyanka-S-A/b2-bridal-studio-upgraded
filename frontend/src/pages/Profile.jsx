@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { fadeUp, staggerContainer } from '../animations/variants';
 
 const API = import.meta.env.VITE_API_URL;
@@ -28,16 +28,7 @@ const Profile = () => {
   }, []);
 
   if (!user) {
-    return (
-      <div style={{ background: '#000', minHeight: '100vh' }} className="flex items-center justify-center">
-        <div className="text-center px-6">
-          <span className="text-5xl block mb-6">🔒</span>
-          <h2 className="font-cinzel text-lg tracking-[0.1em] uppercase mb-3" style={{ color: '#F8F5F0' }}>Please Login</h2>
-          <p className="font-cormorant italic mb-6" style={{ color: 'rgba(248,245,240,0.4)' }}>Login to view your bookings and order history.</p>
-          <Link to="/login" className="btn-gold py-3 px-8 text-xs">Login</Link>
-        </div>
-      </div>
-    );
+    return <Navigate to="/login" replace />;
   }
 
   return (

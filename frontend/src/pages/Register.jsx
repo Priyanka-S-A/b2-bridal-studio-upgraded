@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { fadeUp, staggerContainer } from '../animations/variants';
-const API = import.meta.env.VITE_API_URL;
+const API = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 const Register = () => {
+  const navigate = useNavigate();
   const [form, setForm] = useState({ name: '', email: '', phone: '', password: '' });
   const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -14,9 +15,8 @@ const Register = () => {
     setLoading(true);
     try {
       const res = await axios.post(`${API}/api/customer/register`, form);
-      localStorage.setItem('user', JSON.stringify(res.data.user));
       alert('Registered successfully');
-      window.location.href = '/';
+      navigate('/login');
     } catch (err) {
       alert(err.response?.data?.error || 'Registration failed');
     } finally {
