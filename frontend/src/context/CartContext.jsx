@@ -28,18 +28,18 @@ export const CartProvider = ({ children }) => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
   }, [items]);
 
-  const addToCart = useCallback((product) => {
+  const addToCart = useCallback((product, quantityToAdd = 1) => {
     setItems(prev => {
       const key = product._id || product.id;
       const existing = prev.find(i => (i._id || i.id) === key);
       if (existing) {
         return prev.map(i =>
           (i._id || i.id) === key
-            ? { ...i, quantity: i.quantity + 1 }
+            ? { ...i, quantity: i.quantity + quantityToAdd }
             : i
         );
       }
-      return [...prev, { ...product, quantity: 1 }];
+      return [...prev, { ...product, quantity: quantityToAdd }];
     });
   }, []);
 
@@ -67,13 +67,12 @@ export const CartProvider = ({ children }) => {
 
   const itemCount = items.reduce((sum, i) => sum + i.quantity, 0);
   const subtotal = items.reduce((sum, i) => sum + (i.price || 0) * i.quantity, 0);
-  const gst = subtotal * 0.18;
-  const total = subtotal + gst;
+  const total = subtotal;
 
   return (
     <CartContext.Provider
       value={{
-        items, itemCount, subtotal, gst, total,
+        items, itemCount, subtotal, total,
         isOpen, openCart, closeCart, toggleCart,
         addToCart, removeFromCart, updateQuantity, clearCart,
       }}

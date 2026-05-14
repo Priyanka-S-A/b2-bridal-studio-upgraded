@@ -4,7 +4,7 @@ import { useCart } from '../context/CartContext';
 import { Link } from 'react-router-dom';
 
 const CartDrawer = () => {
-  const { items, itemCount, subtotal, gst, total, isOpen, closeCart, removeFromCart, updateQuantity } = useCart();
+  const { items, itemCount, subtotal, total, isOpen, closeCart, removeFromCart, updateQuantity } = useCart();
 
   return (
     <AnimatePresence>
@@ -152,10 +152,6 @@ const CartDrawer = () => {
                   <div className="flex justify-between font-cormorant text-sm" style={{ color: 'rgba(248,245,240,0.5)' }}>
                     <span>Subtotal</span>
                     <span>₹{subtotal.toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between font-cormorant text-sm" style={{ color: 'rgba(248,245,240,0.5)' }}>
-                    <span>GST (18%)</span>
-                    <span>₹{gst.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between font-cinzel text-sm tracking-wider pt-2" style={{ color: '#F8F5F0', borderTop: '1px solid rgba(255,195,0,0.1)' }}>
                     <span>Total</span>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { fadeUp, staggerContainer } from '../animations/variants';
 import { useCart } from '../context/CartContext';
 const API = import.meta.env.VITE_API_URL;
@@ -17,6 +17,8 @@ const DEMO_PRODUCTS = [
 
 const Products = () => {
   const [products, setProducts] = useState([]);
+  const [quantities, setQuantities] = useState({});
+  const [toast, setToast] = useState(null);
   const { addToCart, items, openCart } = useCart();
 
   useEffect(() => {
@@ -26,6 +28,25 @@ const Products = () => {
   }, []);
 
   const isInCart = (id) => items.some(i => (i._id || i.id) === id);
+
+  const handleQuantityChange = (id, delta) => {
+    setQuantities(prev => {
+      const current = prev[id] || 1;
+      const next = current + delta;
+      return { ...prev, [id]: next < 1 ? 1 : next };
+    });
+  };
+
+  const handleAddToCart = (product) => {
+    const qty = quantities[product._id] || 1;
+    addToCart(product, qty);
+    
+    const id = Date.now();
+    setToast({ message: `${product.name} (Qty: ${qty}) added to cart`, id });
+    setTimeout(() => {
+      setToast(current => current?.id === id ? null : current);
+    }, 3000);
+  };
 
   return (
     <div style={{ background: '#000', minHeight: '100vh' }}>
@@ -74,7 +95,7 @@ const Products = () => {
                   <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-500">
                     {!inCart && (
                       <button
-                        onClick={() => addToCart(product)}
+                        onClick={() => handleAddToCart(product)}
                         className="px-6 py-2 font-cinzel text-[0.6rem] tracking-[0.2em] uppercase transition-all"
                         style={{ background: 'rgba(255,195,0,0.95)', color: '#000' }}
                       >
@@ -90,32 +111,92 @@ const Products = () => {
                 </div>
 
                 {/* Content */}
-                <div className="p-4">
-                  <h3 className="font-playfair text-sm mb-2 leading-tight" style={{ color: '#F8F5F0' }}>{product.name}</h3>
-                  <div className="flex items-center justify-between">
-                    <span className="font-cinzel text-sm" style={{ color: '#FFD700' }}>₹{product.price?.toLocaleString()}</span>
-                    <button
-                      onClick={() => inCart ? openCart() : addToCart(product)}
-                      className="w-8 h-8 flex items-center justify-center rounded-full transition-all duration-200"
-                      style={{
-                        border: `1px solid ${inCart ? '#FFD700' : 'rgba(255,195,0,0.3)'}`,
-                        background: inCart ? 'rgba(255,195,0,0.15)' : 'transparent',
-                        color: '#FFD700',
-                      }}
-                    >
-                      {inCart ? (
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12l5 5L19 7" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                      ) : (
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" strokeLinecap="round" strokeLinejoin="round"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
-                      )}
-                    </button>
+                <div className="p-4 flex flex-col justify-between" style={{ minHeight: '160px' }}>
+                  <div>
+                    <h3 className="font-playfair text-sm mb-2 leading-tight" style={{ color: '#F8F5F0' }}>{product.name}</h3>
+                    <span className="font-cinzel text-sm block mb-3" style={{ color: '#FFD700' }}>₹{product.price?.toLocaleString()}</span>
                   </div>
+                  
+                  {/* Quantity & Add to Cart */}
+                  {!inCart ? (
+                    <div className="flex flex-col gap-3 mt-auto pt-3" style={{ borderTop: '1px solid rgba(255,195,0,0.1)' }}>
+                      <div className="flex items-center justify-between">
+                        <span className="font-cinzel text-[0.6rem] tracking-[0.1em] uppercase" style={{ color: 'rgba(248,245,240,0.5)' }}>Quantity</span>
+                        <div className="flex items-center gap-3">
+                          <button
+                            onClick={() => handleQuantityChange(product._id, -1)}
+                            className="w-6 h-6 flex items-center justify-center rounded-sm transition-colors"
+                            style={{ border: '1px solid rgba(255,195,0,0.3)', color: '#FFD700' }}
+                            onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,195,0,0.1)'; }}
+                            onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}
+                          >
+                            −
+                          </button>
+                          <span className="font-cinzel text-xs w-4 text-center" style={{ color: '#F8F5F0' }}>
+                            {quantities[product._id] || 1}
+                          </span>
+                          <button
+                            onClick={() => handleQuantityChange(product._id, 1)}
+                            className="w-6 h-6 flex items-center justify-center rounded-sm transition-colors"
+                            style={{ border: '1px solid rgba(255,195,0,0.3)', color: '#FFD700' }}
+                            onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,195,0,0.1)'; }}
+                            onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}
+                          >
+                            +
+                          </button>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => handleAddToCart(product)}
+                        className="w-full py-2 font-cinzel text-[0.6rem] tracking-[0.2em] uppercase transition-all rounded-sm"
+                        style={{ background: 'rgba(255,195,0,0.1)', border: '1px solid rgba(255,195,0,0.3)', color: '#FFD700' }}
+                        onMouseEnter={e => { e.currentTarget.style.background = '#FFD700'; e.currentTarget.style.color = '#000'; }}
+                        onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,195,0,0.1)'; e.currentTarget.style.color = '#FFD700'; }}
+                      >
+                        Add to Cart
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="mt-auto pt-3" style={{ borderTop: '1px solid rgba(255,195,0,0.1)' }}>
+                      <button
+                        onClick={openCart}
+                        className="w-full py-2 font-cinzel text-[0.6rem] tracking-[0.2em] uppercase transition-all flex items-center justify-center gap-2 rounded-sm"
+                        style={{ background: 'rgba(255,195,0,0.15)', border: '1px solid #FFD700', color: '#FFD700' }}
+                      >
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12l5 5L19 7" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                        View Cart
+                      </button>
+                    </div>
+                  )}
                 </div>
               </motion.div>
             );
           })}
         </div>
       </div>
+      {/* Toast Notification */}
+      <AnimatePresence>
+        {toast && (
+          <motion.div
+            initial={{ opacity: 0, y: 50, x: '-50%' }}
+            animate={{ opacity: 1, y: 0, x: '-50%' }}
+            exit={{ opacity: 0, y: 20, x: '-50%' }}
+            className="fixed bottom-8 left-1/2 z-[250] px-6 py-3 rounded-full flex items-center gap-3 shadow-2xl w-max max-w-[90vw]"
+            style={{
+              background: 'rgba(5,5,3,0.98)',
+              border: '1px solid rgba(255,195,0,0.3)',
+              backdropFilter: 'blur(10px)',
+            }}
+          >
+            <div className="w-6 h-6 rounded-full flex items-center justify-center" style={{ background: 'rgba(255,195,0,0.2)' }}>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#FFD700" strokeWidth="2">
+                <path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </div>
+            <span className="font-playfair text-sm" style={{ color: '#F8F5F0' }}>{toast.message}</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
