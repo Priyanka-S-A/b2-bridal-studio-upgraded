@@ -15,8 +15,9 @@ const Payment = () => {
   const serviceData = location.state?.serviceData;
   const items = cartItems.length > 0 ? cartItems : (serviceData?.items || []);
   const subtotal = cartItems.length > 0 ? cartSubtotal : (serviceData?.subtotal || 0);
-  const gst = cartItems.length > 0 ? cartGst : (serviceData?.gst || 0);
+  const gst = cartItems.length > 0 ? cartGst : 0; // no GST for service flow
   const total = cartItems.length > 0 ? cartTotal : (serviceData?.total || 0);
+  const isServiceFlow = cartItems.length === 0 && !!serviceData;
 
   // Redirect if both are empty
   if (items.length === 0) {
@@ -180,16 +181,19 @@ const Payment = () => {
               <div className="flex justify-between font-cormorant text-sm" style={{ color: 'rgba(248,245,240,0.5)' }}>
                 <span>Subtotal</span><span>₹{subtotal.toFixed(2)}</span>
               </div>
-              <div className="flex justify-between font-cormorant text-sm" style={{ color: 'rgba(248,245,240,0.5)' }}>
-                <span>GST (18%)</span><span>₹{gst.toFixed(2)}</span>
-              </div>
+              {/* Show GST only for cart/product flow */}
+              {!isServiceFlow && (
+                <div className="flex justify-between font-cormorant text-sm" style={{ color: 'rgba(248,245,240,0.5)' }}>
+                  <span>GST (18%)</span><span>₹{gst.toFixed(2)}</span>
+                </div>
+              )}
               <div className="flex justify-between font-cinzel text-base pt-2" style={{ borderTop: '1px solid rgba(255,195,0,0.08)', color: '#F8F5F0' }}>
                 <span>Total</span><span style={{ color: '#FFD700' }}>₹{total.toFixed(2)}</span>
               </div>
             </div>
 
             <button
-              onClick={() => navigate('/confirm-booking')}
+              onClick={() => navigate('/confirm-booking', { state: { serviceData } })}
               className="btn-gold w-full justify-center mt-8 py-4"
             >
               Confirm Booking

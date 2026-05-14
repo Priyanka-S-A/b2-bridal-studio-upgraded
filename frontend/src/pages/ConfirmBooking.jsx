@@ -1,22 +1,31 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { fadeUp, staggerContainer } from '../animations/variants';
 
 const API = import.meta.env.VITE_API_URL;
 
+const HOUR_LABELS = { '10':'10 AM','11':'11 AM','12':'12 PM','13':'1 PM','14':'2 PM','15':'3 PM','16':'4 PM','17':'5 PM','18':'6 PM','19':'7 PM' };
+
 const ConfirmBooking = () => {
   const navigate = useNavigate();
-  const { items, total, clearCart } = useCart();
+  const location = useLocation();
+  const { items: cartItems, total: cartTotal, clearCart } = useCart();
   const user = JSON.parse(localStorage.getItem('user') || 'null');
+
+  // Support direct service flow (via serviceData) AND cart flow
+  const serviceData = location.state?.serviceData || null;
+  const isServiceFlow = !!serviceData && cartItems.length === 0;
+  const items = isServiceFlow ? (serviceData.items || []) : cartItems;
+  const total = isServiceFlow ? (serviceData.total || 0) : cartTotal;
 
   const [form, setForm] = useState({
     name: user?.name || '',
     phone: user?.phone || '',
     upiId: '',
     transactionId: '',
-    branch: 'Chennai',
+    branch: serviceData?.branch || 'Chennai',
   });
   const [paymentProof, setPaymentProof] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -38,6 +47,11 @@ const ConfirmBooking = () => {
     e.preventDefault();
     if (!validate()) return;
 
+    // Build dateTime: use chosen slot from serviceData, else current time
+    const dateTime = (serviceData?.date && serviceData?.hour)
+      ? `${serviceData.date}T${String(serviceData.hour).padStart(2, '0')}:00:00`
+      : new Date().toISOString();
+
     setLoading(true);
     try {
       const formData = new FormData();
@@ -49,7 +63,7 @@ const ConfirmBooking = () => {
       formData.append('userId', user?.email || '');
       formData.append('email', user?.email || '');
       formData.append('total', total);
-      formData.append('dateTime', new Date().toISOString());
+      formData.append('dateTime', dateTime);
       formData.append('items', JSON.stringify(items.map(i => ({
         name: i.name,
         price: i.price,
@@ -83,6 +97,11 @@ const ConfirmBooking = () => {
       </div>
     );
   }
+
+  // Format scheduled slot label for display
+  const scheduledLabel = (serviceData?.date && serviceData?.hour)
+    ? `${new Date(serviceData.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })} at ${HOUR_LABELS[serviceData.hour] || serviceData.hour}`
+    : null;
 
   return (
     <div style={{ background: '#000', minHeight: '100vh' }}>
@@ -205,12 +224,20 @@ const ConfirmBooking = () => {
             </div>
 
             <div className="mt-5 p-3 rounded-sm" style={{ background: 'rgba(255,195,0,0.05)', border: '1px solid rgba(255,195,0,0.08)' }}>
-              <p className="font-cormorant italic text-xs" style={{ color: 'rgba(248,245,240,0.4)' }}>
-                📅 Date: {new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}
-              </p>
-              <p className="font-cormorant italic text-xs mt-1" style={{ color: 'rgba(248,245,240,0.4)' }}>
-                🕐 Time: {new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
-              </p>
+              {scheduledLabel ? (
+                <p className="font-cormorant italic text-xs" style={{ color: 'rgba(248,245,240,0.4)' }}>
+                  📅 Scheduled: {scheduledLabel}
+                </p>
+              ) : (
+                <>
+                  <p className="font-cormorant italic text-xs" style={{ color: 'rgba(248,245,240,0.4)' }}>
+                    📅 Date: {new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}
+                  </p>
+                  <p className="font-cormorant italic text-xs mt-1" style={{ color: 'rgba(248,245,240,0.4)' }}>
+                    🕐 Time: {new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
+                  </p>
+                </>
+              )}
             </div>
           </motion.div>
         </div>

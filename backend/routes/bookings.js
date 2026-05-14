@@ -102,6 +102,28 @@ router.patch('/:id/reject', async (req, res) => {
   }
 });
 
+// GET /api/bookings/slot-check — Check slot availability (Approved bookings only)
+router.get('/slot-check', async (req, res) => {
+  try {
+    const { branch, date, hour } = req.query;
+    if (!branch || !date || !hour) {
+      return res.status(400).json({ error: 'branch, date, and hour are required' });
+    }
+    // dateTime is stored as ISO string like "2026-05-14T10:00:00.000Z" or "2026-05-14T10:00:00"
+    // We match by branch, Approved status, and dateTime starting with the date+hour
+    const paddedHour = String(hour).padStart(2, '0');
+    const prefix = `${date}T${paddedHour}`;
+    const count = await Booking.countDocuments({
+      branch,
+      status: 'Approved',
+      dateTime: { $regex: `^${prefix}` }
+    });
+    res.json({ count, available: count < 3 });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // GET /api/bookings/bill/:id — Get bill by ID
 router.get('/bill/:id', async (req, res) => {
   try {

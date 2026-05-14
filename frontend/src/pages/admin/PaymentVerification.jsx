@@ -3,6 +3,19 @@ import axios from 'axios';
 
 const API = import.meta.env.VITE_API_URL;
 
+const HOUR_LABELS = { '10':'10 AM','11':'11 AM','12':'12 PM','13':'1 PM','14':'2 PM','15':'3 PM','16':'4 PM','17':'5 PM','18':'6 PM','19':'7 PM' };
+
+const formatScheduled = (dateTime) => {
+  if (!dateTime) return null;
+  try {
+    const d = new Date(dateTime);
+    const datePart = d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+    const hour = String(d.getHours());
+    const timePart = HOUR_LABELS[hour] || d.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+    return `${datePart} – ${timePart}`;
+  } catch { return dateTime; }
+};
+
 const statusBadge = (status) => {
   const styles = {
     Pending: 'bg-yellow-50 text-yellow-700 border-yellow-200',
@@ -134,6 +147,11 @@ const PaymentVerification = () => {
                   <td className="p-4 pl-6">
                     <div className="font-medium text-gray-900">{b.name}</div>
                     <div className="text-xs text-gray-500">{b.phone}</div>
+                    {b.dateTime && (
+                      <div className="text-xs text-indigo-600 mt-1 font-medium">
+                        📅 {formatScheduled(b.dateTime)}
+                      </div>
+                    )}
                   </td>
                   <td className="p-4">
                     <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs font-medium">{b.branch}</span>

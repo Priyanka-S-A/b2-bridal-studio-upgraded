@@ -1,7 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { Search, ShoppingCart, Calendar, Clock, Check, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
+import { Search, ShoppingCart, Calendar, Clock, Check, Trash2, ChevronDown, ChevronUp, MapPin } from 'lucide-react';
+
+const HOUR_SLOTS = [
+  { label: '10 AM', value: '10' },
+  { label: '11 AM', value: '11' },
+  { label: '12 PM', value: '12' },
+  { label: '1 PM',  value: '13' },
+  { label: '2 PM',  value: '14' },
+  { label: '3 PM',  value: '15' },
+  { label: '4 PM',  value: '16' },
+  { label: '5 PM',  value: '17' },
+  { label: '6 PM',  value: '18' },
+  { label: '7 PM',  value: '19' },
+];
 const API = import.meta.env.VITE_API_URL;
 const groupServicesByCategory = (data) => {
   if (!Array.isArray(data)) return []; // safety
@@ -214,8 +227,11 @@ const Services = () => {
   const [cart, setCart] = useState([]);
   const [bookingDate, setBookingDate] = useState('');
   const [bookingTime, setBookingTime] = useState('');
+  const [bookingBranch, setBookingBranch] = useState('');
+  const [bookingErrors, setBookingErrors] = useState({});
+  const [slotChecking, setSlotChecking] = useState(false);
   const [loading, setLoading] = useState(true);
-  
+
   const [expandedCategory, setExpandedCategory] = useState(null);
   const [selectedOptions, setSelectedOptions] = useState({});
 
@@ -263,25 +279,51 @@ const Services = () => {
   };
 
   const subtotal = cart.reduce((acc, curr) => acc + curr.price, 0);
-  const gst = subtotal * 0.18;
-  const total = subtotal + gst;
+  const total = subtotal; // GST already included in service prices
 
-  const handleProceedToPayment = () => {
+  const handleProceedToPayment = async () => {
     const userData = localStorage.getItem('user');
     if (!userData) {
-      alert('Please login first');
       navigate('/login');
       return;
     }
-    if (cart.length === 0) {
-      alert('Please select services before proceeding.');
+    if (cart.length === 0) return;
+
+    // Inline validation — no alert()
+    const errs = {};
+    if (!bookingBranch) errs.branch = 'Please select a branch';
+    if (!bookingDate)   errs.date   = 'Please select a booking date';
+    if (!bookingTime)   errs.time   = 'Please select a booking time';
+    if (Object.keys(errs).length > 0) {
+      setBookingErrors(errs);
       return;
     }
+    setBookingErrors({});
+
+    // Slot availability check
+    setSlotChecking(true);
+    try {
+      const res = await fetch(
+        `${API}/api/bookings/slot-check?branch=${encodeURIComponent(bookingBranch)}&date=${encodeURIComponent(bookingDate)}&hour=${encodeURIComponent(bookingTime)}`
+      );
+      const data = await res.json();
+      if (!data.available) {
+        setBookingErrors({ slot: 'This slot is fully booked for the selected branch. Please choose another time or branch.' });
+        setSlotChecking(false);
+        return;
+      }
+    } catch (_) {
+      // If slot-check fails (network), allow through — backend is source of truth
+    }
+    setSlotChecking(false);
+
     const serviceData = {
       items: cart.map(item => ({ ...item, quantity: 1 })),
       subtotal,
-      gst,
-      total
+      total,
+      branch: bookingBranch,
+      date: bookingDate,
+      hour: bookingTime,
     };
     navigate('/payment', { state: { serviceData } });
   };
@@ -367,14 +409,73 @@ const Services = () => {
           <div className="glass-dark rounded-sm p-6 sticky top-24" style={{ border: '1px solid rgba(255,195,0,0.15)' }}>
             <h2 className="font-cinzel text-sm tracking-[0.2em] uppercase mb-6 pb-4" style={{ color: '#F8F5F0', borderBottom: '1px solid rgba(255,195,0,0.1)' }}>Your Booking</h2>
             <div className="flex flex-col gap-4 mb-8">
+
+              {/* Branch */}
               <div>
-                <label className="block font-cinzel text-[0.55rem] tracking-[0.2em] uppercase mb-2" style={{ color: 'rgba(255,195,0,0.5)' }}>Date</label>
-                <div className="relative"><input type="date" value={bookingDate} onChange={(e) => setBookingDate(e.target.value)} className="input-luxury pl-10 rounded-sm text-sm" /><Calendar className="absolute left-3 top-3.5" size={16} style={{ color: '#FFD700' }} /></div>
+                <label className="block font-cinzel text-[0.55rem] tracking-[0.2em] uppercase mb-2" style={{ color: 'rgba(255,195,0,0.5)' }}>Branch *</label>
+                <div className="flex gap-2">
+                  {['Chennai', 'Madurai'].map(branch => (
+                    <button
+                      key={branch}
+                      type="button"
+                      onClick={() => { setBookingBranch(branch); setBookingErrors(prev => ({ ...prev, branch: '' })); }}
+                      className="flex-1 py-2.5 font-cinzel text-[0.6rem] tracking-[0.15em] uppercase rounded-sm transition-all"
+                      style={{
+                        border: bookingBranch === branch ? '1px solid #FFD700' : '1px solid rgba(255,195,0,0.2)',
+                        background: bookingBranch === branch ? 'rgba(255,215,0,0.12)' : 'transparent',
+                        color: bookingBranch === branch ? '#FFD700' : 'rgba(248,245,240,0.45)',
+                        fontWeight: bookingBranch === branch ? 700 : 400,
+                      }}
+                    >
+                      {branch}
+                    </button>
+                  ))}
+                </div>
+                {bookingErrors.branch && <p className="text-xs mt-1" style={{ color: '#ef4444' }}>{bookingErrors.branch}</p>}
               </div>
+
+              {/* Date */}
               <div>
-                <label className="block font-cinzel text-[0.55rem] tracking-[0.2em] uppercase mb-2" style={{ color: 'rgba(255,195,0,0.5)' }}>Time</label>
-                <div className="relative"><input type="time" value={bookingTime} onChange={(e) => setBookingTime(e.target.value)} className="input-luxury pl-10 rounded-sm text-sm" /><Clock className="absolute left-3 top-3.5" size={16} style={{ color: '#FFD700' }} /></div>
+                <label className="block font-cinzel text-[0.55rem] tracking-[0.2em] uppercase mb-2" style={{ color: 'rgba(255,195,0,0.5)' }}>Date *</label>
+                <div className="relative">
+                  <input
+                    type="date"
+                    value={bookingDate}
+                    onChange={(e) => { setBookingDate(e.target.value); setBookingErrors(prev => ({ ...prev, date: '', slot: '' })); }}
+                    className="input-luxury pl-10 rounded-sm text-sm"
+                  />
+                  <Calendar className="absolute left-3 top-3.5" size={16} style={{ color: '#FFD700' }} />
+                </div>
+                {bookingErrors.date && <p className="text-xs mt-1" style={{ color: '#ef4444' }}>{bookingErrors.date}</p>}
               </div>
+
+              {/* Time — hourly slots only */}
+              <div>
+                <label className="block font-cinzel text-[0.55rem] tracking-[0.2em] uppercase mb-2" style={{ color: 'rgba(255,195,0,0.5)' }}>Time Slot *</label>
+                <div className="relative">
+                  <select
+                    value={bookingTime}
+                    onChange={(e) => { setBookingTime(e.target.value); setBookingErrors(prev => ({ ...prev, time: '', slot: '' })); }}
+                    className="input-luxury pl-10 rounded-sm text-sm"
+                    style={{ background: 'rgba(255,255,255,0.03)' }}
+                  >
+                    <option value="" style={{ background: '#111' }}>Select a time slot</option>
+                    {HOUR_SLOTS.map(slot => (
+                      <option key={slot.value} value={slot.value} style={{ background: '#111' }}>{slot.label}</option>
+                    ))}
+                  </select>
+                  <Clock className="absolute left-3 top-3.5" size={16} style={{ color: '#FFD700' }} />
+                </div>
+                {bookingErrors.time && <p className="text-xs mt-1" style={{ color: '#ef4444' }}>{bookingErrors.time}</p>}
+              </div>
+
+              {/* Slot full error */}
+              {bookingErrors.slot && (
+                <p className="text-xs px-3 py-2 rounded-sm" style={{ color: '#ef4444', background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)' }}>
+                  {bookingErrors.slot}
+                </p>
+              )}
+
             </div>
             <h3 className="font-cinzel text-[0.55rem] tracking-[0.2em] uppercase mb-3" style={{ color: 'rgba(255,195,0,0.5)' }}>Selected Services</h3>
             {cart.length === 0 ? (
@@ -389,13 +490,22 @@ const Services = () => {
             )}
             {cart.length > 0 && (
               <div className="pt-4 mb-4 flex flex-col gap-2 text-sm" style={{ borderTop: '1px solid rgba(255,195,0,0.1)' }}>
-                <div className="flex justify-between font-cormorant" style={{ color: 'rgba(248,245,240,0.5)' }}><span>Subtotal</span><span>₹{subtotal.toFixed(2)}</span></div>
-                <div className="flex justify-between font-cormorant" style={{ color: 'rgba(248,245,240,0.5)' }}><span>GST (18%)</span><span>₹{gst.toFixed(2)}</span></div>
-                <div className="flex justify-between font-cinzel text-sm pt-2" style={{ borderTop: '1px solid rgba(255,195,0,0.08)', color: '#F8F5F0' }}><span>Total</span><span style={{ color: '#FFD700' }}>₹{total.toFixed(2)}</span></div>
+                <div className="flex justify-between font-cinzel text-sm" style={{ color: '#F8F5F0' }}><span>Total</span><span style={{ color: '#FFD700' }}>₹{total.toFixed(2)}</span></div>
               </div>
             )}
-            <button onClick={handleProceedToPayment} disabled={cart.length === 0} className="w-full py-3 font-cinzel text-[0.65rem] tracking-[0.15em] uppercase flex items-center justify-center gap-2 transition-all rounded-sm" style={{ background: cart.length > 0 ? 'linear-gradient(135deg, #FFD700, #FFE566)' : 'rgba(255,255,255,0.03)', color: cart.length > 0 ? '#000' : 'rgba(248,245,240,0.3)', cursor: cart.length > 0 ? 'pointer' : 'not-allowed', fontWeight: 700 }}>
-              Proceed to Payment
+            <button
+              onClick={handleProceedToPayment}
+              disabled={cart.length === 0 || slotChecking}
+              className="w-full py-3 font-cinzel text-[0.65rem] tracking-[0.15em] uppercase flex items-center justify-center gap-2 transition-all rounded-sm"
+              style={{
+                background: cart.length > 0 ? 'linear-gradient(135deg, #FFD700, #FFE566)' : 'rgba(255,255,255,0.03)',
+                color: cart.length > 0 ? '#000' : 'rgba(248,245,240,0.3)',
+                cursor: cart.length > 0 && !slotChecking ? 'pointer' : 'not-allowed',
+                fontWeight: 700,
+                opacity: slotChecking ? 0.7 : 1,
+              }}
+            >
+              {slotChecking ? 'Checking availability...' : 'Proceed to Payment'}
             </button>
           </div>
         </div>
