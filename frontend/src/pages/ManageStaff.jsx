@@ -131,6 +131,7 @@ const ManageStaff = () => {
       <table className="w-full border">
         <thead>
           <tr className="bg-gray-100">
+            <th>Staff ID</th>
             <th>Name</th>
             <th>Phone</th>
             <th>Email</th>
@@ -142,6 +143,7 @@ const ManageStaff = () => {
         <tbody>
           {staffList.map((s) => (
             <tr key={s._id} className="text-center border-t">
+              <td className="font-semibold text-gray-700">{s.staffId || 'N/A'}</td>
               <td>{s.name}</td>
               <td>{s.phone}</td>
               <td>{s.email}</td>
