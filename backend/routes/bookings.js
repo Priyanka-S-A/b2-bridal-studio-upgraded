@@ -2,9 +2,13 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const path = require('path');
+const fs = require('fs');
 const Booking = require('../models/Booking');
 const Bill = require('../models/Bill');
 const Revenue = require('../models/Revenue');
+
+// Ensure uploads directory exists (required for Render and fresh environments)
+fs.mkdirSync(path.join(__dirname, '..', 'uploads'), { recursive: true });
 
 // Multer config for payment proof uploads
 const storage = multer.diskStorage({
