@@ -60,7 +60,7 @@ router.post('/generate-from-booking/:id', verifyToken, verifyRole(['staff', 'own
 
     let revenueCreated = true;
     try {
-      await Revenue.create({
+      const newRevenue = await Revenue.create({
         date: new Date(),
         customer: booking.name || 'Customer',
         total: booking.total,
@@ -69,7 +69,7 @@ router.post('/generate-from-booking/:id', verifyToken, verifyRole(['staff', 'own
         billId: bill._id,
         branch: booking.branch || ''
       });
-      console.log("Revenue created:", revenue);
+      console.log("Revenue created:", newRevenue._id);
     } catch (revErr) {
       console.error("Revenue update failed:", revErr);
       revenueCreated = false;
@@ -110,11 +110,11 @@ router.post('/offline', verifyToken, verifyRole(['staff', 'owner']), async (req,
       customerDetails: { name: customer || 'Walk-in' }
     });
     await bill.save();
-    console.log("Bill created:", bill);
+    console.log("Bill created:", bill._id);
 
     let revenueCreated = true;
     try {
-      await Revenue.create({
+      const newRevenue = await Revenue.create({
         date: bill.date,
         customer: customer || 'Walk-in',
         total,
@@ -123,7 +123,7 @@ router.post('/offline', verifyToken, verifyRole(['staff', 'owner']), async (req,
         billId: bill._id,
         branch: ''
       });
-      console.log("Revenue created:", revenue);
+      console.log("Revenue created:", newRevenue._id);
     } catch (revErr) {
       console.error("Revenue update failed:", revErr);
       revenueCreated = false;

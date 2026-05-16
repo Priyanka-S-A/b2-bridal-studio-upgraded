@@ -63,24 +63,14 @@ const PaymentVerification = () => {
   };
 
   const handleGenerateBill = async (id) => {
-    const paymentMethod = window.prompt('Enter Payment Method (cash, upi, card):', 'upi');
-    if (!paymentMethod) return;
-    const pm = paymentMethod.toLowerCase().trim();
-    if (!['cash', 'upi', 'card'].includes(pm)) {
-      alert('Invalid payment method. Please enter cash, upi, or card.');
-      return;
-    }
-
+    // Online bookings are always paid via UPI — no prompt needed
     try {
-      const res = await axios.post(`${API}/api/billing/generate-from-booking/${id}`, { paymentMethod: pm }, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('adminToken')}` }
-      });
-      
-      if (res.data.revenueCreated === false) {
-        alert('Bill generated, but revenue update failed');
-      } else {
-        alert('Bill generated successfully!');
-      }
+      const res = await axios.post(
+        `${API}/api/billing/generate-from-booking/${id}`,
+        { paymentMethod: 'upi' },
+        { headers: { Authorization: `Bearer ${localStorage.getItem('adminToken')}` } }
+      );
+      alert(res.data.success ? 'Bill generated successfully!' : 'Bill generation failed. Please try again.');
       fetchBookings();
     } catch (err) {
       alert('Failed to generate bill: ' + (err.response?.data?.error || err.message));
