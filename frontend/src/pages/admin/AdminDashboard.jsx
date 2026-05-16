@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Routes, Route, Link, useLocation } from 'react-router-dom';
-import { LogOut, LayoutDashboard, Scissors, Receipt, CreditCard, TrendingUp, FileText } from 'lucide-react';
+import { LogOut, LayoutDashboard, Scissors, Receipt, CreditCard, TrendingUp, FileText, Menu, X } from 'lucide-react';
 import ManageServices from './ManageServices.jsx';
 import ViewBookings from './ViewBookings.jsx';
 import ManageProducts from './ManageProducts.jsx';
@@ -17,6 +17,7 @@ import ManageCoupons from './ManageCoupons';
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const [isCollapsed, setIsCollapsed] = useState(false);
   let user = null;
 try {
   user = JSON.parse(localStorage.getItem("user"));
@@ -56,13 +57,24 @@ const navItems = user?.role === "owner"
   return (
     <div className="admin-root flex h-screen overflow-hidden" style={{ background: '#f4f4f4' }}>
       {/* Sidebar */}
-      <div className="w-64 flex flex-col hidden md:flex admin-sidebar">
-        <div className="admin-sidebar-header flex items-center gap-3">
-          <img src="/b2-logo.png" alt="B2" style={{ width: 36, height: 36, objectFit: 'contain', filter: 'brightness(0) invert(1)' }} />
-          <h1 className="text-base font-bold tracking-widest uppercase text-white" style={{ letterSpacing: '0.18em' }}>Admin Panel</h1>
+      <div className={`flex flex-col hidden md:flex admin-sidebar transition-all duration-300 ${isCollapsed ? 'w-20' : 'w-64'}`}>
+        <div className={`admin-sidebar-header flex items-center ${isCollapsed ? 'justify-center px-0' : 'justify-between'} gap-3 transition-all duration-300`}>
+          {!isCollapsed && (
+            <div className="flex items-center gap-3 overflow-hidden">
+              <img src="/b2-logo.png" alt="B2" style={{ width: 36, height: 36, objectFit: 'contain', filter: 'brightness(0) invert(1)' }} />
+              <h1 className="text-base font-bold tracking-widest uppercase text-white whitespace-nowrap" style={{ letterSpacing: '0.18em' }}>Admin Panel</h1>
+            </div>
+          )}
+          <button 
+            onClick={() => setIsCollapsed(!isCollapsed)} 
+            className="text-gray-400 hover:text-white transition-colors p-1 rounded-md"
+            title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+          >
+            {isCollapsed ? <Menu size={24} /> : <X size={20} />}
+          </button>
         </div>
 
-        <nav className="flex-1 px-3 py-5 space-y-1">
+        <nav className="flex-1 px-3 py-5 space-y-1 overflow-x-hidden">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = location.pathname.includes(item.path);
@@ -70,19 +82,24 @@ const navItems = user?.role === "owner"
               <Link
                 key={item.name}
                 to={item.path}
-                className={`admin-nav-item${isActive ? ' active' : ''}`}
+                className={`admin-nav-item${isActive ? ' active' : ''} ${isCollapsed ? 'justify-center px-0' : ''}`}
+                title={isCollapsed ? item.name : ''}
               >
-                <Icon size={18} />
-                {item.name}
+                <Icon size={isCollapsed ? 22 : 18} className="shrink-0" />
+                {!isCollapsed && <span className="whitespace-nowrap">{item.name}</span>}
               </Link>
             );
           })}
         </nav>
 
         <div className="p-3 border-t border-zinc-800">
-          <button onClick={handleLogout} className="admin-logout-btn">
-            <LogOut size={18} />
-            Logout
+          <button 
+            onClick={handleLogout} 
+            className={`admin-logout-btn w-full flex items-center ${isCollapsed ? 'justify-center px-0' : 'justify-start px-4'} gap-3 py-2.5 rounded-lg text-gray-400 hover:text-white hover:bg-[#1a1a1a] transition-all`}
+            title={isCollapsed ? "Logout" : ""}
+          >
+            <LogOut size={isCollapsed ? 22 : 18} className="shrink-0" />
+            {!isCollapsed && <span className="whitespace-nowrap">Logout</span>}
           </button>
         </div>
       </div>
