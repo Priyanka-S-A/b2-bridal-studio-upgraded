@@ -12,7 +12,7 @@ const Revenue = () => {
   useEffect(() => {
     const fetchRevenue = async () => {
       try {
-        const token = localStorage.getItem('adminToken');
+        const token = sessionStorage.getItem('revenueToken') || localStorage.getItem('adminToken');
         const [entriesRes, statsRes] = await Promise.all([
           axios.get(`${API}/api/revenue`, { headers: { Authorization: `Bearer ${token}` } }),
           axios.get(`${API}/api/revenue/stats`, { headers: { Authorization: `Bearer ${token}` } }),
@@ -32,7 +32,7 @@ const Revenue = () => {
     if (!window.confirm("Are you sure you want to delete this revenue entry?")) return;
     console.log("Deleting ID:", id);
     try {
-      const token = localStorage.getItem('adminToken');
+      const token = sessionStorage.getItem('revenueToken') || localStorage.getItem('adminToken');
       await axios.delete(`${API}/api/revenue/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });

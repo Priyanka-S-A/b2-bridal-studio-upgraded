@@ -73,7 +73,14 @@ router.post('/verify-owner-password', async (req, res) => {
       return res.status(401).json({ message: 'Incorrect password' });
     }
 
-    res.json({ success: true });
+    // Generate a temporary access token with owner privileges specifically for revenue viewing
+    const token = jwt.sign(
+      { id: owner._id, role: 'owner', tempAccess: true },
+      process.env.JWT_SECRET || 'fallback_secret',
+      { expiresIn: '1h' }
+    );
+
+    res.json({ success: true, revenueToken: token });
   } catch (error) {
     console.error(`[Auth] Server error during owner password verification:`, error);
     res.status(500).json({ error: error.message });

@@ -84,6 +84,7 @@ const AdminDashboard = () => {
     try {
       const res = await axios.post(`${API}/api/auth/verify-owner-password`, { password: revenuePassword });
       if (res.data.success) {
+        sessionStorage.setItem('revenueToken', res.data.revenueToken);
         setShowPasswordModal(false);
         navigate('/admin/revenue');
       }
