@@ -57,24 +57,24 @@ const navItems = user?.role === "owner"
   return (
     <div className="admin-root flex h-screen overflow-hidden" style={{ background: '#f4f4f4' }}>
       {/* Sidebar */}
-      <div className={`flex flex-col hidden md:flex admin-sidebar transition-all duration-300 ${isCollapsed ? 'w-20' : 'w-64'}`}>
-        <div className={`admin-sidebar-header flex items-center ${isCollapsed ? 'justify-center px-0' : 'justify-between'} gap-3 transition-all duration-300`}>
+      <div className={`flex flex-col hidden md:flex admin-sidebar transition-all duration-300 ${isCollapsed ? 'w-20' : 'w-64 shrink-0'}`}>
+        <div className={`admin-sidebar-header flex items-center ${isCollapsed ? 'justify-center p-4' : 'justify-between'} transition-all duration-300`}>
           {!isCollapsed && (
-            <div className="flex items-center gap-3 overflow-hidden">
+            <div className="flex items-center gap-3">
               <img src="/b2-logo.png" alt="B2" style={{ width: 36, height: 36, objectFit: 'contain', filter: 'brightness(0) invert(1)' }} />
               <h1 className="text-base font-bold tracking-widest uppercase text-white whitespace-nowrap" style={{ letterSpacing: '0.18em' }}>Admin Panel</h1>
             </div>
           )}
           <button 
             onClick={() => setIsCollapsed(!isCollapsed)} 
-            className="text-gray-400 hover:text-white transition-colors p-1 rounded-md"
+            className="text-gray-400 hover:text-white transition-colors"
             title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
           >
             {isCollapsed ? <Menu size={24} /> : <X size={20} />}
           </button>
         </div>
 
-        <nav className="flex-1 px-3 py-5 space-y-1 overflow-x-hidden">
+        <nav className={`flex-1 py-5 space-y-1 ${isCollapsed ? 'px-2' : 'px-3'} overflow-x-hidden`}>
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = location.pathname.includes(item.path);
@@ -85,7 +85,7 @@ const navItems = user?.role === "owner"
                 className={`admin-nav-item${isActive ? ' active' : ''} ${isCollapsed ? 'justify-center px-0' : ''}`}
                 title={isCollapsed ? item.name : ''}
               >
-                <Icon size={isCollapsed ? 22 : 18} className="shrink-0" />
+                <Icon size={18} className="shrink-0" />
                 {!isCollapsed && <span className="whitespace-nowrap">{item.name}</span>}
               </Link>
             );
@@ -95,10 +95,10 @@ const navItems = user?.role === "owner"
         <div className="p-3 border-t border-zinc-800">
           <button 
             onClick={handleLogout} 
-            className={`admin-logout-btn w-full flex items-center ${isCollapsed ? 'justify-center px-0' : 'justify-start px-4'} gap-3 py-2.5 rounded-lg text-gray-400 hover:text-white hover:bg-[#1a1a1a] transition-all`}
+            className={`admin-logout-btn flex items-center gap-2 text-[#aaa] hover:text-white transition-colors ${isCollapsed ? 'justify-center w-full px-0' : ''}`}
             title={isCollapsed ? "Logout" : ""}
           >
-            <LogOut size={isCollapsed ? 22 : 18} className="shrink-0" />
+            <LogOut size={18} className="shrink-0" />
             {!isCollapsed && <span className="whitespace-nowrap">Logout</span>}
           </button>
         </div>
