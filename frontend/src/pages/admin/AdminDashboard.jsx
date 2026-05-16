@@ -67,7 +67,7 @@ const AdminDashboard = () => {
           )}
           <button
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className="text-gray-400 hover:text-white transition-colors"
+            className="text-white hover:text-white transition-colors"
             title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
           >
             {isCollapsed ? <Menu size={24} /> : <X size={20} />}
@@ -95,7 +95,7 @@ const AdminDashboard = () => {
         <div className="p-3 border-t border-zinc-800">
           <button
             onClick={handleLogout}
-            className={`admin-logout-btn flex items-center gap-2 text-[#aaa] hover:text-white transition-colors ${isCollapsed ? 'justify-center w-full px-0' : ''}`}
+            className={`admin-logout-btn flex items-center gap-2 text-white hover:text-white transition-colors ${isCollapsed ? 'justify-center w-full px-0' : ''}`}
             title={isCollapsed ? "Logout" : ""}
           >
             <LogOut size={18} className="shrink-0" />
