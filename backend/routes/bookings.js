@@ -20,8 +20,9 @@ const upload = multer({
   fileFilter: (req, file, cb) => {
     const allowed = /jpeg|jpg|png|gif|pdf|webp/;
     const ext = allowed.test(path.extname(file.originalname).toLowerCase());
-    const mime = allowed.test(file.mimetype);
-    if (ext && mime) cb(null, true);
+    // Accept if extension matches OR if it is a pdf/image mime
+    const mime = /image\/|application\/pdf/.test(file.mimetype);
+    if (ext || mime) cb(null, true);
     else cb(new Error('Only images and PDFs are allowed'));
   }
 });
@@ -29,22 +30,32 @@ const upload = multer({
 // POST /api/bookings — Create a new booking
 router.post('/', upload.single('paymentProof'), async (req, res) => {
   try {
-    const { name, phone, upiId, transactionId, branch, items, total, dateTime, userId, email, couponCode, discountPercentage, discountAmount, finalAmount } = req.body;
+    const {
+      name, phone, upiId, transactionId, branch, items,
+      total, dateTime, userId, email,
+      couponCode, discountPercentage, discountAmount, finalAmount
+    } = req.body;
+
+    if (!name || !phone || !upiId || !transactionId || !branch || !total) {
+      return res.status(400).json({ error: 'Missing required booking fields' });
+    }
+
+    const userEmail = (email || userId || '').trim().toLowerCase();
 
     const booking = new Booking({
-      userId: email || userId,
+      userId: userEmail,
       name,
       phone,
       upiId,
       transactionId,
       branch,
-      items: typeof items === 'string' ? JSON.parse(items) : items,
+      items: typeof items === 'string' ? JSON.parse(items) : (items || []),
       total: Number(total),
       couponCode: couponCode || null,
       discountPercentage: discountPercentage ? Number(discountPercentage) : null,
       discountAmount: discountAmount ? Number(discountAmount) : null,
       finalAmount: finalAmount ? Number(finalAmount) : Number(total),
-      dateTime,
+      dateTime: dateTime || new Date().toISOString(),
       paymentProof: req.file ? req.file.filename : null,
       status: 'Pending'
     });
@@ -52,6 +63,7 @@ router.post('/', upload.single('paymentProof'), async (req, res) => {
     await booking.save();
     res.status(201).json(booking);
   } catch (err) {
+    console.error('[Booking POST error]', err.message);
     res.status(400).json({ error: err.message });
   }
 });
@@ -66,45 +78,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-// GET /api/bookings/user/:email — Customer: Get own bookings
-router.get('/user/:email', async (req, res) => {
-  try {
-    const bookings = await Booking.find({ userId: req.params.email }).sort({ createdAt: -1 });
-    res.json(bookings);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// PATCH /api/bookings/:id/accept — Admin: Accept booking
-router.patch('/:id/accept', async (req, res) => {
-  try {
-    const booking = await Booking.findById(req.params.id);
-    if (!booking) return res.status(404).json({ error: 'Booking not found' });
-
-    booking.status = 'Approved';
-    await booking.save();
-
-    res.json({ booking });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// PATCH /api/bookings/:id/reject — Admin: Reject booking
-router.patch('/:id/reject', async (req, res) => {
-  try {
-    const booking = await Booking.findById(req.params.id);
-    if (!booking) return res.status(404).json({ error: 'Booking not found' });
-
-    booking.status = 'Rejected';
-    await booking.save();
-
-    res.json(booking);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
+// ─── NAMED ROUTES (must be before /:id wildcards) ────────────────────────────
 
 // GET /api/bookings/slot-check — Check slot availability (Approved bookings only)
 router.get('/slot-check', async (req, res) => {
@@ -113,8 +87,6 @@ router.get('/slot-check', async (req, res) => {
     if (!branch || !date || !hour) {
       return res.status(400).json({ error: 'branch, date, and hour are required' });
     }
-    // dateTime is stored as ISO string like "2026-05-14T10:00:00.000Z" or "2026-05-14T10:00:00"
-    // We match by branch, Approved status, and dateTime starting with the date+hour
     const paddedHour = String(hour).padStart(2, '0');
     const prefix = `${date}T${paddedHour}`;
     const count = await Booking.countDocuments({
@@ -128,12 +100,79 @@ router.get('/slot-check', async (req, res) => {
   }
 });
 
+// GET /api/bookings/user/:email — Customer: Get own bookings (case-insensitive)
+router.get('/user/:email', async (req, res) => {
+  try {
+    const email = decodeURIComponent(req.params.email).trim();
+    // Escape regex special chars then do case-insensitive match
+    const escaped = email.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const bookings = await Booking.find({
+      userId: { $regex: new RegExp(`^${escaped}$`, 'i') }
+    }).sort({ createdAt: -1 });
+    res.json(bookings);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // GET /api/bookings/bill/:id — Get bill by ID
 router.get('/bill/:id', async (req, res) => {
   try {
     const bill = await Bill.findById(req.params.id);
     if (!bill) return res.status(404).json({ error: 'Bill not found' });
     res.json(bill);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ─── /:id WILDCARD ROUTES ─────────────────────────────────────────────────────
+
+// PATCH /api/bookings/:id/accept — Admin: Accept booking → Approved
+router.patch('/:id/accept', async (req, res) => {
+  try {
+    const booking = await Booking.findByIdAndUpdate(
+      req.params.id,
+      { status: 'Approved' },
+      { new: true }
+    );
+    if (!booking) return res.status(404).json({ error: 'Booking not found' });
+    res.json({ booking });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// PATCH /api/bookings/:id/reject — Admin: Reject booking
+router.patch('/:id/reject', async (req, res) => {
+  try {
+    const booking = await Booking.findByIdAndUpdate(
+      req.params.id,
+      { status: 'Rejected' },
+      { new: true }
+    );
+    if (!booking) return res.status(404).json({ error: 'Booking not found' });
+    res.json(booking);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// PATCH /api/bookings/:id/status — Admin: Set any valid status directly
+router.patch('/:id/status', async (req, res) => {
+  try {
+    const { status } = req.body;
+    const validStatuses = ['Pending', 'Approved', 'Rejected', 'Completed'];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({ error: `Invalid status. Must be one of: ${validStatuses.join(', ')}` });
+    }
+    const booking = await Booking.findByIdAndUpdate(
+      req.params.id,
+      { status },
+      { new: true }
+    );
+    if (!booking) return res.status(404).json({ error: 'Booking not found' });
+    res.json(booking);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

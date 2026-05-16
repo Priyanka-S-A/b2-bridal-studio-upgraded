@@ -6,11 +6,11 @@ import { fadeUp, staggerContainer } from '../animations/variants';
 const API = import.meta.env.VITE_API_URL;
 
 const statusColors = {
-  Pending: { bg: 'rgba(234,179,8,0.1)', border: 'rgba(234,179,8,0.3)', color: '#eab308' },
-  Approved: { bg: 'rgba(59,130,246,0.1)', border: 'rgba(59,130,246,0.3)', color: '#3b82f6' },
-  Successful: { bg: 'rgba(34,197,94,0.1)', border: 'rgba(34,197,94,0.3)', color: '#22c55e' },
-  Completed: { bg: 'rgba(34,197,94,0.1)', border: 'rgba(34,197,94,0.3)', color: '#22c55e' },
-  Rejected: { bg: 'rgba(239,68,68,0.1)', border: 'rgba(239,68,68,0.3)', color: '#ef4444' },
+  Pending:   { bg: 'rgba(234,179,8,0.12)',  border: 'rgba(234,179,8,0.35)',  color: '#eab308' },
+  Approved:  { bg: 'rgba(34,197,94,0.12)',  border: 'rgba(34,197,94,0.35)',  color: '#22c55e' },
+  Successful:{ bg: 'rgba(34,197,94,0.12)',  border: 'rgba(34,197,94,0.35)',  color: '#22c55e' },
+  Completed: { bg: 'rgba(34,197,94,0.12)',  border: 'rgba(34,197,94,0.35)',  color: '#22c55e' },
+  Rejected:  { bg: 'rgba(239,68,68,0.12)',  border: 'rgba(239,68,68,0.35)',  color: '#ef4444' },
 };
 
 const Profile = () => {
@@ -20,11 +20,17 @@ const Profile = () => {
 
   useEffect(() => {
     if (!user?.email) { setLoading(false); return; }
-    fetch(`${API}/api/bookings/user/${user.email}`)
-      .then(r => r.json())
-      .then(setBookings)
-      .catch(console.error)
-      .finally(() => setLoading(false));
+    const load = () =>
+      fetch(`${API}/api/bookings/user/${encodeURIComponent(user.email)}`)
+        .then(r => r.ok ? r.json() : Promise.reject(r.status))
+        .then(data => setBookings(Array.isArray(data) ? data : []))
+        .catch(console.error)
+        .finally(() => setLoading(false));
+
+    load();
+    // Poll every 10 seconds so status updates (Pending→Approved) reflect automatically
+    const timer = setInterval(load, 10000);
+    return () => clearInterval(timer);
   }, []);
 
   if (!user) {
@@ -93,9 +99,17 @@ const Profile = () => {
                             {booking.branch}
                           </span>
                         </div>
-                        <span className="font-cormorant italic text-xs" style={{ color: 'rgba(248,245,240,0.35)' }}>
-                          {new Date(booking.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}
-                        </span>
+                        <div className="text-right">
+                          {booking.dateTime && (
+                            <div className="font-cormorant italic text-xs mb-1" style={{ color: 'rgba(255,195,0,0.65)' }}>
+                              📅 {new Date(booking.dateTime).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}
+                              {' '}&nbsp;🕐 {new Date(booking.dateTime).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
+                            </div>
+                          )}
+                          <span className="font-cormorant italic text-xs" style={{ color: 'rgba(248,245,240,0.35)' }}>
+                            Booked: {new Date(booking.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}
+                          </span>
+                        </div>
                       </div>
 
                       {/* Items */}

@@ -80,15 +80,20 @@ const ConfirmBooking = () => {
       }))));
       formData.append('paymentProof', paymentProof);
 
-      await fetch(`${API}/api/bookings`, {
+      const response = await fetch(`${API}/api/bookings`, {
         method: 'POST',
         body: formData,
       });
 
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(errData.error || `Server error: ${response.status}`);
+      }
+
       clearCart();
       navigate('/profile');
     } catch (err) {
-      alert('Failed to submit booking. Please try again.');
+      alert(`Failed to submit booking: ${err.message || 'Please try again.'}`);
     } finally {
       setLoading(false);
     }

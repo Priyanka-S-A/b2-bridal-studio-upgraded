@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
+import { Tag } from 'lucide-react';
 
 const API = import.meta.env.VITE_API_URL;
 
@@ -18,10 +19,10 @@ const formatScheduled = (dateTime) => {
 
 const statusBadge = (status) => {
   const styles = {
-    Pending: 'bg-yellow-50 text-yellow-700 border-yellow-200',
-    Approved: 'bg-blue-50 text-blue-700 border-blue-200',
-    Completed: 'bg-green-50 text-green-700 border-green-200',
-    Rejected: 'bg-red-50 text-red-700 border-red-200',
+    Pending:   'bg-yellow-50 text-yellow-700 border-yellow-200',
+    Approved:  'bg-green-50 text-green-700 border-green-200',
+    Completed: 'bg-blue-50 text-blue-700 border-blue-200',
+    Rejected:  'bg-red-50 text-red-700 border-red-200',
   };
   return `px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider border ${styles[status] || styles.Pending}`;
 };
@@ -185,7 +186,10 @@ const PaymentVerification = () => {
                     )}
                   </td>
                   <td className="p-4">
-                    <div className="font-bold text-gray-900">₹{b.total.toFixed(2)}</div>
+                    <div className="font-bold text-gray-900">₹{(b.finalAmount ?? b.total).toFixed(2)}</div>
+                    {b.couponCode && (
+                      <div className="text-xs text-gray-400 line-through">₹{b.total.toFixed(2)}</div>
+                    )}
                   </td>
                   <td className="p-4">
                     <span className={statusBadge(b.status)}>{b.status}</span>
