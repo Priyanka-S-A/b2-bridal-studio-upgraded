@@ -19,11 +19,11 @@ const AdminDashboard = () => {
   const location = useLocation();
   const [isCollapsed, setIsCollapsed] = useState(false);
   let user = null;
-try {
-  user = JSON.parse(localStorage.getItem("user"));
-} catch {
-  user = null;
-}
+  try {
+    user = JSON.parse(localStorage.getItem("user"));
+  } catch {
+    user = null;
+  }
 
   useEffect(() => {
     const token = localStorage.getItem('adminToken');
@@ -37,11 +37,11 @@ try {
     navigate('/admin-login');
   };
 
-const navItems = user?.role === "owner"
-  ? [
+  const navItems = user?.role === "owner"
+    ? [
       { name: 'Revenue', path: '/admin/revenue', icon: TrendingUp },
     ]
-  : [
+    : [
       { name: 'Services', path: '/admin/services', icon: Scissors },
       { name: 'Bookings', path: '/admin/bookings', icon: Receipt },
       { name: 'Payments', path: '/admin/payments', icon: CreditCard },
@@ -65,8 +65,8 @@ const navItems = user?.role === "owner"
               <h1 className="text-base font-bold tracking-widest uppercase text-white whitespace-nowrap" style={{ letterSpacing: '0.18em' }}>Admin Panel</h1>
             </div>
           )}
-          <button 
-            onClick={() => setIsCollapsed(!isCollapsed)} 
+          <button
+            onClick={() => setIsCollapsed(!isCollapsed)}
             className="text-gray-400 hover:text-white transition-colors"
             title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
           >
@@ -93,9 +93,9 @@ const navItems = user?.role === "owner"
         </nav>
 
         <div className="p-3 border-t border-zinc-800">
-          <button 
-            onClick={handleLogout} 
-            className={`admin-logout-btn flex items-center gap-2 text-[#f8f8f8] hover:text-white transition-colors ${isCollapsed ? 'justify-center w-full px-0' : ''}`}
+          <button
+            onClick={handleLogout}
+            className={`admin-logout-btn flex items-center gap-2 text-[#aaa] hover:text-white transition-colors ${isCollapsed ? 'justify-center w-full px-0' : ''}`}
             title={isCollapsed ? "Logout" : ""}
           >
             <LogOut size={18} className="shrink-0" />
@@ -107,7 +107,7 @@ const navItems = user?.role === "owner"
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
         {/* Mobile Header */}
-        <header className="h-14 flex items-center justify-between px-4 md:hidden" style={{ background: '#0a0a0a', borderBottom: '1px solid #222' }}>
+        <header className="h-14 flex items-center justify-between px-4 md:hidden" style={{ background: '#0a0a0aff', borderBottom: '1px solid #222' }}>
           <div className="flex items-center gap-2">
             <img src="/b2-logo.png" alt="B2" style={{ width: 30, height: 30, objectFit: 'contain', filter: 'brightness(0) invert(1)' }} />
             <h1 className="text-sm font-bold tracking-widest uppercase text-white">Admin Panel</h1>
