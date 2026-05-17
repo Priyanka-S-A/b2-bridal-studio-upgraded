@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Plus, Trash2, Edit2, Save, X } from 'lucide-react';
+import { Plus, Trash2, Edit2, Save, X, Package, ImageIcon } from 'lucide-react';
 const API = import.meta.env.VITE_API_URL;
 const ManageProducts = () => {
   const [products, setProducts] = useState([]);
@@ -90,13 +90,17 @@ const ManageProducts = () => {
   };
 
   return (
-    <div className="p-6 bg-[#fafafa] min-h-screen">
+    <div className="bg-[#FDFDFD] min-h-screen p-4 md:p-8 font-sans text-gray-900">
 
       {/* HEADER */}
-      <div className="flex justify-between items-center mb-8">
-        <h2 className="text-3xl font-bold tracking-wide text-black">
-          Manage Products
-        </h2>
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <h1 className="text-2xl font-bold font-cinzel uppercase tracking-wide text-gray-900 flex items-center gap-3">
+            <Package size={24} className="text-[#D4AF37]" />
+            Manage Products
+          </h1>
+          <p className="text-sm text-gray-600 mt-1">Add, edit and manage your product catalogue.</p>
+        </div>
 
         {!isEditing && (
           <button
@@ -111,7 +115,7 @@ const ManageProducts = () => {
               });
               setIsEditing(true);
             }}
-            className="admin-btn-primary"
+            className="flex items-center gap-2 px-5 py-2 rounded-lg font-cinzel text-xs font-bold uppercase tracking-wide transition-all shadow-md hover:shadow-lg bg-[#111] text-white"
           >
             <Plus size={18} /> Add Product
           </button>
@@ -120,9 +124,9 @@ const ManageProducts = () => {
 
       {/* FORM */}
       {isEditing && (
-        <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 mb-8 max-w-xl">
+        <div className="bg-white p-5 rounded-xl shadow-[0_2px_15px_rgba(0,0,0,0.04)] border border-gray-100 mb-6 max-w-xl">
           <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-semibold text-black">
+            <h3 className="text-sm font-cinzel font-bold uppercase tracking-wide text-gray-700">
               {currentProduct._id ? "Edit Product" : "Add Product"}
             </h3>
             <button onClick={() => setIsEditing(false)}>
@@ -137,7 +141,7 @@ const ManageProducts = () => {
               placeholder="Product Name"
               value={currentProduct.name || ''}
               onChange={e => setCurrentProduct({ ...currentProduct, name: e.target.value })}
-              className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#c9a13b]"
+              className="w-full p-2.5 border border-gray-200 rounded-lg focus:outline-none focus:border-[#FFD700] focus:ring-1 focus:ring-[#FFD700]/30 bg-gray-50 text-sm"
               required
             />
 
@@ -146,7 +150,7 @@ const ManageProducts = () => {
               placeholder="Category"
               value={currentProduct.category || ''}
               onChange={e => setCurrentProduct({ ...currentProduct, category: e.target.value })}
-              className="w-full p-3 border rounded-lg"
+              className="w-full p-2.5 border border-gray-200 rounded-lg focus:outline-none focus:border-[#FFD700] focus:ring-1 focus:ring-[#FFD700]/30 bg-gray-50 text-sm"
               required
             />
 
@@ -155,7 +159,7 @@ const ManageProducts = () => {
               placeholder="Price"
               value={currentProduct.price || ''}
               onChange={e => setCurrentProduct({ ...currentProduct, price: e.target.value })}
-              className="w-full p-3 border rounded-lg"
+              className="w-full p-2.5 border border-gray-200 rounded-lg focus:outline-none focus:border-[#FFD700] focus:ring-1 focus:ring-[#FFD700]/30 bg-gray-50 text-sm"
               required
             />
 
@@ -164,7 +168,7 @@ const ManageProducts = () => {
               placeholder="Stock"
               value={currentProduct.stock || ''}
               onChange={e => setCurrentProduct({ ...currentProduct, stock: e.target.value })}
-              className="w-full p-3 border rounded-lg"
+              className="w-full p-2.5 border border-gray-200 rounded-lg focus:outline-none focus:border-[#FFD700] focus:ring-1 focus:ring-[#FFD700]/30 bg-gray-50 text-sm"
               required
             />
 
@@ -174,18 +178,18 @@ const ManageProducts = () => {
               onChange={(e) =>
                 setCurrentProduct({ ...currentProduct, image: e.target.files[0] })
               }
-              className="w-full p-2"
+              className="w-full text-sm file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-cinzel file:font-bold file:uppercase file:tracking-wide file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200 file:cursor-pointer file:transition-colors"
             />
 
-            <div className="flex gap-3">
-              <button className="admin-btn-primary">
+            <div className="flex gap-3 pt-2">
+              <button className="flex items-center gap-2 px-5 py-2 rounded-lg font-cinzel text-xs font-bold uppercase tracking-wide transition-all shadow-md hover:shadow-lg bg-[#111] text-white">
                 <Save size={16} /> Save
               </button>
 
               <button
                 type="button"
                 onClick={() => setIsEditing(false)}
-                className="admin-btn-secondary"
+                className="flex items-center gap-2 px-4 py-2 rounded-lg font-cinzel text-xs font-bold uppercase tracking-wide border border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors"
               >
                 Cancel
               </button>
@@ -195,38 +199,41 @@ const ManageProducts = () => {
       )}
 
       {/* PRODUCT GRID */}
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
         {products.map(p => (
           <div
             key={p._id}
-            className="bg-white rounded-2xl shadow hover:shadow-xl transition p-4 border"
+            className="bg-white rounded-xl shadow-[0_2px_15px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-all p-3 border border-gray-100"
           >
-            <div className="h-48 bg-gray-100 rounded-lg overflow-hidden mb-4">
-              {p.image && (
+            <div className="h-44 bg-gray-50 rounded-lg overflow-hidden mb-3 flex items-center justify-center">
+              {p.image ? (
                 <img
                   src={p.image}
-                  alt=""
+                  alt={p.name}
                   className="w-full h-full object-cover"
                 />
+              ) : (
+                <div className="flex flex-col items-center gap-2 text-gray-300">
+                  <ImageIcon size={36} strokeWidth={1.2} />
+                  <span className="text-xs text-gray-400">No Image</span>
+                </div>
               )}
             </div>
 
-            <h3 className="font-semibold text-lg">{p.name}</h3>
+            <h3 className="font-semibold text-base text-gray-900">{p.name}</h3>
+            <p className="text-xs text-gray-500 mt-0.5">{p.category}</p>
 
-            <p className="text-sm text-gray-500">{p.category}</p>
-
-            <div className="flex justify-between items-center mt-3">
-              <span className="text-[#c9a13b] font-bold text-lg">
+            <div className="flex justify-between items-center mt-2">
+              <span className="text-amber-700 font-bold text-sm font-cinzel">
                 ₹{p.price}
               </span>
-
-              <span className="text-xs bg-green-100 text-green-600 px-2 py-1 rounded-full">
+              <span className="text-xs bg-green-100 text-green-600 px-2 py-0.5 rounded-full font-medium">
                 {p.stock} left
               </span>
             </div>
 
             {/* ✅ FIXED BUTTONS */}
-            <div className="flex justify-end gap-2 mt-4">
+            <div className="flex justify-end gap-2 mt-3 pt-2 border-t border-gray-50">
 
               <button
                 onClick={() => {
@@ -240,14 +247,14 @@ const ManageProducts = () => {
                   });
                   setIsEditing(true);
                 }}
-                className="admin-btn-edit p-2"
+                className="p-2 rounded-md text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition-colors"
               >
                 <Edit2 size={16} />
               </button>
 
               <button
                 onClick={() => handleDelete(p._id)}
-                className="admin-btn-danger p-2"
+                className="p-2 rounded-md text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors"
               >
                 <Trash2 size={16} />
               </button>

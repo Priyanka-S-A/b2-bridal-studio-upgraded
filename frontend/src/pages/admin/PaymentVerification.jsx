@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import { Tag } from 'lucide-react';
+import { Tag, CreditCard, X } from 'lucide-react';
 
 const API = import.meta.env.VITE_API_URL;
 
@@ -24,7 +24,7 @@ const statusBadge = (status) => {
     Completed: 'bg-blue-50 text-blue-700 border-blue-200',
     Rejected:  'bg-red-50 text-red-700 border-red-200',
   };
-  return `px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider border ${styles[status] || styles.Pending}`;
+  return `px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border ${styles[status] || styles.Pending}`;
 };
 
 const PaymentVerification = () => {
@@ -96,18 +96,32 @@ const PaymentVerification = () => {
 
   const filtered = filter === 'All' ? bookings : bookings.filter(b => b.status === filter);
 
-  if (loading) return <div className="text-center py-10">Loading bookings...</div>;
+  if (loading) return (
+    <div className="flex justify-center py-20">
+      <div className="w-8 h-8 rounded-full animate-spin border-2 border-gray-200 border-t-[#FFD700]"></div>
+    </div>
+  );
 
   return (
-    <div>
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-        <h2 className="text-2xl font-bold admin-heading">Payment Verification</h2>
-        <div className="flex gap-2">
+    <div className="bg-[#FDFDFD] min-h-screen p-4 md:p-8 font-sans text-gray-900">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6">
+        <div>
+          <h1 className="text-2xl font-bold font-cinzel uppercase tracking-wide text-gray-900 flex items-center gap-3">
+            <CreditCard size={24} className="text-[#D4AF37]" />
+            Payment Verification
+          </h1>
+          <p className="text-sm text-gray-600 mt-1">Review and manage incoming payments.</p>
+        </div>
+        <div className="flex gap-2 flex-wrap">
           {['All', 'Pending', 'Approved', 'Completed', 'Rejected'].map(f => (
             <button
               key={f}
               onClick={() => setFilter(f)}
-              className={`px-4 py-2 text-xs font-semibold rounded-lg transition-colors ${filter === f ? 'bg-black text-gray-800' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+              className={`px-4 py-2 text-xs font-cinzel font-bold uppercase tracking-wide rounded-lg transition-all ${
+                filter === f 
+                  ? 'bg-[#111] text-amber-400 shadow-md' 
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
             >
               {f} {f !== 'All' ? `(${bookings.filter(b => b.status === f).length})` : `(${bookings.length})`}
             </button>
@@ -115,29 +129,29 @@ const PaymentVerification = () => {
         </div>
       </div>
 
-      <div className="admin-card overflow-hidden">
+      <div className="bg-white rounded-xl shadow-[0_2px_15px_rgba(0,0,0,0.04)] border border-gray-100 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-gray-50 border-b border-gray-100 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                <th className="p-4 pl-6">Customer</th>
-                <th className="p-4">Branch</th>
-                <th className="p-4">Items</th>
-                <th className="p-4">Transaction</th>
-                <th className="p-4">Proof</th>
-                <th className="p-4">Total</th>
-                <th className="p-4">Status</th>
-                <th className="p-4 pr-6">Actions</th>
+              <tr className="bg-gray-50 border-b border-gray-100">
+                <th className="p-4 pl-6 text-xs font-cinzel font-bold uppercase tracking-wider text-gray-700">Customer</th>
+                <th className="p-4 text-xs font-cinzel font-bold uppercase tracking-wider text-gray-700">Branch</th>
+                <th className="p-4 text-xs font-cinzel font-bold uppercase tracking-wider text-gray-700">Items</th>
+                <th className="p-4 text-xs font-cinzel font-bold uppercase tracking-wider text-gray-700">Transaction</th>
+                <th className="p-4 text-xs font-cinzel font-bold uppercase tracking-wider text-gray-700">Proof</th>
+                <th className="p-4 text-xs font-cinzel font-bold uppercase tracking-wider text-gray-700">Total</th>
+                <th className="p-4 text-xs font-cinzel font-bold uppercase tracking-wider text-gray-700">Status</th>
+                <th className="p-4 pr-6 text-xs font-cinzel font-bold uppercase tracking-wider text-gray-700">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
               {filtered.length === 0 ? (
-                <tr><td colSpan="8" className="p-8 text-center text-gray-500">No bookings found.</td></tr>
+                <tr><td colSpan="8" className="p-10 text-center text-gray-500 font-cormorant italic text-lg">No bookings found.</td></tr>
               ) : filtered.map(b => (
-                <tr key={b._id} className="hover:bg-gray-50 transition-colors">
+                <tr key={b._id} className="hover:bg-[#FFFCF5] transition-colors">
                   <td className="p-4 pl-6">
-                    <div className="font-medium text-gray-900">{b.name}</div>
-                    <div className="text-xs text-gray-500">{b.phone}</div>
+                    <div className="font-medium text-gray-900 font-playfair">{b.name}</div>
+                    <div className="text-xs text-gray-500 font-cormorant">{b.phone}</div>
                     {b.dateTime && (
                       <div className="text-xs text-indigo-600 mt-1 font-medium">
                         📅 {formatScheduled(b.dateTime)}
@@ -150,10 +164,10 @@ const PaymentVerification = () => {
                     )}
                   </td>
                   <td className="p-4">
-                    <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs font-medium">{b.branch}</span>
+                    <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs font-medium">{b.branch}</span>
                   </td>
                   <td className="p-4 text-sm text-gray-600">
-                    <ul className="list-disc pl-4 space-y-0.5">
+                    <ul className="list-disc pl-4 space-y-0.5 font-cormorant">
                       {b.items.map((item, i) => (
                         <li key={i} className="text-xs">{item.name} <span className="text-gray-400">(₹{item.price})</span></li>
                       ))}
@@ -176,7 +190,7 @@ const PaymentVerification = () => {
                     )}
                   </td>
                   <td className="p-4">
-                    <div className="font-bold text-gray-900">₹{(b.finalAmount ?? b.total).toFixed(2)}</div>
+                    <div className="font-bold text-gray-900 font-cinzel">₹{(b.finalAmount ?? b.total).toFixed(2)}</div>
                     {b.couponCode && (
                       <div className="text-xs text-gray-400 line-through">₹{b.total.toFixed(2)}</div>
                     )}
@@ -187,24 +201,24 @@ const PaymentVerification = () => {
                   <td className="p-4 pr-6">
                     {b.status === 'Pending' ? (
                       <div className="flex gap-2">
-                        <button onClick={() => handleAccept(b._id)} className="px-3 py-1.5 bg-green-600 text-white text-xs font-semibold rounded-lg hover:bg-green-700 transition-colors">
+                        <button onClick={() => handleAccept(b._id)} className="px-3 py-1.5 bg-green-600 text-white text-xs font-bold rounded-lg hover:bg-green-700 transition-colors">
                           Accept
                         </button>
-                        <button onClick={() => handleReject(b._id)} className="px-3 py-1.5 bg-red-600 text-white text-xs font-semibold rounded-lg hover:bg-red-700 transition-colors">
+                        <button onClick={() => handleReject(b._id)} className="px-3 py-1.5 bg-red-600 text-white text-xs font-bold rounded-lg hover:bg-red-700 transition-colors">
                           Reject
                         </button>
                       </div>
                     ) : b.status === 'Approved' && !b.billId ? (
-                      <button onClick={() => handleGenerateBill(b._id)} className="px-3 py-1.5 bg-blue-600 text-white text-xs font-semibold rounded-lg hover:bg-blue-700 transition-colors">
+                      <button onClick={() => handleGenerateBill(b._id)} className="px-3 py-1.5 bg-blue-600 text-white text-xs font-bold rounded-lg hover:bg-blue-700 transition-colors">
                         Generate Bill
                       </button>
                     ) : (b.status === 'Completed' || b.billId) ? (
                       <div className="flex gap-2">
-                        <a href={`/bill/${b.billId}`} target="_blank" rel="noreferrer" className="px-3 py-1.5 bg-gray-100 text-gray-700 text-xs font-semibold rounded-lg hover:bg-gray-200 transition-colors">
+                        <a href={`/bill/${b.billId}`} target="_blank" rel="noreferrer" className="px-3 py-1.5 bg-gray-100 text-gray-700 text-xs font-bold rounded-lg hover:bg-gray-200 transition-colors">
                           View Bill
                         </a>
-                        <button onClick={() => sendWhatsApp(b)} className="px-3 py-1.5 bg-green-500 text-white text-xs font-semibold rounded-lg hover:bg-green-600 transition-colors">
-                          Send to Customer
+                        <button onClick={() => sendWhatsApp(b)} className="px-3 py-1.5 bg-green-500 text-white text-xs font-bold rounded-lg hover:bg-green-600 transition-colors">
+                          Send
                         </button>
                       </div>
                     ) : (
@@ -220,16 +234,18 @@ const PaymentVerification = () => {
 
       {/* Payment Proof Modal */}
       {proofModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60" onClick={() => setProofModal(null)}>
-          <div className="bg-white rounded-xl p-4 max-w-lg max-h-[80vh] overflow-auto shadow-2xl" onClick={e => e.stopPropagation()}>
-            <div className="flex justify-between items-center mb-3">
-              <h3 className="font-bold text-gray-900">Payment Proof</h3>
-              <button onClick={() => setProofModal(null)} className="text-gray-400 hover:text-gray-600 text-xl">✕</button>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm" onClick={() => setProofModal(null)}>
+          <div className="bg-white rounded-2xl p-6 max-w-lg max-h-[80vh] overflow-auto shadow-2xl border border-gray-100" onClick={e => e.stopPropagation()}>
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="font-bold text-gray-900 font-cinzel uppercase tracking-wide">Payment Proof</h3>
+              <button onClick={() => setProofModal(null)} className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
+                <X size={20} />
+              </button>
             </div>
             {proofModal.endsWith('.pdf') ? (
-              <iframe src={proofModal} className="w-full h-96" title="Payment Proof" />
+              <iframe src={proofModal} className="w-full h-96 rounded-lg" title="Payment Proof" />
             ) : (
-              <img src={proofModal} alt="Payment Proof" className="w-full rounded" />
+              <img src={proofModal} alt="Payment Proof" className="w-full rounded-lg" />
             )}
           </div>
         </div>

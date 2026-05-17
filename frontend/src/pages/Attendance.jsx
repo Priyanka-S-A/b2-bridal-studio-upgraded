@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { CalendarCheck, Plus, Save, X } from 'lucide-react';
 
 const getTodayStr = () => {
   const d = new Date();
@@ -112,36 +113,44 @@ const Attendance = () => {
   });
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-        <h1 className="text-3xl font-bold font-playfair tracking-wide text-zinc-900">Attendance Management</h1>
+    <div className="bg-[#FDFDFD] min-h-screen p-4 md:p-8 font-sans text-gray-900">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-3">
+        <div>
+          <h1 className="text-2xl font-bold font-cinzel uppercase tracking-wide text-gray-900 flex items-center gap-3">
+            <CalendarCheck size={24} className="text-[#D4AF37]" />
+            Attendance Management
+          </h1>
+          <p className="text-sm text-gray-600 mt-1">Track daily staff check-ins and check-outs.</p>
+        </div>
         
         {/* Date Filter */}
-        <div className="flex items-center gap-3 bg-white px-4 py-2 rounded-lg shadow-sm border border-zinc-200">
-          <label className="text-sm font-semibold text-zinc-700 uppercase tracking-wider">Filter Date:</label>
+        <div className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-white border border-gray-200 shadow-sm">
+          <label className="text-xs font-cinzel font-bold uppercase tracking-wide text-gray-700">Filter:</label>
           <input
             type="date"
             value={filterDate}
             onChange={(e) => setFilterDate(e.target.value)}
-            className="border-none bg-transparent focus:outline-none focus:ring-0 text-zinc-900 font-medium cursor-pointer"
+            className="border-none bg-transparent focus:outline-none focus:ring-0 font-cormorant text-lg text-gray-800 cursor-pointer"
           />
         </div>
       </div>
 
       {/* ➕ FORM CARD */}
-      <div className="bg-white p-6 rounded-lg shadow-sm border border-zinc-200 mb-8">
-        <h2 className="text-lg font-semibold mb-5 text-zinc-800 border-b border-zinc-100 pb-3">Mark Attendance</h2>
+      <div className="bg-white rounded-xl shadow-[0_2px_15px_rgba(0,0,0,0.04)] p-6 mb-8 border border-gray-100">
+        <h2 className="text-sm font-cinzel font-bold uppercase tracking-wide mb-5 pb-3 text-gray-700" style={{ borderBottom: '1px solid rgba(0,0,0,0.06)' }}>Mark Attendance</h2>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           {/* Staff Dropdown */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-zinc-700">Select Staff <span className="text-red-500">*</span></label>
+            <label className="text-xs font-cinzel font-semibold uppercase tracking-wide text-gray-700">Select Staff <span className="text-amber-600">*</span></label>
             <select
               value={form.staffId}
               onChange={(e) => {
                 setForm({ ...form, staffId: e.target.value });
                 if (errors.staffId) setErrors({ ...errors, staffId: null });
               }}
-              className={`border p-2.5 rounded-md focus:outline-none transition-shadow bg-zinc-50 ${errors.staffId ? 'border-red-400 bg-red-50 focus:ring-1 focus:ring-red-400' : 'border-zinc-200 focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37]'}`}
+              className={`w-full p-3 rounded-lg border focus:outline-none focus:ring-1 bg-gray-50 font-cormorant text-lg text-gray-800 transition-colors ${
+                errors.staffId ? 'border-red-300 focus:border-red-400 focus:ring-red-200' : 'border-gray-200 focus:border-[#FFD700] focus:ring-[#FFD700]/30'
+              }`}
             >
               <option value="">-- Select Staff --</option>
               {staffList.map((s) => (
@@ -155,7 +164,7 @@ const Attendance = () => {
 
           {/* Date */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-zinc-700">Attendance Date <span className="text-red-500">*</span></label>
+            <label className="text-xs font-cinzel font-semibold uppercase tracking-wide text-gray-700">Date <span className="text-amber-600">*</span></label>
             <input
               type="date"
               value={form.date}
@@ -163,14 +172,16 @@ const Attendance = () => {
                 setForm({ ...form, date: e.target.value });
                 if (errors.date) setErrors({ ...errors, date: null });
               }}
-              className={`border p-2.5 rounded-md focus:outline-none transition-shadow bg-zinc-50 ${errors.date ? 'border-red-400 bg-red-50 focus:ring-1 focus:ring-red-400' : 'border-zinc-200 focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37]'}`}
+              className={`w-full p-3 rounded-lg border focus:outline-none focus:ring-1 bg-gray-50 font-cormorant text-lg text-gray-800 transition-colors ${
+                errors.date ? 'border-red-300 focus:border-red-400 focus:ring-red-200' : 'border-gray-200 focus:border-[#FFD700] focus:ring-[#FFD700]/30'
+              }`}
             />
             {errors.date && <span className="text-red-500 text-xs font-medium mt-0.5">{errors.date}</span>}
           </div>
 
           {/* Entry */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-zinc-700">Entry Time <span className="text-red-500">*</span></label>
+            <label className="text-xs font-cinzel font-semibold uppercase tracking-wider text-gray-500">Entry Time <span className="text-amber-600">*</span></label>
             <input
               type="time"
               value={form.entryTime}
@@ -178,19 +189,21 @@ const Attendance = () => {
                 setForm({ ...form, entryTime: e.target.value });
                 if (errors.entryTime) setErrors({ ...errors, entryTime: null });
               }}
-              className={`border p-2.5 rounded-md focus:outline-none transition-shadow bg-zinc-50 ${errors.entryTime ? 'border-red-400 bg-red-50 focus:ring-1 focus:ring-red-400' : 'border-zinc-200 focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37]'}`}
+              className={`w-full p-3 rounded-lg border focus:outline-none focus:ring-1 bg-gray-50 font-cormorant text-lg text-gray-800 transition-colors ${
+                errors.entryTime ? 'border-red-300 focus:border-red-400 focus:ring-red-200' : 'border-gray-200 focus:border-[#FFD700] focus:ring-[#FFD700]/30'
+              }`}
             />
             {errors.entryTime && <span className="text-red-500 text-xs font-medium mt-0.5">{errors.entryTime}</span>}
           </div>
 
           {/* Exit */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-zinc-700">Exit Time <span className="text-zinc-400 text-xs font-normal ml-1">(Optional)</span></label>
+            <label className="text-xs font-cinzel font-semibold uppercase tracking-wide text-gray-700">Exit Time <span className="text-xs font-normal text-gray-500 ml-1">(Optional)</span></label>
             <input
               type="time"
               value={form.exitTime}
               onChange={(e) => setForm({ ...form, exitTime: e.target.value })}
-              className="border border-zinc-200 bg-zinc-50 p-2.5 rounded-md focus:outline-none focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37] transition-shadow"
+              className="w-full p-3 rounded-lg border border-gray-200 focus:outline-none focus:border-[#FFD700] focus:ring-1 focus:ring-[#FFD700]/30 bg-gray-50 font-cormorant text-lg text-gray-800 transition-colors"
             />
           </div>
         </div>
@@ -198,39 +211,39 @@ const Attendance = () => {
         <div className="mt-8 flex justify-end">
           <button
             onClick={handleAdd}
-            className="bg-zinc-900 text-white px-8 py-2.5 rounded-md uppercase tracking-widest font-semibold text-sm hover:bg-[#D4AF37] transition-colors shadow-sm"
+            className="flex items-center gap-2 px-8 py-2.5 rounded-lg font-cinzel text-xs font-bold uppercase tracking-widest transition-all shadow-md hover:shadow-lg bg-[#111] text-white"
           >
-            Mark Attendance
+            <Plus size={16} className="text-[#FFD700]" /> Mark Attendance
           </button>
         </div>
       </div>
 
       {/* 📋 TABLE CARD */}
-      <div className="bg-white rounded-lg shadow-sm border border-zinc-200 overflow-hidden">
+      <div className="bg-white rounded-xl shadow-[0_2px_15px_rgba(0,0,0,0.04)] border border-gray-100 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-zinc-50 border-b border-zinc-200">
-                <th className="p-4 text-xs font-bold text-zinc-500 uppercase tracking-wider">Staff Details</th>
-                <th className="p-4 text-xs font-bold text-zinc-500 uppercase tracking-wider">Date</th>
-                <th className="p-4 text-xs font-bold text-zinc-500 uppercase tracking-wider">Entry Time</th>
-                <th className="p-4 text-xs font-bold text-zinc-500 uppercase tracking-wider">Exit Time</th>
-                <th className="p-4 text-xs font-bold text-zinc-500 uppercase tracking-wider text-right">Actions</th>
+              <tr className="bg-gray-50 border-b border-gray-100">
+                <th className="p-4 pl-6 text-xs font-cinzel font-bold uppercase tracking-wider text-gray-700">Staff Details</th>
+                <th className="p-4 text-xs font-cinzel font-bold uppercase tracking-wider text-gray-700">Date</th>
+                <th className="p-4 text-xs font-cinzel font-bold uppercase tracking-wider text-gray-700">Entry Time</th>
+                <th className="p-4 text-xs font-cinzel font-bold uppercase tracking-wider text-gray-700">Exit Time</th>
+                <th className="p-4 text-xs font-cinzel font-bold uppercase tracking-wider text-gray-700 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-zinc-100">
+            <tbody className="divide-y divide-gray-100">
               {filteredRecords.length > 0 ? (
                 filteredRecords.map((r) => (
-                  <tr key={r._id} className="hover:bg-zinc-50 transition-colors">
-                    <td className="p-4">
-                      <div className="font-semibold text-zinc-900">{r.staffId?.name || 'Unknown Staff'}</div>
-                      <div className="text-xs text-zinc-500 mt-0.5 tracking-wide">{r.staffId?.staffId || 'NO ID'}</div>
+                  <tr key={r._id} className="hover:bg-[#FFFCF5] transition-colors">
+                    <td className="p-4 pl-6">
+                      <div className="font-medium text-gray-900 font-playfair">{r.staffId?.name || 'Unknown Staff'}</div>
+                      <div className="text-xs mt-0.5 tracking-wider font-mono text-amber-700">{r.staffId?.staffId || 'NO ID'}</div>
                     </td>
-                    <td className="p-4 text-zinc-700 font-medium">
+                    <td className="p-4 font-cormorant text-lg text-gray-600">
                       {new Date(r.date).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
                     </td>
                     <td className="p-4">
-                      <span className="bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-md text-xs font-bold tracking-wide border border-emerald-100">
+                      <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-green-50 text-green-700 border border-green-200">
                         {r.entryTime}
                       </span>
                     </td>
@@ -240,16 +253,16 @@ const Attendance = () => {
                           type="time"
                           value={editExitTime}
                           onChange={(e) => setEditExitTime(e.target.value)}
-                          className="border border-zinc-300 p-1.5 rounded focus:outline-none focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37] text-sm shadow-inner"
+                          className="p-2 rounded-lg border border-amber-200 focus:outline-none focus:border-amber-400 bg-amber-50 text-sm text-gray-800"
                           autoFocus
                         />
                       ) : (
                         r.exitTime ? (
-                          <span className="bg-blue-50 text-blue-700 px-2.5 py-1 rounded-md text-xs font-bold tracking-wide border border-blue-100">
+                          <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200">
                             {r.exitTime}
                           </span>
                         ) : (
-                          <span className="text-zinc-400 italic text-sm">- Not marked -</span>
+                          <span className="italic text-sm text-gray-300">- Not marked -</span>
                         )
                       )}
                     </td>
@@ -258,13 +271,13 @@ const Attendance = () => {
                         <div className="flex justify-end gap-2">
                           <button
                             onClick={() => handleSaveExitTime(r._id)}
-                            className="bg-[#D4AF37] text-white px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wider hover:bg-yellow-600 transition-colors"
+                            className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-cinzel font-bold uppercase tracking-wider bg-[#111] text-white transition-colors"
                           >
-                            Save
+                            <Save size={14} className="text-[#FFD700]" /> Save
                           </button>
                           <button
                             onClick={() => setEditRecordId(null)}
-                            className="bg-zinc-200 text-zinc-700 px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wider hover:bg-zinc-300 transition-colors"
+                            className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-cinzel font-bold uppercase tracking-wider border border-gray-200 text-gray-500 hover:bg-gray-50 transition-colors"
                           >
                             Cancel
                           </button>
@@ -272,7 +285,7 @@ const Attendance = () => {
                       ) : (
                         <button
                           onClick={() => handleEditClick(r)}
-                          className="text-[#D4AF37] hover:text-yellow-700 font-bold text-xs uppercase tracking-wider transition-colors border border-transparent hover:border-[#D4AF37] px-3 py-1.5 rounded"
+                          className="font-cinzel font-bold text-xs uppercase tracking-wider transition-colors px-3 py-1.5 rounded-lg text-amber-700 border border-amber-200 hover:bg-amber-50"
                         >
                           Edit Exit
                         </button>
@@ -283,12 +296,12 @@ const Attendance = () => {
               ) : (
                 <tr>
                   <td colSpan="5" className="p-12 text-center">
-                    <div className="text-zinc-400 mb-2">
+                    <div className="text-gray-300 mb-2">
                       <svg className="w-12 h-12 mx-auto mb-2 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
                     </div>
-                    <p className="text-zinc-500 font-medium">No attendance records found for the selected date.</p>
+                    <p className="text-gray-500 font-cormorant italic text-lg">No attendance records found for the selected date.</p>
                   </td>
                 </tr>
               )}

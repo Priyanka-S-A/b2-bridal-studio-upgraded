@@ -59,8 +59,14 @@ const Revenue = () => {
   }
 
   return (
-    <div>
-      <h2 className="text-2xl font-bold admin-heading mb-6">Revenue Dashboard</h2>
+    <div className="bg-[#FDFDFD] min-h-screen p-4 md:p-8 font-sans text-gray-900">
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold font-cinzel uppercase tracking-wide text-gray-900 flex items-center gap-3">
+          <TrendingUp size={24} className="text-[#D4AF37]" />
+          Revenue Dashboard
+        </h1>
+        <p className="text-sm text-gray-600 mt-1">Track all income across online and offline channels.</p>
+      </div>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
@@ -97,9 +103,9 @@ const Revenue = () => {
           <button
             key={f.key}
             onClick={() => setFilter(f.key)}
-            className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-colors ${
+            className={`px-4 py-1.5 rounded-full text-xs font-cinzel font-bold uppercase tracking-wide transition-all ${
               filter === f.key
-                ? 'bg-black text-amber-400'
+                ? 'bg-[#111] text-amber-400 shadow-md'
                 : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
             }`}
           >
@@ -109,17 +115,18 @@ const Revenue = () => {
       </div>
 
       {/* Revenue Table */}
-      <div className="admin-card overflow-hidden">
+      <div className="bg-white rounded-xl shadow-[0_2px_15px_rgba(0,0,0,0.04)] border border-gray-100 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-gray-50 border-b border-gray-100 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                <th className="p-4 pl-6">Date</th>
-                <th className="p-4">Customer</th>
-                <th className="p-4">Source</th>
-                <th className="p-4">Mode</th>
-                <th className="p-4">Total</th>
-                <th className="p-4 pr-6">Bill</th>
+              <tr className="bg-gray-50 border-b border-gray-100">
+                
+                <th className="p-4 pl-6 text-xs font-cinzel font-bold uppercase tracking-wider text-gray-700">Date</th>
+                <th className="p-4 text-xs font-cinzel font-bold uppercase tracking-wider text-gray-700">Customer</th>
+                <th className="p-4 text-xs font-cinzel font-bold uppercase tracking-wider text-gray-700">Source</th>
+                <th className="p-4 text-xs font-cinzel font-bold uppercase tracking-wider text-gray-700">Mode</th>
+                <th className="p-4 text-xs font-cinzel font-bold uppercase tracking-wider text-gray-700">Total</th>
+                <th className="p-4 pr-6 text-xs font-cinzel font-bold uppercase tracking-wider text-gray-700">Bill</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -133,7 +140,7 @@ const Revenue = () => {
                 </tr>
               ) : (
                 filtered.map(entry => (
-                  <tr key={entry._id} className="hover:bg-gray-50 transition-colors">
+                  <tr key={entry._id} className="hover:bg-[#FFFCF5] transition-colors">
                     <td className="p-4 pl-6 text-sm text-gray-600">
                       {new Date(entry.date).toLocaleDateString('en-IN', {
                         day: 'numeric', month: 'short', year: 'numeric'

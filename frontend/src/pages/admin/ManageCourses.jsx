@@ -164,15 +164,18 @@ const ManageCourses = () => {
     <div className="bg-[#FDFDFD] min-h-screen p-4 md:p-8 font-sans text-gray-900">
       
       {/* Header Section */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold font-cinzel uppercase tracking-[0.1em] text-gray-900">Course Management</h1>
-        <p className="font-cormorant italic text-lg text-gray-500 mt-1">Organize and manage your academy's curriculum.</p>
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold font-cinzel uppercase tracking-wide text-gray-900 flex items-center gap-3">
+          <PlusCircle size={24} className="text-[#D4AF37]" />
+          Course Management
+        </h1>
+        <p className="text-sm text-gray-600 mt-1">Organize and manage your academy's curriculum.</p>
       </div>
 
       {/* TOP SECTION: ADD COURSE & SEARCH */}
-      <div className="bg-white rounded-xl shadow-[0_2px_15px_rgba(0,0,0,0.04)] p-6 mb-8 border border-gray-100">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-          <h2 className="text-lg font-cinzel font-bold tracking-widest uppercase text-gray-900 flex items-center gap-2">
+      <div className="bg-white rounded-xl shadow-[0_2px_15px_rgba(0,0,0,0.04)] p-5 mb-6 border border-gray-100">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-5 gap-3">
+          <h2 className="text-base font-cinzel font-bold tracking-wide uppercase text-gray-900 flex items-center gap-2">
             <PlusCircle className="text-[#FFD700]" size={20}/>
             Add New Course
           </h2>
@@ -184,7 +187,7 @@ const ManageCourses = () => {
               placeholder="Search courses..." 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-11 pr-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:border-[#FFD700] focus:ring-1 focus:ring-[#FFD700]/30 bg-gray-50 text-gray-900 placeholder-gray-400 transition-all font-cormorant text-lg shadow-sm"
+              className="w-full pl-11 pr-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:border-[#FFD700] focus:ring-1 focus:ring-[#FFD700]/30 bg-gray-50 text-gray-900 placeholder-gray-400 transition-all text-sm shadow-sm"
             />
             <Search className="absolute left-4 top-3 text-gray-400 group-focus-within:text-[#FFD700] transition-colors" size={18} />
           </div>
@@ -195,7 +198,7 @@ const ManageCourses = () => {
           <select
             value={newCourse.category}
             onChange={(e) => setNewCourse({ ...newCourse, category: e.target.value })}
-            className="w-full p-3 rounded-lg border border-gray-200 focus:outline-none focus:border-[#FFD700] bg-gray-50 font-cormorant text-lg text-gray-800 transition-colors"
+            className="w-full p-2.5 rounded-lg border border-gray-200 focus:outline-none focus:border-[#FFD700] bg-gray-50 text-sm text-gray-800 transition-colors"
           >
             <option value="">Select Category</option>
             {uniqueCategories.map(cat => (
@@ -207,28 +210,28 @@ const ManageCourses = () => {
             placeholder="Course Title"
             value={newCourse.title}
             onChange={(e) => setNewCourse({ ...newCourse, title: e.target.value })}
-            className="w-full p-3 rounded-lg border border-gray-200 focus:outline-none focus:border-[#FFD700] bg-gray-50 font-cormorant text-lg text-gray-800 transition-colors"
+            className="w-full p-2.5 rounded-lg border border-gray-200 focus:outline-none focus:border-[#FFD700] bg-gray-50 text-sm text-gray-800 transition-colors"
           />
 
           <input
             placeholder="Duration (e.g., 3 Months)"
             value={newCourse.duration}
             onChange={(e) => setNewCourse({ ...newCourse, duration: e.target.value })}
-            className="w-full p-3 rounded-lg border border-gray-200 focus:outline-none focus:border-[#FFD700] bg-gray-50 font-cormorant text-lg text-gray-800 transition-colors"
+            className="w-full p-2.5 rounded-lg border border-gray-200 focus:outline-none focus:border-[#FFD700] bg-gray-50 text-sm text-gray-800 transition-colors"
           />
 
           <input
             placeholder="Learnings (comma separated)"
             value={newCourse.learnings}
             onChange={(e) => setNewCourse({ ...newCourse, learnings: e.target.value })}
-            className="w-full p-3 rounded-lg border border-gray-200 focus:outline-none focus:border-[#FFD700] bg-gray-50 font-cormorant text-lg text-gray-800 transition-colors"
+            className="w-full p-2.5 rounded-lg border border-gray-200 focus:outline-none focus:border-[#FFD700] bg-gray-50 text-sm text-gray-800 transition-colors"
           />
         </div>
         
         <div className="mt-5 flex justify-end">
           <button
             onClick={handleAdd}
-            className="flex items-center gap-2 px-6 py-2.5 rounded-lg font-cinzel text-xs font-bold uppercase tracking-widest transition-all shadow-md hover:shadow-lg"
+            className="flex items-center gap-2 px-5 py-2 rounded-lg font-cinzel text-xs font-bold uppercase tracking-wide transition-all shadow-md hover:shadow-lg"
             style={{ background: '#111', color: '#FFF' }}
           >
             <Plus size={16} className="text-[#FFD700]" /> Add Course
@@ -237,13 +240,13 @@ const ManageCourses = () => {
       </div>
 
       {/* SPLIT LAYOUT: SIDEBAR & MAIN CONTENT */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         
         {/* LEFT SIDEBAR: CATEGORIES */}
         <div className="lg:col-span-3">
           <div className="bg-white rounded-xl shadow-[0_2px_15px_rgba(0,0,0,0.04)] border border-gray-100 overflow-hidden sticky top-6">
-            <div className="p-4 bg-gray-50 border-b border-gray-100">
-              <h3 className="font-cinzel font-bold text-gray-800 uppercase tracking-widest text-sm">Categories</h3>
+            <div className="p-3 bg-gray-50 border-b border-gray-100">
+              <h3 className="font-cinzel font-bold text-gray-800 uppercase tracking-wide text-xs">Categories</h3>
             </div>
             <div className="flex flex-col">
               {uniqueCategories.map(cat => {
@@ -253,13 +256,13 @@ const ManageCourses = () => {
                   <button
                     key={cat}
                     onClick={() => setSelectedCategory(cat)}
-                    className={`w-full text-left px-5 py-4 flex justify-between items-center transition-all duration-300 border-l-4 ${
+                    className={`w-full text-left px-4 py-3 flex justify-between items-center transition-all duration-300 border-l-3 ${
                       isSelected
                         ? 'border-[#FFD700] bg-[#FFFAF0] text-gray-900 font-bold shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)]'
                         : 'border-transparent text-gray-500 hover:bg-gray-50 hover:text-gray-900'
                     }`}
                   >
-                    <span className="font-cinzel uppercase tracking-[0.1em] text-sm flex items-center gap-2">
+                    <span className="font-cinzel uppercase tracking-wide text-xs font-bold flex items-center gap-2">
                       {cat}
                     </span>
                     <div className="flex items-center gap-3">

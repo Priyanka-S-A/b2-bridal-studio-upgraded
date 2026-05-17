@@ -199,11 +199,14 @@ export default function Billing() {
 
   /* ─── render ───────────────────────────────────────────────── */
   return (
-    <div className="p-4 md:p-6 max-w-5xl mx-auto">
+    <div className="bg-[#FDFDFD] min-h-screen p-4 md:p-8 font-sans text-gray-900">
       {/* Page header */}
       <div className="mb-6">
-        <h2 className="text-2xl font-bold admin-heading">Offline Billing</h2>
-        <p className="text-sm text-gray-400 mt-1">B2 Bridal Studio — Generate walk-in bills instantly</p>
+        <h1 className="text-2xl font-bold font-cinzel uppercase tracking-wide text-gray-900 flex items-center gap-3">
+          <ShoppingCart size={24} className="text-[#D4AF37]" />
+          Offline Billing
+        </h1>
+        <p className="text-sm text-gray-600 mt-1">B2 Bridal Studio — Generate walk-in bills instantly</p>
       </div>
 
       {/* Success/Warning banner */}
@@ -222,23 +225,23 @@ export default function Billing() {
                 href={`/bill/${successBill.bill._id}`}
                 target="_blank"
                 rel="noreferrer"
-                className="admin-btn-primary"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-cinzel font-bold uppercase tracking-wide bg-[#111] text-white transition-all hover:shadow-md"
               >
                 <FileText size={14} /> View Bill
               </a>
               <button
                 onClick={() => generatePDF(successBill.bill)}
-                className="admin-btn-secondary"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-cinzel font-bold uppercase tracking-wide border border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors"
               >
                 <Download size={14} /> Download PDF
               </button>
               <button
                 onClick={() => handlePrint(successBill.bill)}
-                className="admin-btn-secondary"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-cinzel font-bold uppercase tracking-wide border border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors"
               >
                 <Printer size={14} /> Print
               </button>
-              <button onClick={() => setSuccessBill(null)} className="ml-auto text-gray-400 hover:text-gray-600">
+              <button onClick={() => setSuccessBill(null)} className="ml-auto text-gray-400 hover:text-gray-700 transition-colors">
                 <X size={18} />
               </button>
             </div>
@@ -248,7 +251,7 @@ export default function Billing() {
 
       {/* Error banner */}
       {error && (
-        <div className="mb-4 bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3 flex justify-between items-center">
+        <div className="mb-4 bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3 flex justify-between items-center font-medium">
           {error}
           <button onClick={() => setError('')}><X size={16} /></button>
         </div>
@@ -260,28 +263,28 @@ export default function Billing() {
         <div className="space-y-4">
 
           {/* Bill info */}
-          <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 space-y-4">
-            <h3 className="font-semibold text-gray-800 text-sm uppercase tracking-wider">Bill Details</h3>
+          <div className="bg-white rounded-xl border border-gray-100 shadow-[0_2px_15px_rgba(0,0,0,0.04)] p-5 space-y-4">
+            <h3 className="font-cinzel font-bold text-gray-900 text-sm uppercase tracking-wide pb-3" style={{ borderBottom: '1px solid rgba(0,0,0,0.06)' }}>Bill Details</h3>
 
             <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1">Customer Name</label>
+              <label className="block text-xs font-cinzel font-semibold uppercase tracking-wide text-gray-700 mb-1.5">Customer Name</label>
               <input
                 id="billing-customer"
                 type="text"
                 value={customer}
                 onChange={e => setCustomer(e.target.value)}
                 placeholder="Walk-in"
-                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-200 focus:border-amber-400 font-cormorant text-lg transition-colors"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1">Source</label>
+              <label className="block text-xs font-cinzel font-semibold uppercase tracking-wide text-gray-700 mb-1.5">Source</label>
               <select
                 id="billing-source"
                 value={source}
                 onChange={e => setSource(e.target.value)}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 bg-white"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-200 focus:border-amber-400 font-cormorant text-lg transition-colors"
               >
                 <option value="offline">Offline</option>
                 <option value="online">Online</option>
@@ -289,12 +292,12 @@ export default function Billing() {
             </div>
 
             <div className="mt-4">
-              <label className="block text-xs font-medium text-gray-500 mb-1">Payment Method</label>
+              <label className="block text-xs font-cinzel font-semibold uppercase tracking-wide text-gray-700 mb-1.5">Payment Method</label>
               <select
                 id="billing-payment-method"
                 value={paymentMethod}
                 onChange={e => setPaymentMethod(e.target.value)}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 bg-white"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-200 focus:border-amber-400 font-cormorant text-lg transition-colors"
               >
                 <option value="cash">Cash</option>
                 <option value="upi">UPI</option>
@@ -304,8 +307,8 @@ export default function Billing() {
           </div>
 
           {/* Category + item picker */}
-          <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 space-y-4">
-            <h3 className="font-semibold text-gray-800 text-sm uppercase tracking-wider">Add Items</h3>
+          <div className="bg-white rounded-xl border border-gray-100 shadow-[0_2px_15px_rgba(0,0,0,0.04)] p-5 space-y-4">
+            <h3 className="font-cinzel font-bold text-gray-900 text-sm uppercase tracking-wide pb-3" style={{ borderBottom: '1px solid rgba(0,0,0,0.06)' }}>Add Items</h3>
 
             {/* Category tabs */}
             <div className="flex gap-2">
@@ -314,10 +317,10 @@ export default function Billing() {
                   key={cat}
                   id={`billing-cat-${cat}`}
                   onClick={() => { setCategory(cat); setSelectedItem(''); }}
-                  className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors capitalize ${
+                  className={`flex-1 py-2.5 rounded-lg font-cinzel text-xs font-bold uppercase tracking-wide transition-all capitalize ${
                     category === cat
-                      ? 'bg-black text-amber-400'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      ? 'bg-[#111] text-amber-400 shadow-md'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
                   {cat}
@@ -327,13 +330,13 @@ export default function Billing() {
 
             {/* Item dropdown */}
             {loadingCat ? (
-              <div className="text-center py-4 text-sm text-gray-400">Loading catalogue…</div>
+              <div className="text-center py-4 text-sm text-gray-600 font-cormorant italic">Loading catalogue…</div>
             ) : (
               <select
                 id="billing-item-select"
                 value={selectedItem}
                 onChange={e => setSelectedItem(e.target.value)}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 bg-white"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-200 focus:border-amber-400 font-cormorant text-lg transition-colors"
               >
                 <option value="">— Select {category === 'services' ? 'a service' : 'a product'} —</option>
                 {catalogueItems.map(item => (
@@ -347,53 +350,53 @@ export default function Billing() {
             {/* Quantity */}
             <div className="flex items-center gap-3">
               <div className="flex-1">
-                <label className="block text-xs font-medium text-gray-500 mb-1">Quantity</label>
+                <label className="block text-xs font-cinzel font-semibold uppercase tracking-wide text-gray-700 mb-1.5">Quantity</label>
                 <input
                   id="billing-qty"
                   type="number"
                   min={1}
                   value={qty}
                   onChange={e => setQty(Math.max(1, Number(e.target.value)))}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2.5 bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-200 focus:border-amber-400 font-cormorant text-lg transition-colors"
                 />
               </div>
               <button
                 id="billing-add-btn"
                 onClick={handleAddItem}
                 disabled={!selectedItem}
-                className="admin-btn-primary mt-5"
+                className="flex items-center gap-1.5 px-5 py-2.5 mt-6 rounded-lg font-cinzel text-xs font-bold uppercase tracking-wide bg-[#111] text-white transition-all hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <Plus size={16} /> Add
+                <Plus size={16} className="text-[#FFD700]" /> Add
               </button>
             </div>
           </div>
         </div>
 
         {/* ── RIGHT: Bill preview ───────────────────────────── */}
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm flex flex-col">
+        <div className="bg-white rounded-xl border border-gray-100 shadow-[0_2px_15px_rgba(0,0,0,0.04)] flex flex-col">
           {/* Bill header */}
-          <div className="bg-black text-center py-5 rounded-t-xl">
-            <p className="text-amber-400 font-bold tracking-widest text-sm uppercase">B2 Bridal Studio</p>
-            <p className="text-amber-200/50 text-xs mt-0.5">Offline Bill Preview</p>
+          <div className="bg-[#111] text-center py-5 rounded-t-xl">
+            <p className="text-amber-400 font-cinzel font-bold tracking-wide text-sm uppercase">B2 Bridal Studio</p>
+            <p className="text-amber-200/60 text-xs mt-0.5 font-cormorant italic">Offline Bill Preview</p>
           </div>
 
           {/* Items list */}
           <div className="flex-1 p-5">
             {billItems.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-12 text-gray-300">
+              <div className="flex flex-col items-center justify-center py-12 text-gray-400">
                 <ShoppingCart size={40} strokeWidth={1.2} />
-                <p className="text-sm mt-3">No items added yet</p>
-                <p className="text-xs mt-1">Select a category and add items</p>
+                <p className="text-sm mt-3 font-medium text-gray-600">No items added yet</p>
+                <p className="text-xs mt-1 text-gray-500">Select a category and add items</p>
               </div>
             ) : (
               <div className="space-y-2">
                 {billItems.map(item => (
-                  <div key={item.id} className="flex items-center justify-between py-2.5 border-b border-gray-50 group">
+                  <div key={item.id} className="flex items-center justify-between py-2.5 border-b border-gray-100 group">
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-800 truncate">{item.name}</p>
-                      <p className="text-xs text-gray-400 mt-0.5">
+                      <p className="text-sm font-semibold text-gray-900 truncate">{item.name}</p>
+                      <p className="text-xs text-gray-600 mt-0.5">
                         ₹{item.price} × {item.quantity}
-                        <span className="ml-2 px-1.5 py-0.5 rounded bg-gray-100 text-gray-500 capitalize">{item.itemType}</span>
+                        <span className="ml-2 px-1.5 py-0.5 rounded bg-gray-100 text-gray-700 capitalize text-[0.65rem] font-medium">{item.itemType}</span>
                       </p>
                     </div>
                     <div className="flex items-center gap-3 ml-3">
@@ -414,22 +417,23 @@ export default function Billing() {
           {/* Total + generate */}
           <div className="border-t border-gray-100 p-5">
             <div className="flex justify-between items-center mb-4">
-              <span className="text-sm font-medium text-gray-500">Total</span>
-              <span className="text-2xl font-bold text-gray-900">₹{total.toLocaleString()}</span>
+              <span className="text-sm font-cinzel font-bold uppercase tracking-wide text-gray-700">Total</span>
+              <span className="text-2xl font-bold text-gray-900 font-cinzel">₹{total.toLocaleString()}</span>
             </div>
-            <div className="flex items-center justify-between text-xs text-gray-400 mb-4">
-              <span>Source: <strong className="text-gray-600 capitalize">{source}</strong> | Payment: <strong className="text-gray-600 capitalize">{paymentMethod}</strong></span>
-              <span>Customer: <strong className="text-gray-600">{customer || 'Walk-in'}</strong></span>
+            <div className="flex items-center justify-between text-xs text-gray-600 mb-4">
+              <span>Source: <strong className="text-gray-900 capitalize">{source}</strong> | Payment: <strong className="text-gray-900 capitalize">{paymentMethod}</strong></span>
+              <span>Customer: <strong className="text-gray-900">{customer || 'Walk-in'}</strong></span>
             </div>
             <button
               id="billing-generate-btn"
               onClick={handleGenerateBill}
               disabled={billItems.length === 0 || generating}
-              className="w-full py-3.5 bg-amber-500 text-black font-bold rounded-xl text-sm hover:bg-amber-400 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
+              className="w-full py-3.5 rounded-xl font-cinzel text-sm font-bold uppercase tracking-wide disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
+              style={{ background: 'linear-gradient(135deg, #D4AF37, #C9A227)', color: '#fff', boxShadow: '0 4px 16px rgba(212,175,55,0.3)' }}
             >
               {generating ? (
                 <>
-                  <div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                   Generating…
                 </>
               ) : (

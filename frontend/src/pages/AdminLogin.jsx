@@ -40,31 +40,35 @@ const AdminLogin = () => {
   };
 
   return (
-    <div className="admin-login-page">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md px-4">
+    <div className="min-h-screen flex items-center justify-center relative" style={{ background: 'linear-gradient(135deg, #FAF8F5 0%, #F5F0E8 50%, #EDE8DD 100%)' }}>
+      {/* Subtle decorative elements */}
+      <div className="absolute top-0 right-0 w-96 h-96 rounded-full opacity-30" style={{ background: 'radial-gradient(circle, rgba(212,175,55,0.08), transparent 70%)' }} />
+      <div className="absolute bottom-0 left-0 w-80 h-80 rounded-full opacity-20" style={{ background: 'radial-gradient(circle, rgba(212,175,55,0.1), transparent 60%)' }} />
+
+      <div className="sm:mx-auto sm:w-full sm:max-w-md px-4 relative z-10">
         {/* Logo */}
         <div className="flex flex-col items-center mb-8">
-          <img src="/b2-logo.png" alt="B2 Bridal Studio" style={{ width: 72, height: 72, objectFit: 'contain', filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.15))' }} />
-          <h2 className="mt-4 text-2xl font-extrabold text-gray-900 tracking-tight" style={{ fontFamily: 'Cinzel, serif' }}>
+          <img src="/b2-admin-logo.png" alt="B2 Bridal Studio" style={{ width: 72, height: 72, objectFit: 'contain', filter: 'drop-shadow(0 2px 12px rgba(212,175,55,0.2))' }} />
+          <h2 className="mt-4 text-2xl font-extrabold tracking-wide uppercase font-cinzel" style={{ color: '#1a1a1a' }}>
             Admin Portal
           </h2>
-          <p className="mt-1 text-sm font-medium" style={{ color: '#555' }}>
+          <p className="mt-1 text-sm font-cormorant italic" style={{ color: '#666' }}>
             Sign in to manage services and bookings
           </p>
         </div>
 
-        <div className="admin-login-card">
+        <div className="bg-white rounded-2xl p-8 shadow-xl" style={{ border: '1px solid rgba(0,0,0,0.06)', boxShadow: '0 8px 40px rgba(0,0,0,0.06)' }}>
           {error && (
-            <div className="bg-red-50 text-red-600 border border-red-200 p-3 rounded-lg text-sm mb-5 text-center font-medium">
+            <div className="bg-red-50 text-red-600 border border-red-200 p-3 rounded-xl text-sm mb-5 text-center font-medium">
               {error}
             </div>
           )}
 
           <form className="space-y-5" onSubmit={handleLogin}>
             <div>
-              <label className="block text-sm font-semibold text-gray-800 mb-1">Username</label>
+              <label className="block text-xs font-cinzel font-semibold uppercase tracking-wide mb-2 text-gray-700">Username</label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
                   <User className="h-4 w-4 text-gray-400" />
                 </div>
                 <input
@@ -72,16 +76,16 @@ const AdminLogin = () => {
                   required
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  className="admin-input pl-10"
+                  className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-100 transition-all text-sm"
                   placeholder="Enter admin username"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-800 mb-1">Password</label>
+              <label className="block text-xs font-cinzel font-semibold uppercase tracking-wide mb-2 text-gray-700">Password</label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
                   <Lock className="h-4 w-4 text-gray-400" />
                 </div>
                 <input
@@ -89,7 +93,7 @@ const AdminLogin = () => {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="admin-input pl-10"
+                  className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-100 transition-all text-sm"
                   placeholder="Enter admin password"
                 />
               </div>
@@ -99,8 +103,8 @@ const AdminLogin = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="admin-btn-primary w-full justify-center py-3 text-base"
-                style={{ borderRadius: 8 }}
+                className="w-full py-3.5 rounded-xl font-cinzel text-sm font-bold tracking-wider uppercase transition-all disabled:opacity-50"
+                style={{ background: 'linear-gradient(135deg, #D4AF37, #C9A227)', color: '#fff', boxShadow: '0 4px 16px rgba(212,175,55,0.3)' }}
               >
                 {loading ? 'Signing in…' : 'Sign In'}
               </button>
