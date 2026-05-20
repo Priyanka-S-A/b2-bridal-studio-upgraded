@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Search, ShoppingCart, Calendar, Clock, Check, Trash2, ChevronDown, ChevronUp, MapPin } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const HOUR_SLOTS = [
   { label: '10 AM', value: '10' },
@@ -234,6 +235,7 @@ const Services = () => {
 
   const [expandedCategory, setExpandedCategory] = useState(null);
   const [selectedOptions, setSelectedOptions] = useState({});
+  const [toast, setToast] = useState({ show: false, message: '' });
 
   useEffect(() => {
     const fetchServices = async () => {
@@ -248,6 +250,15 @@ const Services = () => {
 };
     fetchServices();
   }, []);
+
+  useEffect(() => {
+    if (toast.show) {
+      const timer = setTimeout(() => {
+        setToast(prev => ({ ...prev, show: false }));
+      }, 3500);
+      return () => clearTimeout(timer);
+    }
+  }, [toast]);
 
   const toggleCategory = (category) => {
     setExpandedCategory(expandedCategory === category ? null : category);
@@ -271,6 +282,10 @@ const Services = () => {
   const addToCart = (serviceItem) => {
     if (!cart.find(item => item._id === serviceItem._id)) {
       setCart([...cart, serviceItem]);
+      setToast({
+        show: true,
+        message: `“${serviceItem.name}” added successfully. Scroll down to view your cart.`
+      });
     }
   };
 
@@ -511,6 +526,37 @@ const Services = () => {
           </div>
         </div>
       </div>
+      <AnimatePresence>
+        {toast.show && (
+          <motion.div
+            initial={{ opacity: 0, y: 50, x: '-50%' }}
+            animate={{ opacity: 1, y: 0, x: '-50%' }}
+            exit={{ opacity: 0, y: 20, x: '-50%' }}
+            transition={{ duration: 0.3, ease: 'easeOut' }}
+            className="fixed bottom-6 left-1/2 z-[9999] lg:hidden w-[90%] max-w-md animate-glow-pulse"
+          >
+            <div className="glass-dark border-gold-glow px-4 py-3 rounded-md flex items-center justify-between shadow-2xl relative overflow-hidden" style={{ background: 'rgba(10, 10, 10, 0.95)' }}>
+              <div className="flex items-center gap-3">
+                <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center" style={{ background: 'rgba(255, 215, 0, 0.1)', border: '1px solid rgba(255, 215, 0, 0.3)' }}>
+                  <Check size={16} style={{ color: '#FFD700' }} />
+                </div>
+                <div className="flex-1">
+                  <p className="font-playfair text-[0.85rem] font-semibold leading-snug" style={{ color: '#F8F5F0' }}>
+                    {toast.message}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setToast(prev => ({ ...prev, show: false }))}
+                className="ml-3 transition-colors text-xs font-sans px-2 py-1 rounded"
+                style={{ color: 'rgba(248, 245, 240, 0.5)' }}
+              >
+                ✕
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
