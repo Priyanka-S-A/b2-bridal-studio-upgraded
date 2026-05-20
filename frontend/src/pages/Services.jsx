@@ -233,6 +233,8 @@ const Services = () => {
   const [slotChecking, setSlotChecking] = useState(false);
   const [loading, setLoading] = useState(true);
   const [fullSlots, setFullSlots] = useState([]);
+  const [blockedSlots, setBlockedSlots] = useState([]);
+  const [isDayBlocked, setIsDayBlocked] = useState(false);
 
   const [expandedCategory, setExpandedCategory] = useState(null);
   const [selectedOptions, setSelectedOptions] = useState({});
@@ -265,14 +267,21 @@ const Services = () => {
     const fetchFullSlots = async () => {
       if (!bookingBranch || !bookingDate) {
         setFullSlots([]);
+        setBlockedSlots([]);
+        setIsDayBlocked(false);
         return;
       }
       try {
         const res = await fetch(`${API}/api/bookings/full-slots?branch=${encodeURIComponent(bookingBranch)}&date=${encodeURIComponent(bookingDate)}`);
         const data = await res.json();
         setFullSlots(data.fullSlots || []);
+        setBlockedSlots(data.blockedSlots || []);
+        setIsDayBlocked(!!data.isDayBlocked);
       } catch (err) {
         console.error("Failed to fetch full slots:", err);
+        setFullSlots([]);
+        setBlockedSlots([]);
+        setIsDayBlocked(false);
       }
     };
     fetchFullSlots();
@@ -364,6 +373,14 @@ const Services = () => {
     if (!bookingTime)   errs.time   = 'Please select a booking time';
     if (Object.keys(errs).length > 0) {
       setBookingErrors(errs);
+      return;
+    }
+    if (isDayBlocked) {
+      setBookingErrors({ date: 'This date is unavailable for booking.' });
+      return;
+    }
+    if (blockedSlots.includes(bookingTime)) {
+      setBookingErrors({ slot: 'This time slot is blocked. Please choose another slot.' });
       return;
     }
     setBookingErrors({});
@@ -526,28 +543,40 @@ const Services = () => {
               {/* Time — hourly slots only */}
               <div>
                 <label className="block font-cinzel text-[0.55rem] tracking-[0.2em] uppercase mb-2" style={{ color: 'rgba(255,195,0,0.75)' }}>Time Slot *</label>
+                {isDayBlocked && (
+                  <div className="p-3 text-xs rounded-sm mb-3 text-center" style={{ color: '#ef4444', background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)' }}>
+                    This date is unavailable for booking.
+                  </div>
+                )}
                 <div className="relative">
                   <select
                     value={bookingTime}
                     onChange={(e) => { setBookingTime(e.target.value); setBookingErrors(prev => ({ ...prev, time: '', slot: '' })); }}
+                    disabled={isDayBlocked}
                     className="input-luxury pl-10 rounded-sm text-sm"
-                    style={{ background: 'rgba(255,255,255,0.03)' }}
+                    style={{ 
+                      background: 'rgba(255,255,255,0.03)',
+                      opacity: isDayBlocked ? 0.5 : 1,
+                      cursor: isDayBlocked ? 'not-allowed' : 'default'
+                    }}
                   >
                     <option value="" style={{ background: '#111' }}>Select a time slot</option>
                     {HOUR_SLOTS.map(slot => {
                       const isFull = fullSlots.includes(slot.value);
+                      const isBlocked = blockedSlots.includes(slot.value);
+                      const isDisabled = isFull || isBlocked;
                       return (
                         <option
                           key={slot.value}
                           value={slot.value}
-                          disabled={isFull}
+                          disabled={isDisabled}
                           style={{
                             background: '#111',
-                            color: isFull ? 'rgba(248,245,240,0.2)' : '#F8F5F0',
-                            textDecoration: isFull ? 'line-through' : 'none'
+                            color: isDisabled ? 'rgba(248,245,240,0.2)' : '#F8F5F0',
+                            textDecoration: isDisabled ? 'line-through' : 'none'
                           }}
                         >
-                          {slot.label} {isFull ? '(Unavailable/Full)' : ''}
+                          {slot.label} {isBlocked ? '(Blocked)' : isFull ? '(Unavailable/Full)' : ''}
                         </option>
                       );
                     })}

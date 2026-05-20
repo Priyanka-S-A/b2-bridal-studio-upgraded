@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Routes, Route, Link, useLocation } from 'react-router-dom';
-import { LogOut, LayoutDashboard, Scissors, Receipt, CreditCard, TrendingUp, FileText, Menu, X, Lock, Eye, EyeOff, Package, GraduationCap, Boxes, Users, CalendarCheck, Tag } from 'lucide-react';
+import { LogOut, LayoutDashboard, Scissors, Receipt, CreditCard, TrendingUp, FileText, Menu, X, Lock, Eye, EyeOff, Package, GraduationCap, Boxes, Users, CalendarCheck, Tag, CalendarOff } from 'lucide-react';
 import axios from 'axios';
 import ManageServices from './ManageServices.jsx';
 import ViewBookings from './ViewBookings.jsx';
@@ -13,6 +13,7 @@ import PaymentVerification from './PaymentVerification';
 import Revenue from './Revenue';
 import Billing from './Billing';
 import ManageCoupons from './ManageCoupons';
+import SlotManagement from './SlotManagement.jsx';
 
 
 const AdminDashboard = () => {
@@ -57,6 +58,7 @@ const AdminDashboard = () => {
     { name: 'Staff', path: '/admin/staff', icon: Users },
     { name: 'Attendance', path: '/admin/attendance', icon: CalendarCheck },
     { name: 'Coupons', path: '/admin/coupons', icon: Tag },
+    { name: 'Slot Management', path: '/admin/slots', icon: CalendarOff },
     { name: 'Revenue', path: '/admin/revenue', icon: TrendingUp },
   ];
 
@@ -231,6 +233,7 @@ const AdminDashboard = () => {
               <Route path="revenue" element={<Revenue />} />
               <Route path="billing" element={<Billing />} />
               <Route path="coupons" element={<ManageCoupons />} />
+              <Route path="slots" element={<SlotManagement />} />
             </Routes>
           </div>
           <footer className="mt-8 pt-4 text-center text-[0.65rem] border-t" style={{ borderColor: 'rgba(0,0,0,0.05)', color: '#888' }}>

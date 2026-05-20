@@ -6,6 +6,7 @@ const fs = require('fs');
 const Booking = require('../models/Booking');
 const Bill = require('../models/Bill');
 const Revenue = require('../models/Revenue');
+const SlotBlock = require('../models/SlotBlock');
 
 // Ensure uploads directory exists (required for Render and fresh environments)
 fs.mkdirSync(path.join(__dirname, '..', 'uploads'), { recursive: true });
@@ -44,7 +45,7 @@ router.post('/', upload.single('paymentProof'), async (req, res) => {
       return res.status(400).json({ error: 'Missing required booking fields' });
     }
 
-    // Check slot capacity (Max 3 Approved/Completed bookings)
+    // Check slot capacity & slot blocking
     if (dateTime && branch) {
       const datePart = dateTime.split('T')[0];
       const timePart = dateTime.split('T')[1] || '';
@@ -52,6 +53,26 @@ router.post('/', upload.single('paymentProof'), async (req, res) => {
       const paddedHour = String(hourPart).padStart(2, '0');
       const prefix = `${datePart}T${paddedHour}`;
 
+      // Check slot blocking first
+      const blocks = await SlotBlock.find({
+        date: datePart,
+        branch: { $in: ['All', branch] }
+      });
+
+      for (const block of blocks) {
+        if (block.type === 'Full Day') {
+          return res.status(400).json({ error: 'This date is currently blocked for bookings by admin.' });
+        } else if (block.type === 'Time Range') {
+          const hourVal = parseInt(paddedHour, 10);
+          const startVal = parseInt(block.startTime, 10);
+          const endVal = parseInt(block.endTime, 10);
+          if (hourVal >= startVal && hourVal < endVal) {
+            return res.status(400).json({ error: 'This slot is currently blocked for bookings by admin.' });
+          }
+        }
+      }
+
+      // Check slot capacity (Max 3 Approved/Completed bookings)
       const count = await Booking.countDocuments({
         branch,
         status: { $in: ['Approved', 'Completed'] },
@@ -103,13 +124,33 @@ router.get('/', async (req, res) => {
 
 // ─── NAMED ROUTES (must be before /:id wildcards) ────────────────────────────
 
-// GET /api/bookings/slot-check — Check slot availability (Approved/Completed bookings only)
+// GET /api/bookings/slot-check — Check slot availability (Approved/Completed bookings & admin slot blocks)
 router.get('/slot-check', async (req, res) => {
   try {
     const { branch, date, hour } = req.query;
     if (!branch || !date || !hour) {
       return res.status(400).json({ error: 'branch, date, and hour are required' });
     }
+
+    // Check slot blocking
+    const blocks = await SlotBlock.find({
+      date,
+      branch: { $in: ['All', branch] }
+    });
+
+    for (const block of blocks) {
+      if (block.type === 'Full Day') {
+        return res.json({ available: false, count: 0, reason: 'blocked' });
+      } else if (block.type === 'Time Range') {
+        const hourVal = parseInt(hour, 10);
+        const startVal = parseInt(block.startTime, 10);
+        const endVal = parseInt(block.endTime, 10);
+        if (hourVal >= startVal && hourVal < endVal) {
+          return res.json({ available: false, count: 0, reason: 'blocked' });
+        }
+      }
+    }
+
     const paddedHour = String(hour).padStart(2, '0');
     const prefix = `${date}T${paddedHour}`;
     const count = await Booking.countDocuments({
@@ -123,7 +164,7 @@ router.get('/slot-check', async (req, res) => {
   }
 });
 
-// GET /api/bookings/full-slots — Get all slots for a branch and date that are full (>= 3 bookings)
+// GET /api/bookings/full-slots — Get all slots for a branch and date that are full (>= 3 bookings) or blocked
 router.get('/full-slots', async (req, res) => {
   try {
     const { branch, date } = req.query;
@@ -131,6 +172,27 @@ router.get('/full-slots', async (req, res) => {
       return res.status(400).json({ error: 'branch and date are required' });
     }
     
+    // Check slot blocks for this date and branch
+    const blocks = await SlotBlock.find({
+      date,
+      branch: { $in: ['All', branch] }
+    });
+
+    let isDayBlocked = false;
+    const blockedSlotsSet = new Set();
+
+    blocks.forEach(block => {
+      if (block.type === 'Full Day') {
+        isDayBlocked = true;
+      } else if (block.type === 'Time Range') {
+        const start = parseInt(block.startTime, 10);
+        const end = parseInt(block.endTime, 10);
+        for (let h = start; h < end; h++) {
+          blockedSlotsSet.add(h.toString());
+        }
+      }
+    });
+
     // Find all approved or completed bookings for this branch and date
     const prefix = date;
     const bookings = await Booking.find({
@@ -153,7 +215,11 @@ router.get('/full-slots', async (req, res) => {
     // Find slots where count >= 3
     const fullSlots = Object.keys(slotCounts).filter(hour => slotCounts[hour] >= 3);
 
-    res.json({ fullSlots });
+    res.json({
+      fullSlots,
+      blockedSlots: Array.from(blockedSlotsSet),
+      isDayBlocked
+    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
