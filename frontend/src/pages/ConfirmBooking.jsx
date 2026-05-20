@@ -93,6 +93,10 @@ const ConfirmBooking = () => {
       }
 
       clearCart();
+      localStorage.removeItem('services_cart');
+      localStorage.removeItem('services_bookingDate');
+      localStorage.removeItem('services_bookingTime');
+      localStorage.removeItem('services_bookingBranch');
       navigate('/profile');
     } catch (err) {
       alert(`Failed to submit booking: ${err.message || 'Please try again.'}`);

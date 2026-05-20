@@ -225,10 +225,23 @@ const Services = () => {
   const navigate = useNavigate();
   const [services, setServices] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [cart, setCart] = useState([]);
-  const [bookingDate, setBookingDate] = useState('');
-  const [bookingTime, setBookingTime] = useState('');
-  const [bookingBranch, setBookingBranch] = useState('');
+  const [cart, setCart] = useState(() => {
+    try {
+      const saved = localStorage.getItem('services_cart');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+  const [bookingDate, setBookingDate] = useState(() => {
+    return localStorage.getItem('services_bookingDate') || '';
+  });
+  const [bookingTime, setBookingTime] = useState(() => {
+    return localStorage.getItem('services_bookingTime') || '';
+  });
+  const [bookingBranch, setBookingBranch] = useState(() => {
+    return localStorage.getItem('services_bookingBranch') || '';
+  });
   const [bookingErrors, setBookingErrors] = useState({});
   const [slotChecking, setSlotChecking] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -239,6 +252,23 @@ const Services = () => {
   const [expandedCategory, setExpandedCategory] = useState(null);
   const [selectedOptions, setSelectedOptions] = useState({});
   const [toast, setToast] = useState({ show: false, message: '' });
+
+  // Sync state to localStorage
+  useEffect(() => {
+    localStorage.setItem('services_cart', JSON.stringify(cart));
+  }, [cart]);
+
+  useEffect(() => {
+    localStorage.setItem('services_bookingDate', bookingDate);
+  }, [bookingDate]);
+
+  useEffect(() => {
+    localStorage.setItem('services_bookingTime', bookingTime);
+  }, [bookingTime]);
+
+  useEffect(() => {
+    localStorage.setItem('services_bookingBranch', bookingBranch);
+  }, [bookingBranch]);
 
   useEffect(() => {
     const fetchServices = async () => {
