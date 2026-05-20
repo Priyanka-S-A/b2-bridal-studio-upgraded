@@ -62,6 +62,9 @@ const Payment = () => {
     );
   }
 
+  const finalAmount = appliedCoupon ? appliedCoupon.finalAmount : total;
+  const upiUri = `upi://pay?pa=${UPI_ID}&pn=B2%20Bridal%20Studio&am=${finalAmount.toFixed(2)}&cu=INR`;
+
   return (
     <div style={{ background: '#000', minHeight: '100vh' }}>
       {/* Hero */}
@@ -106,16 +109,31 @@ const Payment = () => {
             {/* UPI ID */}
             <div className="mb-6">
               <span className="font-cinzel text-[0.5rem] tracking-[0.2em] uppercase block mb-2" style={{ color: 'rgba(255,195,0,0.5)' }}>UPI ID</span>
-              <div className="flex items-center justify-center gap-3">
+              <div className="flex items-center justify-center gap-3 mb-4">
                 <span className="font-inter text-base font-medium" style={{ color: '#FFD700' }}>{UPI_ID}</span>
                 <button
                   onClick={() => { navigator.clipboard.writeText(UPI_ID); }}
-                  className="px-3 py-1 font-cinzel text-[0.5rem] tracking-[0.15em] uppercase transition-all"
+                  className="px-3 py-1 font-cinzel text-[0.5rem] tracking-[0.15em] uppercase transition-all cursor-pointer"
                   style={{ border: '1px solid rgba(255,195,0,0.3)', color: '#FFD700' }}
                 >
                   Copy
                 </button>
               </div>
+              <a
+                href={upiUri}
+                className="btn-gold w-full justify-center py-3 text-xs tracking-wider flex items-center gap-2 mb-2"
+                style={{
+                  background: 'linear-gradient(135deg, #FFED8A 0%, #FFD700 35%, #FFCA28 65%, #E5A100 100%)',
+                  color: '#000',
+                  fontWeight: 700,
+                  boxShadow: '0 2px 10px rgba(255, 195, 0, 0.25)',
+                }}
+              >
+                Tap to Pay via UPI
+              </a>
+              <span className="font-cormorant italic text-[0.7rem] block text-center" style={{ color: 'rgba(248,245,240,0.45)' }}>
+                Opens Google Pay, PhonePe, or Paytm on mobile devices
+              </span>
             </div>
 
             <div className="p-4 rounded-sm" style={{ background: 'rgba(255,195,0,0.05)', border: '1px solid rgba(255,195,0,0.1)' }}>
