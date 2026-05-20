@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { fadeUp, staggerContainer } from '../animations/variants';
+import { UploadCloud, FileText, Check } from 'lucide-react';
 
 const API = import.meta.env.VITE_API_URL;
 
@@ -29,6 +30,7 @@ const ConfirmBooking = () => {
     branch: serviceData?.branch || 'Chennai',
   });
   const [paymentProof, setPaymentProof] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(null);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
 
@@ -190,19 +192,100 @@ const ConfirmBooking = () => {
               {/* Payment Proof */}
               <div>
                 <label className="block font-cinzel text-[0.55rem] tracking-[0.2em] uppercase mb-2" style={{ color: 'rgba(255,195,0,0.5)' }}>Payment Proof (Screenshot/PDF) *</label>
-                <div className="relative">
+                
+                <label 
+                  htmlFor="paymentProofInput"
+                  className="relative flex flex-col items-center justify-center min-h-[160px] p-6 rounded-sm cursor-pointer transition-all duration-300 group border"
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.02)',
+                    borderColor: errors.paymentProof ? '#ef4444' : 'rgba(255, 195, 0, 0.25)',
+                    borderStyle: 'dashed'
+                  }}
+                >
                   <input
+                    id="paymentProofInput"
                     type="file"
                     accept="image/*,.pdf"
-                    onChange={e => setPaymentProof(e.target.files[0])}
-                    className="w-full py-3 px-4 font-inter text-sm rounded-sm"
-                    style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,195,0,0.2)', color: '#F8F5F0' }}
+                    onChange={e => {
+                      const file = e.target.files[0];
+                      if (file) {
+                        setPaymentProof(file);
+                        if (file.type.startsWith('image/')) {
+                          setPreviewUrl(URL.createObjectURL(file));
+                        } else {
+                          setPreviewUrl(null);
+                        }
+                      }
+                    }}
+                    className="hidden"
                   />
-                </div>
-                {paymentProof && (
-                  <span className="text-xs mt-1 block" style={{ color: 'rgba(255,195,0,0.5)' }}>✓ {paymentProof.name}</span>
+
+                  {paymentProof ? (
+                    <div className="flex flex-col items-center text-center gap-3 w-full">
+                      {/* Image preview or Doc indicator */}
+                      {previewUrl ? (
+                        <div className="relative w-20 h-20 rounded-md overflow-hidden border border-amber-500/30 bg-black/40 flex items-center justify-center">
+                          <img
+                            src={previewUrl}
+                            alt="Payment Proof Preview"
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      ) : (
+                        <div className="p-3 bg-amber-500/10 rounded-full border border-amber-500/20 text-amber-400">
+                          <FileText size={28} />
+                        </div>
+                      )}
+
+                      {/* File Details */}
+                      <div className="max-w-full px-2">
+                        <p className="text-xs font-medium text-amber-300 truncate max-w-[250px] md:max-w-[320px] mb-1">
+                          {paymentProof.name}
+                        </p>
+                        <p className="text-[0.65rem]" style={{ color: 'rgba(248, 245, 240, 0.4)' }}>
+                          {(paymentProof.size / 1024 / 1024).toFixed(2)} MB
+                        </p>
+                      </div>
+
+                      {/* Success Badge */}
+                      <div className="flex items-center gap-1.5 px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full text-emerald-400">
+                        <Check size={12} className="stroke-[3]" />
+                        <span className="font-cinzel text-[0.55rem] tracking-wider uppercase font-bold">Selected</span>
+                      </div>
+
+                      {/* Tap to change text */}
+                      <p className="text-[0.6rem] uppercase tracking-widest text-amber-500/60 group-hover:text-amber-400 transition-colors mt-1 font-semibold">
+                        Tap again to change file
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center text-center gap-3">
+                      {/* Upload Icon */}
+                      <div className="p-4 bg-amber-500/5 group-hover:bg-amber-500/10 border border-amber-500/10 group-hover:border-amber-500/30 rounded-full text-amber-400/80 group-hover:text-amber-300 transition-all duration-300 shadow-[0_0_15px_rgba(255,195,0,0.02)] group-hover:shadow-[0_0_20px_rgba(255,195,0,0.08)]">
+                        <UploadCloud size={28} className="transition-transform duration-300 group-hover:-translate-y-0.5" />
+                      </div>
+
+                      {/* Description */}
+                      <div>
+                        <p className="font-cinzel text-xs tracking-wider font-semibold text-amber-400 group-hover:text-amber-300 transition-colors mb-1">
+                          Upload Payment Screenshot
+                        </p>
+                        <p className="font-cormorant italic text-xs max-w-[260px] leading-relaxed" style={{ color: 'rgba(248, 245, 240, 0.5)' }}>
+                          Tap here to upload your payment proof <span className="block text-[0.65rem] opacity-75 mt-0.5">(JPG, PNG, or PDF supported)</span>
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Elegant Golden Border Hover/Focus effect */}
+                  <div className="absolute inset-0 border border-transparent rounded-sm group-hover:border-amber-400/40 pointer-events-none transition-all duration-300" />
+                </label>
+
+                {errors.paymentProof && (
+                  <span className="text-xs mt-1.5 block font-inter" style={{ color: '#ef4444' }}>
+                    {errors.paymentProof}
+                  </span>
                 )}
-                {errors.paymentProof && <span className="text-xs mt-1 block" style={{ color: '#ef4444' }}>{errors.paymentProof}</span>}
               </div>
 
               <button type="submit" disabled={loading} className="btn-gold w-full justify-center mt-4 py-4" style={{ opacity: loading ? 0.6 : 1 }}>
