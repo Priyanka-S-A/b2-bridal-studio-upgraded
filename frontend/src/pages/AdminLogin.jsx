@@ -112,6 +112,21 @@ const AdminLogin = () => {
           </form>
         </div>
       </div>
+
+      {/* Attribution Footer */}
+      <footer className="absolute bottom-4 left-0 right-0 text-center text-[0.65rem] tracking-wide" style={{ color: '#888' }}>
+        Powered by{' '}
+        <a 
+          href="https://cenexa.io" 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          className="font-semibold hover:underline transition-all duration-300" 
+          style={{ color: '#D4AF37' }}
+        >
+          Cenexa Systems
+        </a>{' '}
+        © 2026
+      </footer>
     </div>
   );
 };

@@ -208,29 +208,38 @@ const AdminDashboard = () => {
         )}
 
         {/* Scrollable Content */}
-        <main className="flex-1 overflow-y-auto p-4 md:p-8" style={{ background: '#FAF8F5' }}>
-          <Routes>
-            <Route path="/" element={
-              <div className="flex flex-col items-center justify-center py-20 text-center">
-                <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4" style={{ background: 'rgba(212,175,55,0.08)', border: '1px solid rgba(212,175,55,0.15)' }}>
-                  <LayoutDashboard size={28} style={{ color: '#D4AF37' }} />
+        <main className="flex-1 overflow-y-auto p-4 md:p-8 flex flex-col justify-between" style={{ background: '#FAF8F5' }}>
+          <div className="flex-grow">
+            <Routes>
+              <Route path="/" element={
+                <div className="flex flex-col items-center justify-center py-20 text-center">
+                  <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4" style={{ background: 'rgba(212,175,55,0.08)', border: '1px solid rgba(212,175,55,0.15)' }}>
+                    <LayoutDashboard size={28} style={{ color: '#D4AF37' }} />
+                  </div>
+                  <h2 className="font-cinzel text-xl font-bold tracking-wide uppercase text-gray-900 mb-2">Welcome to Admin Panel</h2>
+                  <p className="font-cormorant italic text-gray-600 text-lg">Select an option from the sidebar to get started.</p>
                 </div>
-                <h2 className="font-cinzel text-xl font-bold tracking-wide uppercase text-gray-900 mb-2">Welcome to Admin Panel</h2>
-                <p className="font-cormorant italic text-gray-600 text-lg">Select an option from the sidebar to get started.</p>
-              </div>
-            } />
-            <Route path="services" element={<ManageServices />} />
-            <Route path="bookings" element={<ViewBookings />} />
-            <Route path="payments" element={<PaymentVerification />} />
-            <Route path="products" element={<ManageProducts />} />
-            <Route path="courses" element={<ManageCourses />} />
-            <Route path="stock" element={<ManageStock />} />
-            <Route path="staff" element={<ManageStaff />} />
-            <Route path="attendance" element={<Attendance />} />
-            <Route path="revenue" element={<Revenue />} />
-            <Route path="billing" element={<Billing />} />
-            <Route path="coupons" element={<ManageCoupons />} />
-          </Routes>
+              } />
+              <Route path="services" element={<ManageServices />} />
+              <Route path="bookings" element={<ViewBookings />} />
+              <Route path="payments" element={<PaymentVerification />} />
+              <Route path="products" element={<ManageProducts />} />
+              <Route path="courses" element={<ManageCourses />} />
+              <Route path="stock" element={<ManageStock />} />
+              <Route path="staff" element={<ManageStaff />} />
+              <Route path="attendance" element={<Attendance />} />
+              <Route path="revenue" element={<Revenue />} />
+              <Route path="billing" element={<Billing />} />
+              <Route path="coupons" element={<ManageCoupons />} />
+            </Routes>
+          </div>
+          <footer className="mt-8 pt-4 text-center text-[0.65rem] border-t" style={{ borderColor: 'rgba(0,0,0,0.05)', color: '#888' }}>
+            Powered by{' '}
+            <a href="https://cenexa.io" target="_blank" rel="noopener noreferrer" className="font-semibold hover:underline" style={{ color: '#D4AF37' }}>
+              Cenexa Systems
+            </a>{' '}
+            © 2026
+          </footer>
         </main>
       </div>
 

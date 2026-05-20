@@ -162,12 +162,28 @@ const Footer = () => {
 
       {/* Bottom bar */}
       <div
-        className="max-w-[1300px] mx-auto px-6 lg:px-12 py-6 flex flex-col sm:flex-row items-center justify-between gap-3"
+        className="max-w-[1300px] mx-auto px-6 lg:px-12 py-6 flex flex-col md:flex-row items-center justify-between gap-4"
         style={{ borderTop: '1px solid rgba(255,195,0,0.08)' }}
       >
-        <p className="font-cormorant text-sm" style={{ color: 'rgba(248,245,240,0.45)', fontSize: '0.9rem' }}>
+        <p className="font-cormorant text-sm text-center md:text-left" style={{ color: 'rgba(248,245,240,0.45)', fontSize: '0.9rem' }}>
           © {new Date().getFullYear()} B2 Bridal Studio. All rights reserved.
         </p>
+        
+        {/* Attribution */}
+        <p className="font-inter text-[0.7rem] tracking-wide text-center" style={{ color: 'rgba(248,245,240,0.35)' }}>
+          Powered by{' '}
+          <a
+            href="https://cenexa.io"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="transition-all duration-300 font-semibold hover:text-[#FFD700]"
+            style={{ color: '#FFED8A', textDecoration: 'none' }}
+          >
+            Cenexa Systems
+          </a>{' '}
+          © 2026
+        </p>
+
         <div className="flex items-center gap-2">
           <div className="gold-divider" style={{ width: '20px' }} />
           <span className="font-cinzel text-[0.55rem] tracking-[0.3em] uppercase" style={{ color: 'rgba(255,195,0,0.3)' }}>
