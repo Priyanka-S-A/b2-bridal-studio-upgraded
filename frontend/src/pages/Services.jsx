@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { Search, ShoppingCart, Calendar, Clock, Check, Trash2, ChevronDown, ChevronUp, MapPin } from 'lucide-react';
+import { Search, ShoppingCart, Calendar, Clock, Check, Trash2, ChevronDown, ChevronUp, MapPin, MessageCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const HOUR_SLOTS = [
@@ -295,6 +295,41 @@ const Services = () => {
 
   const subtotal = cart.reduce((acc, curr) => acc + curr.price, 0);
   const total = subtotal; // GST already included in service prices
+  const hasBridalService = cart.some(item => item.category === 'Bridal Services');
+
+  const handleWhatsAppInquiry = () => {
+    if (cart.length === 0) return;
+
+    // Validation
+    const errs = {};
+    if (!bookingBranch) errs.branch = 'Please select a branch';
+    if (!bookingDate)   errs.date   = 'Please select a booking date';
+    if (!bookingTime)   errs.time   = 'Please select a booking time';
+    if (Object.keys(errs).length > 0) {
+      setBookingErrors(errs);
+      return;
+    }
+    setBookingErrors({});
+
+    // Filter bridal services in the cart
+    const bridalItems = cart.filter(item => item.category === 'Bridal Services');
+    const bridalNames = bridalItems.map(item => item.name).join(', ');
+
+    // Prefilled message formatting
+    const formattedDate = new Date(bookingDate).toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+    
+    const timeLabel = HOUR_SLOTS.find(slot => slot.value === bookingTime)?.label || bookingTime;
+
+    const message = `Hello B2 Bridal Studio! I would like to inquire about Bridal Services (${bridalNames}) for ${formattedDate} at the ${bookingBranch} branch around ${timeLabel}.`;
+    
+    const whatsappUrl = `https://wa.me/919840551365?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
+  };
 
   const handleProceedToPayment = async () => {
     const userData = localStorage.getItem('user');
@@ -396,6 +431,11 @@ const Services = () => {
                                 <div>
                                   <span className="font-cinzel text-[0.6rem] tracking-[0.2em] uppercase block mb-1 font-semibold" style={{ color: 'rgba(255,195,0,0.85)' }}>{category.category}</span>
                                   <h3 className="font-playfair text-base font-semibold" style={{ color: '#F8F5F0' }}>{service.name}</h3>
+                                  {category.category === 'Bridal Services' && (
+                                    <span className="inline-block text-[0.55rem] font-cinzel tracking-[0.1em] uppercase px-1.5 py-0.5 rounded-sm mt-1.5" style={{ background: 'rgba(255, 215, 0, 0.1)', color: '#FFD700', border: '1px solid rgba(255, 215, 0, 0.2)' }}>
+                                      WhatsApp Inquiry Only
+                                    </span>
+                                  )}
                                 </div>
                                 <span className="font-cinzel text-sm font-bold min-w-max ml-3" style={{ color: '#FFD700' }}>₹{priceToDisplay}</span>
                               </div>
@@ -509,20 +549,39 @@ const Services = () => {
                 <div className="flex justify-between font-cinzel text-sm" style={{ color: '#F8F5F0' }}><span>Total</span><span style={{ color: '#FFD700' }}>₹{total.toFixed(2)}</span></div>
               </div>
             )}
-            <button
-              onClick={handleProceedToPayment}
-              disabled={cart.length === 0 || slotChecking}
-              className="w-full py-3 font-cinzel text-[0.65rem] tracking-[0.15em] uppercase flex items-center justify-center gap-2 transition-all rounded-sm"
-              style={{
-                background: cart.length > 0 ? 'linear-gradient(135deg, #FFD700, #FFE566)' : 'rgba(255,255,255,0.03)',
-                color: cart.length > 0 ? '#000' : 'rgba(248,245,240,0.3)',
-                cursor: cart.length > 0 && !slotChecking ? 'pointer' : 'not-allowed',
-                fontWeight: 700,
-                opacity: slotChecking ? 0.7 : 1,
-              }}
-            >
-              {slotChecking ? 'Checking availability...' : 'Proceed to Payment'}
-            </button>
+            {hasBridalService ? (
+              <button
+                onClick={handleWhatsAppInquiry}
+                disabled={cart.length === 0}
+                className="w-full py-3 font-cinzel text-[0.65rem] tracking-[0.15em] uppercase flex items-center justify-center gap-2 transition-all rounded-sm"
+                style={{
+                  background: 'linear-gradient(135deg, #25D366, #128C7E)',
+                  color: '#FFF',
+                  cursor: cart.length > 0 ? 'pointer' : 'not-allowed',
+                  fontWeight: 700,
+                  boxShadow: cart.length > 0 ? '0 2px 10px rgba(37,211,102,0.25)' : 'none',
+                  opacity: cart.length > 0 ? 1 : 0.4,
+                  border: 'none',
+                }}
+              >
+                <MessageCircle size={14} /> Inquire via WhatsApp
+              </button>
+            ) : (
+              <button
+                onClick={handleProceedToPayment}
+                disabled={cart.length === 0 || slotChecking}
+                className="w-full py-3 font-cinzel text-[0.65rem] tracking-[0.15em] uppercase flex items-center justify-center gap-2 transition-all rounded-sm"
+                style={{
+                  background: cart.length > 0 ? 'linear-gradient(135deg, #FFD700, #FFE566)' : 'rgba(255,255,255,0.03)',
+                  color: cart.length > 0 ? '#000' : 'rgba(248,245,240,0.3)',
+                  cursor: cart.length > 0 && !slotChecking ? 'pointer' : 'not-allowed',
+                  fontWeight: 700,
+                  opacity: slotChecking ? 0.7 : 1,
+                }}
+              >
+                {slotChecking ? 'Checking availability...' : 'Proceed to Payment'}
+              </button>
+            )}
           </div>
         </div>
       </div>
