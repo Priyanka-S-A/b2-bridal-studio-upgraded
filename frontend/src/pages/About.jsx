@@ -66,7 +66,7 @@ const About = () => {
           <motion.div variants={slideLeft} className="relative">
             <div className="img-zoom-container rounded-sm" style={{ border: '1px solid rgba(255,195,0,0.15)' }}>
               <img
-                src="https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=700&q=80"
+                src="/images/about3.jpg"
                 alt="About B2 Bridal Studio"
                 className="w-full aspect-square object-cover"
                 loading="lazy"
@@ -113,6 +113,39 @@ const About = () => {
             B2 Bridal Studio was born from a belief that every woman deserves to feel extraordinary — and every aspiring professional deserves world-class training. We blend tradition with modern artistry to create experiences that transform lives.
           </p>
         </motion.div>
+      </section>
+
+      {/* ═══ GALLERY — 3 IMAGE SHOWCASE ═══ */}
+      <section className="relative" style={{ padding: '5rem 0' }}>
+        <div className="absolute top-0 left-0 right-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(255,195,0,0.2), transparent)' }} />
+        <div className="max-w-[1200px] mx-auto px-6 lg:px-12">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+            {[
+              { src: '/images/about1.jpeg', alt: 'B2 Bridal Studio — Artistry in Action' },
+              { src: '/images/about2.jpeg', alt: 'B2 Bridal Studio — Bridal Elegance' },
+              { src: '/images/about4.jpeg', alt: 'B2 Bridal Studio — Professional Training' },
+            ].map((img, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.15, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+                className="overflow-hidden rounded-sm group"
+                style={{ border: '1px solid rgba(255,195,0,0.15)' }}
+              >
+                <div style={{ aspectRatio: '3 / 4', overflow: 'hidden' }}>
+                  <img
+                    src={img.src}
+                    alt={img.alt}
+                    className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                    loading="lazy"
+                  />
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
       </section>
 
       {/* ═══ SECTION 3 — HIGHLIGHTS / STATS ═══ */}

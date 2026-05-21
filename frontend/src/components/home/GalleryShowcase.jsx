@@ -6,9 +6,9 @@ const GALLERY_ITEMS = [
   { id: 1, src: '/images/bridal10.jpeg', category: 'Bridal', title: 'South Indian Bridal' },
   { id: 2, src: '/images/bridal4.jpeg', category: 'Makeup', title: 'HD Bridal Look' },
   { id: 3, src: '/images/sareedraping.jpeg', category: 'Styling', title: 'Saree Draping' },
-  { id: 4, src: '/images/bridal9.jpeg', category: 'Amman', title: 'Goddess Makeup' },
-  { id: 5, src: '/images/bridal12.jpeg', category: 'Bridal', title: 'Bridal Makeup' },
-  { id: 6, src: '/images/bridal2.jpeg', category: 'Puberty', title: 'Puberty Makeover' },
+  { id: 4, src: '/images/5.jpeg', category: 'Bride', title: 'Makeup' },
+  { id: 5, src: '/images/2.jpeg', category: 'Bridal', title: 'Bridal Makeup' },
+  { id: 6, src: '/images/4.jpeg', category: 'Reception', title: 'Reception Look' },
   { id: 7, src: '/images/bridal7.jpeg', category: 'Maternity Photoshoot', title: 'Baby Bump' },
   { id: 8, src: '/images/bridal11.jpeg', category: 'Reception', title: 'Bridal Makeup' },
 ];

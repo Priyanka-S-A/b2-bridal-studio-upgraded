@@ -60,7 +60,7 @@ const OwnerSpotlight = () => {
 
             <div className="relative overflow-hidden w-full max-w-[360px] mx-auto" style={{ aspectRatio: '3/4', zIndex: 1 }}>
               <motion.img
-                src="/images/ownerspotlight.jpeg"
+                src="/images/about3.jpg"
                 alt="Studio Owner — Bridal Makeup Artist"
                 className="w-full h-full object-cover"
                 style={{ filter: 'brightness(0.9) contrast(1.05)' }}
