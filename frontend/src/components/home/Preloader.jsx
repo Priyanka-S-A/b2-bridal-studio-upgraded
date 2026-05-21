@@ -55,7 +55,7 @@ const Preloader = ({ onComplete }) => {
               }}
             >
               <img
-                src="/b2-logo.png"
+                src="/b2-logo-transparent.svg"
                 alt="B2 Bridal Studio"
                 style={{ width: 60, height: 60, objectFit: 'contain', filter: 'drop-shadow(0 0 8px rgba(255,195,0,0.6))' }}
               />

@@ -385,7 +385,7 @@ const Services = () => {
 
     const message = `Hello B2 Bridal Studio! I would like to inquire about Bridal Services (${bridalNames}) for ${formattedDate} at the ${bookingBranch} branch around ${timeLabel}.`;
     
-    const whatsappUrl = `https://wa.me/919840551365?text=${encodeURIComponent(message)}`;
+    const whatsappUrl = `https://wa.me/919361527951?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
   };
 
@@ -463,7 +463,7 @@ const Services = () => {
         {/* Services List */}
         <div className="lg:col-span-2">
           <div className="relative mb-8">
-            <input type="text" placeholder="Search services..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="input-luxury pl-12 rounded-sm" />
+            <input type="text" placeholder="     Search services..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="input-luxury pl-12 rounded-sm" />
             <Search className="absolute left-4 top-4" size={18} style={{ color: 'rgba(255,195,0,0.4)' }} />
           </div>
 
@@ -557,7 +557,7 @@ const Services = () => {
 
               {/* Date */}
               <div>
-                <label className="block font-cinzel text-[0.55rem] tracking-[0.2em] uppercase mb-2" style={{ color: 'rgba(255,195,0,0.75)' }}>Date *</label>
+                <label className="block font-cinzel text-[0.55rem] tracking-[0.2em] uppercase mb-2" style={{ color: 'rgba(255,195,0,0.75)' }}>    Date *</label>
                 <div className="relative">
                   <input
                     type="date"
@@ -573,7 +573,7 @@ const Services = () => {
 
               {/* Time — hourly slots only */}
               <div>
-                <label className="block font-cinzel text-[0.55rem] tracking-[0.2em] uppercase mb-2" style={{ color: 'rgba(255,195,0,0.75)' }}>Time Slot *</label>
+                <label className="block font-cinzel text-[0.55rem] tracking-[0.2em] uppercase mb-2" style={{ color: 'rgba(255,195,0,0.75)' }}>    Time Slot *</label>
                 {isDayBlocked && (
                   <div className="p-3 text-xs rounded-sm mb-3 text-center" style={{ color: '#ef4444', background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)' }}>
                     This date is unavailable for booking.
@@ -591,7 +591,7 @@ const Services = () => {
                       cursor: isDayBlocked ? 'not-allowed' : 'default'
                     }}
                   >
-                    <option value="" style={{ background: '#111' }}>Select a time slot</option>
+                    <option value="" style={{ background: '#111' }}>   Select a time slot</option>
                     {HOUR_SLOTS.map(slot => {
                       const isFull = fullSlots.includes(slot.value);
                       const isBlocked = blockedSlots.includes(slot.value);

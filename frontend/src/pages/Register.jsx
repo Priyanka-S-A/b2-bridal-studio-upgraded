@@ -3,10 +3,13 @@ import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { fadeUp, staggerContainer } from '../animations/variants';
+import { GoogleLogin } from '@react-oauth/google';
+
 const API = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 const Register = () => {
   const navigate = useNavigate();
-  const [form, setForm] = useState({ name: '', email: '', phone: '', password: '' });
+  const [form, setForm] = useState({ name: '', email: '', phone: '', password: '', dob: '' });
   const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -19,6 +22,23 @@ const Register = () => {
       navigate('/login');
     } catch (err) {
       alert(err.response?.data?.error || 'Registration failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleSuccess = async (credentialResponse) => {
+    try {
+      setLoading(true);
+      const res = await axios.post(`${API}/api/customer/google-auth`, {
+        credential: credentialResponse.credential
+      });
+      localStorage.setItem('user', JSON.stringify(res.data.user));
+      if (res.data.token) localStorage.setItem('customerToken', res.data.token);
+      window.dispatchEvent(new Event('userStateChange'));
+      navigate('/profile');
+    } catch (err) {
+      alert(err.response?.data?.error || 'Google authentication failed');
     } finally {
       setLoading(false);
     }
@@ -54,6 +74,10 @@ const Register = () => {
               <input type="tel" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} placeholder="+91 00000 00000" required className="input-luxury rounded-sm" />
             </div>
             <div>
+              <label className="block font-cinzel text-[0.6rem] tracking-[0.2em] uppercase mb-2 font-semibold" style={{ color: 'rgba(255,195,0,0.75)' }}>Date of Birth <span className="font-cormorant italic text-[0.65rem] normal-case tracking-normal font-normal" style={{ color: 'rgba(248,245,240,0.4)' }}>(optional — to avail offers in future)</span></label>
+              <input type="date" value={form.dob} onChange={e => setForm({ ...form, dob: e.target.value })} className="input-luxury rounded-sm" style={{ colorScheme: 'dark' }} />
+            </div>
+            <div>
               <label className="block font-cinzel text-[0.6rem] tracking-[0.2em] uppercase mb-2 font-semibold" style={{ color: 'rgba(255,195,0,0.75)' }}>Password</label>
               <div className="relative">
                 <input type={showPw ? 'text' : 'password'} value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} placeholder="••••••••" required className="input-luxury rounded-sm pr-12" />
@@ -67,6 +91,25 @@ const Register = () => {
             <button type="submit" disabled={loading} className="btn-gold w-full justify-center mt-2" style={{ opacity: loading ? 0.6 : 1 }}>
               {loading ? 'Creating account...' : 'Register'}
             </button>
+
+            {/* Divider */}
+            <div className="flex items-center gap-3 mt-4">
+              <div className="flex-1 h-px" style={{ background: 'rgba(255,195,0,0.15)' }} />
+              <span className="font-cormorant text-xs italic" style={{ color: 'rgba(248,245,240,0.4)' }}>or</span>
+              <div className="flex-1 h-px" style={{ background: 'rgba(255,195,0,0.15)' }} />
+            </div>
+
+            {/* Google Auth */}
+            <div className="flex justify-center">
+              <GoogleLogin
+                onSuccess={handleGoogleSuccess}
+                onError={() => alert('Google login failed')}
+                theme="filled_black"
+                shape="rectangular"
+                text="continue_with"
+                width="300"
+              />
+            </div>
           </div>
         </motion.form>
 

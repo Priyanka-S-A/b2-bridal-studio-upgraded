@@ -100,12 +100,9 @@ const TestimonialCard = ({ testimonial }) => (
 
     {/* Author */}
     <div className="flex flex-col items-center gap-2">
-      <img
-        src={testimonial.image}
-        alt={testimonial.name}
-        className="w-12 h-12 rounded-full object-cover"
-        style={{ border: '2px solid rgba(255,215,0,0.45)' }}
-      />
+      <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ border: '1px solid rgba(255,215,0,0.4)', background: 'rgba(255,215,0,0.08)' }}>
+        <span className="font-cinzel text-sm font-bold" style={{ color: '#FFD700' }}>{testimonial.name.charAt(0)}</span>
+      </div>
       <div>
         <div className="font-cinzel text-sm tracking-[0.1em] uppercase" style={{ color: '#F8F5F0' }}>
           {testimonial.name}

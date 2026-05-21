@@ -30,7 +30,7 @@ const StatCard = ({ value, suffix, label, isInView }) => {
         {count.toLocaleString()}{suffix}
       </div>
       <div className="gold-divider mx-auto my-3" style={{ width: '30px' }} />
-      <div className="font-cormorant italic text-sm" style={{ color: 'rgba(248,245,240,0.7)' }}>{label}</div>
+      <div className="font-cormorant italic text-base" style={{ color: 'rgba(248,245,240,0.7)' }}>{label}</div>
     </div>
   );
 };
@@ -88,13 +88,13 @@ const About = () => {
             <h1 className="font-cinzel font-bold uppercase leading-tight mb-6" style={{ fontSize: 'clamp(1.8rem, 4vw, 2.8rem)', color: '#F8F5F0', letterSpacing: '0.03em' }}>
               About B2 Bridal Studio
             </h1>
-            <p className="font-cormorant italic text-lg mb-4" style={{ color: 'rgba(255,195,0,0.7)' }}>
+            <p className="font-cormorant italic text-xl mb-4" style={{ color: 'rgba(255,195,0,0.7)' }}>
               A legacy of beauty, artistry, and transformation
             </p>
-            <p className="font-inter text-sm leading-relaxed mb-4" style={{ color: 'rgba(248,245,240,0.82)' }}>
+            <p className="font-inter text-base leading-relaxed mb-4" style={{ color: 'rgba(248,245,240,0.82)' }}>
               Shanmugavadivu Sabarinathan is a professional makeup artist, creative entrepreneur, and certified trainer with 20+ certifications. She is recognized for expertise in bridal makeup artistry and skill-based education.
             </p>
-            <p className="font-inter text-sm leading-relaxed" style={{ color: 'rgba(248,245,240,0.75)' }}>
+            <p className="font-inter text-base leading-relaxed" style={{ color: 'rgba(248,245,240,0.75)' }}>
               As the founder of B2 Bridal Studio, she has built a legacy of empowering women through beauty and craftsmanship, training thousands of aspiring professionals across Tamil Nadu.
             </p>
           </motion.div>
@@ -109,8 +109,7 @@ const About = () => {
           <h2 className="font-playfair italic text-2xl md:text-3xl mt-4 leading-relaxed" style={{ color: '#F8F5F0' }}>
             "Crafting Beauty One Story at a Time"
           </h2>
-          <div className="gold-divider my-6" />
-          <p className="font-cormorant text-lg leading-relaxed" style={{ color: 'rgba(248,245,240,0.72)' }}>
+          <p className="font-cormorant text-xl leading-relaxed" style={{ color: 'rgba(248,245,240,0.72)' }}>
             B2 Bridal Studio was born from a belief that every woman deserves to feel extraordinary — and every aspiring professional deserves world-class training. We blend tradition with modern artistry to create experiences that transform lives.
           </p>
         </motion.div>
@@ -229,8 +228,8 @@ const About = () => {
 
         <div className="max-w-[1000px] mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-8">
           {[
-            { name: 'Chennai Branch', address: 'No: 63, Madavaram Red Hills Rd, Kodungaiyur, Chennai — 600060', phone: '+91 98405 51365', mapUrl: 'https://maps.google.com/?q=Kodungaiyur+Chennai' },
-            { name: 'Madurai Branch', address: 'Madurai, Tamil Nadu', phone: '+91 97908 82561', mapUrl: 'https://maps.google.com/?q=Madurai+Tamil+Nadu' },
+            { name: 'Chennai Branch', address: 'No: 63, Madavaram Red Hills Rd, Kodungaiyur, Chennai — 600060', phone: '+91 98405 51365', mapUrl: 'https://www.google.com/maps/dir/?api=1&destination=13.1283,80.2410' },
+            { name: 'Madurai Branch', address: 'C6, Santhi Sadan Enclave, Melakkal Main Road, Kochadai, Madurai – 625016', phone: '+91 97908 82561', mapUrl: 'https://www.google.com/maps/dir/?api=1&destination=9.9252,78.0747' },
           ].map((branch, i) => (
             <motion.div
               key={branch.name}
@@ -256,11 +255,27 @@ const About = () => {
                 href={branch.mapUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="btn-outline-gold text-[0.6rem] py-2 px-4 inline-flex items-center gap-2"
+                className="btn-outline-gold text-[0.65rem] py-2 px-4 inline-flex items-center gap-2"
               >
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
                 Get Directions
               </a>
+              {/* Embedded Map */}
+              <div className="mt-4 overflow-hidden rounded-sm" style={{ border: '1px solid rgba(255,195,0,0.08)' }}>
+                <iframe
+                  title={`${branch.name} Location`}
+                  src={branch.name === 'Chennai Branch'
+                    ? 'https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&q=No+63+Madavaram+Red+Hills+Rd+Kodungaiyur+Chennai+600060&zoom=16'
+                    : 'https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&q=C6+Santhi+Sadan+Enclave+Melakkal+Main+Road+Kochadai+Madurai+625016&zoom=16'
+                  }
+                  width="100%"
+                  height="180"
+                  style={{ border: 0, filter: 'invert(90%) hue-rotate(180deg) brightness(0.85)' }}
+                  allowFullScreen=""
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                />
+              </div>
             </motion.div>
           ))}
         </div>

@@ -107,7 +107,7 @@ const Courses = () => {
     if (!userData) { alert('Please login first'); window.location.href = '/login'; return; }
     const user = JSON.parse(userData);
     const message = `*Course Enrollment*%0A%0A*Customer:* ${user.name}%0APhone: ${user.phone}%0AEmail: ${user.email}%0A%0A*Category:* ${categoryData.title}%0A*Course:* ${course.title}%0A*Duration:* ${course.duration}%0A*Branch:* ${selectedBranch === 'branch1' ? 'Chennai' : 'Madurai'}%0A%0APlease send QR code for fee payment.`;
-    window.open(`https://wa.me/919840551365?text=${message}`, '_blank');
+    window.open(`https://wa.me/919361527951?text=${message}`, '_blank');
   };
 
   /* ─── Main category grid (no category selected) ─── */

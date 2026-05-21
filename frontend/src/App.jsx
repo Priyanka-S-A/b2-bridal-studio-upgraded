@@ -29,6 +29,9 @@ import BillView from './pages/BillView';
 // Auth Pages
 import Login from './pages/Login';
 import Register from './pages/Register';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
 // Admin / Owner Pages
 import AdminLogin from './pages/AdminLogin';
@@ -41,8 +44,11 @@ const ScrollToTop = () => {
   return null;
 };
 
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
+
 function App() {
   return (
+    <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
     <CartProvider>
       <LazyMotion features={domAnimation}>
         <Router>
@@ -73,6 +79,8 @@ function App() {
               {/* AUTH ROUTES */}
               <Route path="/login" element={<PublicLayout><Login /></PublicLayout>} />
               <Route path="/register" element={<PublicLayout><Register /></PublicLayout>} />
+              <Route path="/forgot-password" element={<PublicLayout><ForgotPassword /></PublicLayout>} />
+              <Route path="/reset-password" element={<PublicLayout><ResetPassword /></PublicLayout>} />
 
               {/* ADMIN ROUTES */}
               <Route path="/admin-login" element={<AdminLogin />} />
@@ -86,6 +94,7 @@ function App() {
         </Router>
       </LazyMotion>
     </CartProvider>
+    </GoogleOAuthProvider>
   );
 }
 

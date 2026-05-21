@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-const WHATSAPP_NUMBER = '919840551365';
+const WHATSAPP_NUMBER = '919361527951';
 const WHATSAPP_MESSAGE = encodeURIComponent('Hi B2 Bridal Studio! I\'d like to enquire about your services.');
 
 const WhatsAppFAB = () => {

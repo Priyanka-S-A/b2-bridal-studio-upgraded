@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { fadeUp, staggerContainer } from '../animations/variants';
+import { GoogleLogin } from '@react-oauth/google';
 
 const API = import.meta.env.VITE_API_URL;
 
@@ -19,6 +20,7 @@ const Login = () => {
     try {
       const res = await axios.post(`${API}/api/customer/login`, form);
       localStorage.setItem('user', JSON.stringify(res.data.user));
+      if (res.data.token) localStorage.setItem('customerToken', res.data.token);
       
       // Dispatch custom event to notify Navbar of login
       window.dispatchEvent(new Event('userStateChange'));
@@ -26,6 +28,23 @@ const Login = () => {
       navigate('/profile');
     } catch (err) {
       alert(err.response?.data?.error || 'Login failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleSuccess = async (credentialResponse) => {
+    try {
+      setLoading(true);
+      const res = await axios.post(`${API}/api/customer/google-auth`, {
+        credential: credentialResponse.credential
+      });
+      localStorage.setItem('user', JSON.stringify(res.data.user));
+      if (res.data.token) localStorage.setItem('customerToken', res.data.token);
+      window.dispatchEvent(new Event('userStateChange'));
+      navigate('/profile');
+    } catch (err) {
+      alert(err.response?.data?.error || 'Google authentication failed');
     } finally {
       setLoading(false);
     }
@@ -92,6 +111,11 @@ const Login = () => {
                   </svg>
                 </button>
               </div>
+              <div className="text-right mt-1">
+                <Link to="/forgot-password" className="font-cormorant text-xs italic transition-colors duration-200" style={{ color: 'rgba(255,195,0,0.6)' }} onMouseEnter={e => e.currentTarget.style.color = '#FFD700'} onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,195,0,0.6)'}>
+                  Forgot Password?
+                </Link>
+              </div>
             </div>
             <button
               type="submit"
@@ -101,6 +125,25 @@ const Login = () => {
             >
               {loading ? 'Signing in...' : 'Login'}
             </button>
+
+            {/* Divider */}
+            <div className="flex items-center gap-3 mt-4">
+              <div className="flex-1 h-px" style={{ background: 'rgba(255,195,0,0.15)' }} />
+              <span className="font-cormorant text-xs italic" style={{ color: 'rgba(248,245,240,0.4)' }}>or</span>
+              <div className="flex-1 h-px" style={{ background: 'rgba(255,195,0,0.15)' }} />
+            </div>
+
+            {/* Google Auth */}
+            <div className="flex justify-center">
+              <GoogleLogin
+                onSuccess={handleGoogleSuccess}
+                onError={() => alert('Google login failed')}
+                theme="filled_black"
+                shape="rectangular"
+                text="continue_with"
+                width="300"
+              />
+            </div>
           </div>
         </motion.form>
 

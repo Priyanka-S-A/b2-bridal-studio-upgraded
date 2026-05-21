@@ -103,9 +103,9 @@ const Navbar = () => {
                 style={{ width: 48, height: 48, flexShrink: 0 }}
               >
                 <img
-                  src="/b2-logo.png"
+                  src="/b2-logo-transparent.svg"
                   alt="B2 Bridal Studio"
-                  style={{ width: 48, height: 48, objectFit: 'contain', filter: 'drop-shadow(0 0 6px rgba(255,195,0,0.45))', mixBlendMode: 'lighten' }}
+                  style={{ width: 48, height: 48, objectFit: 'contain', filter: 'drop-shadow(0 0 6px rgba(255,195,0,0.45))' }}
                 />
               </div>
               <div>
@@ -148,7 +148,7 @@ const Navbar = () => {
                           exit={{ opacity: 0, y: 8 }}
                           transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
                           className="absolute top-full left-1/2 -translate-x-1/2 pt-3"
-                          style={{ width: '260px' }}
+                          style={{ width: '300px' }}
                         >
                           <div
                             className="rounded-sm py-2"
@@ -168,8 +168,8 @@ const Navbar = () => {
                                 onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,195,0,0.08)'; }}
                                 onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}
                               >
-                                <span className="text-sm">{cat.icon}</span>
-                                <span className="font-cormorant text-sm" style={{ color: 'rgba(248,245,240,0.7)' }}>
+                                <span className="text-base">{cat.icon}</span>
+                                <span className="font-cormorant text-base" style={{ color: 'rgba(248,245,240,0.7)' }}>
                                   {cat.label}
                                 </span>
                                 <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="rgba(255,195,0,0.4)" strokeWidth="1" className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity">
@@ -180,7 +180,7 @@ const Navbar = () => {
                             <div className="px-5 pt-3 pb-2" style={{ borderTop: '1px solid rgba(255,195,0,0.1)' }}>
                               <Link
                                 to="/courses"
-                                className="font-cinzel text-[0.6rem] tracking-[0.2em] uppercase flex items-center gap-2"
+                                className="font-cinzel text-[0.65rem] tracking-[0.2em] uppercase flex items-center gap-2"
                                 style={{ color: '#FFD700' }}
                               >
                                 View All Courses

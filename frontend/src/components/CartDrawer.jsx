@@ -174,7 +174,7 @@ const CartDrawer = () => {
                     });
                     message += `\n*Total Amount:* ₹${total.toFixed(2)}\n\nPlease contact me regarding availability and payment.`;
                     
-                    window.open(`https://wa.me/919840551365?text=${encodeURIComponent(message)}`, '_blank');
+                    window.open(`https://wa.me/919361527951?text=${encodeURIComponent(message)}`, '_blank');
                     closeCart();
                     // clearCart(); // Optional: We can keep the items in cart if they just enquired
                   }}

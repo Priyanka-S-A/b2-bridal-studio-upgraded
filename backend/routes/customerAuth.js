@@ -2,11 +2,17 @@ const express = require('express');
 const router = express.Router();
 const Customer = require('../models/Customer');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
+const { OAuth2Client } = require('google-auth-library');
+const nodemailer = require('nodemailer');
+
+const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret';
 
 // 🔹 REGISTER
 router.post('/register', async (req, res) => {
   try {
-    const { name, email, phone, password } = req.body;
+    const { name, email, phone, password, dob } = req.body;
 
     const existing = await Customer.findOne({ email });
     if (existing) {
@@ -15,12 +21,18 @@ router.post('/register', async (req, res) => {
 
     const hashed = await bcrypt.hash(password, 10);
 
-    const user = new Customer({
+    const userData = {
       name,
       email,
       phone,
       password: hashed
-    });
+    };
+
+    if (dob) {
+      userData.dob = dob;
+    }
+
+    const user = new Customer(userData);
 
     await user.save();
 
@@ -29,7 +41,8 @@ router.post('/register', async (req, res) => {
       user: {
         name: user.name,
         email: user.email,
-        phone: user.phone
+        phone: user.phone,
+        dob: user.dob
       }
     });
 
@@ -53,17 +66,208 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ error: "Wrong password" });
     }
 
+    const token = jwt.sign(
+      { id: user._id, email: user.email, role: 'customer' },
+      JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
     res.json({
       message: "Login success",
       user: {
         name: user.name,
         email: user.email,
-        phone: user.phone
-      }
+        phone: user.phone,
+        dob: user.dob
+      },
+      token
     });
 
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+});
+
+// 🔹 GOOGLE AUTH
+router.post('/google-auth', async (req, res) => {
+  try {
+    const { credential } = req.body;
+
+    if (!credential) {
+      return res.status(400).json({ error: 'Google credential is required' });
+    }
+
+    const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+    const ticket = await client.verifyIdToken({
+      idToken: credential,
+      audience: process.env.GOOGLE_CLIENT_ID
+    });
+
+    const payload = ticket.getPayload();
+    const { sub: googleId, email, name, picture } = payload;
+
+    let user = await Customer.findOne({ googleId });
+
+    if (!user) {
+      user = await Customer.findOne({ email });
+
+      if (user) {
+        // Link Google account to existing user
+        user.googleId = googleId;
+        if (!user.authProvider || user.authProvider === 'local') {
+          user.authProvider = user.password ? 'local' : 'google';
+        }
+        await user.save();
+      } else {
+        // Create new customer with Google data
+        user = new Customer({
+          name,
+          email,
+          googleId,
+          authProvider: 'google'
+        });
+        await user.save();
+      }
+    }
+
+    const token = jwt.sign(
+      { id: user._id, email: user.email, role: 'customer' },
+      JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    res.json({
+      message: 'Google authentication successful',
+      user: {
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        dob: user.dob
+      },
+      token
+    });
+
+  } catch (err) {
+    console.error('Google auth error:', err.message);
+    res.status(500).json({ error: 'Google authentication failed' });
+  }
+});
+
+// 🔹 FORGOT PASSWORD
+router.post('/forgot-password', async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    const user = await Customer.findOne({ email });
+
+    if (!user) {
+      // Don't reveal whether email exists
+      return res.json({ message: 'If an account exists with this email, a reset link has been sent.' });
+    }
+
+    // Generate random token
+    const resetToken = crypto.randomBytes(32).toString('hex');
+
+    // Hash token before storing
+    const hashedToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+
+    user.resetPasswordToken = hashedToken;
+    user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+    await user.save();
+
+    // Send email
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+      }
+    });
+
+    const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
+
+    const mailOptions = {
+      from: `"B2 Bridal Studio" <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject: 'Password Reset - B2 Bridal Studio',
+      html: `
+        <div style="max-width: 600px; margin: 0 auto; font-family: 'Georgia', serif; background-color: #1a1a1a; color: #f5f5f5; padding: 40px; border: 2px solid #c9a84c;">
+          <div style="text-align: center; margin-bottom: 30px;">
+            <h1 style="color: #c9a84c; font-size: 28px; margin: 0; letter-spacing: 2px;">B2 BRIDAL STUDIO</h1>
+            <div style="width: 60px; height: 2px; background-color: #c9a84c; margin: 15px auto;"></div>
+          </div>
+          
+          <h2 style="color: #c9a84c; font-size: 20px; text-align: center; margin-bottom: 20px;">Password Reset Request</h2>
+          
+          <p style="color: #d4d4d4; line-height: 1.8; font-size: 15px;">Dear ${user.name || 'Valued Customer'},</p>
+          
+          <p style="color: #d4d4d4; line-height: 1.8; font-size: 15px;">
+            We received a request to reset your password. Click the button below to set a new password. This link is valid for <strong style="color: #c9a84c;">1 hour</strong>.
+          </p>
+          
+          <div style="text-align: center; margin: 35px 0;">
+            <a href="${resetUrl}" style="background-color: #c9a84c; color: #1a1a1a; padding: 14px 40px; text-decoration: none; font-size: 16px; font-weight: bold; letter-spacing: 1px; border-radius: 4px; display: inline-block;">
+              RESET PASSWORD
+            </a>
+          </div>
+          
+          <p style="color: #888; font-size: 13px; line-height: 1.6;">
+            If you did not request a password reset, please ignore this email. Your password will remain unchanged.
+          </p>
+          
+          <div style="border-top: 1px solid #333; margin-top: 30px; padding-top: 20px; text-align: center;">
+            <p style="color: #666; font-size: 12px; margin: 0;">
+              &copy; ${new Date().getFullYear()} B2 Bridal Studio. All rights reserved.
+            </p>
+          </div>
+        </div>
+      `
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    res.json({ message: 'If an account exists with this email, a reset link has been sent.' });
+
+  } catch (err) {
+    console.error('Forgot password error:', err.message);
+    res.status(500).json({ error: 'Something went wrong. Please try again later.' });
+  }
+});
+
+// 🔹 RESET PASSWORD
+router.post('/reset-password', async (req, res) => {
+  try {
+    const { token, newPassword } = req.body;
+
+    if (!token || !newPassword) {
+      return res.status(400).json({ error: 'Token and new password are required' });
+    }
+
+    // Hash the received token to compare with stored hash
+    const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+
+    const user = await Customer.findOne({
+      resetPasswordToken: hashedToken,
+      resetPasswordExpires: { $gt: Date.now() }
+    });
+
+    if (!user) {
+      return res.status(400).json({ error: 'Invalid or expired reset token' });
+    }
+
+    // Hash new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    user.password = hashedPassword;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+    await user.save();
+
+    res.json({ message: 'Password reset successful. Please login with your new password.' });
+
+  } catch (err) {
+    console.error('Reset password error:', err.message);
+    res.status(500).json({ error: 'Something went wrong. Please try again later.' });
   }
 });
 
