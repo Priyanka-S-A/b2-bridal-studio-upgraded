@@ -69,11 +69,17 @@ const BillView = () => {
 
     const finalY = doc.lastAutoTable.finalY + 10;
     doc.setFontSize(10);
-    doc.text(`Subtotal: ₹${bill.subtotal.toFixed(2)}`, 150, finalY, { align: 'right' });
-    doc.text(`GST (18%): ₹${bill.gst.toFixed(2)}`, 150, finalY + 7, { align: 'right' });
-    doc.setFontSize(12);
-    doc.setTextColor(201, 162, 39);
-    doc.text(`Total: ₹${bill.total.toFixed(2)}`, 150, finalY + 17, { align: 'right' });
+    if (bill.gst > 0) {
+      doc.text(`Subtotal: \u20b9${bill.subtotal.toFixed(2)}`, 150, finalY, { align: 'right' });
+      doc.text(`GST: \u20b9${bill.gst.toFixed(2)}`, 150, finalY + 7, { align: 'right' });
+      doc.setFontSize(12);
+      doc.setTextColor(201, 162, 39);
+      doc.text(`Total: \u20b9${bill.total.toFixed(2)}`, 150, finalY + 17, { align: 'right' });
+    } else {
+      doc.setFontSize(12);
+      doc.setTextColor(201, 162, 39);
+      doc.text(`Total: \u20b9${bill.total.toFixed(2)}`, 150, finalY + 7, { align: 'right' });
+    }
 
     // Footer
     doc.setFontSize(8);
@@ -174,13 +180,13 @@ const BillView = () => {
 
             {/* Totals */}
             <div className="px-6 py-5" style={{ background: 'rgba(255,195,0,0.03)', borderTop: '1px solid rgba(255,195,0,0.1)' }}>
-              {bill.source !== 'offline' && bill.subtotal > 0 && (
+              {bill.gst > 0 && (
                 <>
                   <div className="flex justify-between mb-2 font-cormorant text-sm" style={{ color: 'rgba(248,245,240,0.5)' }}>
                     <span>Subtotal</span><span>₹{(bill.subtotal || 0).toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between mb-3 font-cormorant text-sm" style={{ color: 'rgba(248,245,240,0.5)' }}>
-                    <span>GST (18%)</span><span>₹{(bill.gst || 0).toFixed(2)}</span>
+                    <span>GST</span><span>₹{(bill.gst || 0).toFixed(2)}</span>
                   </div>
                 </>
               )}

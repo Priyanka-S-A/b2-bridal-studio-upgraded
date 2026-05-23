@@ -10,9 +10,11 @@ const bookingSchema = new mongoose.Schema({
   items: [{
     name: String,
     price: Number,
-    quantity: { type: Number, default: 1 }
+    quantity: { type: Number, default: 1 },
+    gstPercentage: { type: Number }
   }],
   total: { type: Number, required: true },
+  gstAmount: { type: Number, default: 0 },
   couponCode: { type: String },
   discountPercentage: { type: Number },
   discountAmount: { type: Number },

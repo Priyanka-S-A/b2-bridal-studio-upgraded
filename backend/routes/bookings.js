@@ -38,7 +38,8 @@ router.post('/', upload.single('paymentProof'), async (req, res) => {
     const {
       name, phone, upiId, transactionId, branch, items,
       total, dateTime, userId, email,
-      couponCode, discountPercentage, discountAmount, finalAmount
+      couponCode, discountPercentage, discountAmount, finalAmount,
+      gstAmount
     } = req.body;
 
     if (!name || !phone || !upiId || !transactionId || !branch || !total) {
@@ -95,6 +96,7 @@ router.post('/', upload.single('paymentProof'), async (req, res) => {
       branch,
       items: typeof items === 'string' ? JSON.parse(items) : (items || []),
       total: Number(total),
+      gstAmount: gstAmount ? Number(gstAmount) : 0,
       couponCode: couponCode || null,
       discountPercentage: discountPercentage ? Number(discountPercentage) : null,
       discountAmount: discountAmount ? Number(discountAmount) : null,

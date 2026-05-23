@@ -14,7 +14,8 @@ const ManageServices = () => {
     category: '',
     name: '',
     price: '',
-    options: []
+    options: [],
+    gstPercentage: ''
   });
 
   // Search & Grouping State
@@ -49,6 +50,12 @@ const ManageServices = () => {
       options: currentService.options.filter(opt => opt.name && opt.price)
     };
     if (payload.options.length === 0) delete payload.options;
+    // Handle GST: convert to number or remove if empty
+    if (payload.gstPercentage === '' || payload.gstPercentage === null || payload.gstPercentage === undefined) {
+      delete payload.gstPercentage;
+    } else {
+      payload.gstPercentage = Number(payload.gstPercentage);
+    }
 
     try {
       if (currentService._id) {
@@ -299,6 +306,36 @@ const ManageServices = () => {
               </button>
             </div>
 
+            {/* GST Percentage (Optional) */}
+            <div className="pt-6 border-t border-gray-100">
+              <div className="flex items-center gap-3 mb-4">
+                <h4 className="text-sm font-cinzel tracking-wide text-gray-900 uppercase font-bold">GST (Optional)</h4>
+                <span className="text-[0.65rem] font-medium text-gray-600 bg-gray-100 px-2.5 py-0.5 rounded-full border border-gray-200">
+                  Leave empty if not applicable
+                </span>
+              </div>
+              <div className="max-w-sm">
+                <label className="block text-xs font-cinzel tracking-wide text-gray-700 uppercase mb-1.5 font-semibold">GST Percentage</label>
+                <input
+                  type="number"
+                  min="0"
+                  max="100"
+                  step="0.1"
+                  value={currentService.gstPercentage || ''}
+                  onChange={e => setCurrentService({...currentService, gstPercentage: e.target.value})}
+                  className="w-full p-2.5 rounded-lg border border-gray-200 focus:outline-none focus:border-[#FFD700] bg-gray-50 text-sm text-gray-800 transition-colors"
+                  placeholder="Optional GST %"
+                />
+                {currentService.gstPercentage && Number(currentService.gstPercentage) > 0 && currentService.price && currentService.options.length === 0 && (
+                  <div className="mt-2 px-3 py-2 rounded-lg bg-amber-50 border border-amber-200">
+                    <span className="text-xs font-cinzel text-amber-800 font-semibold">
+                      Final Price After GST: ₹{(Number(currentService.price) + (Number(currentService.price) * Number(currentService.gstPercentage) / 100)).toFixed(2)}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+
             <div className="flex justify-end gap-3 pt-6 mt-4 border-t border-gray-100">
               <button 
                 type="button" onClick={() => setIsEditing(false)}
@@ -340,7 +377,7 @@ const ManageServices = () => {
                 
                 <button 
                   onClick={() => {
-                    setCurrentService({ category: '', name: '', price: '', options: [] });
+                    setCurrentService({ category: '', name: '', price: '', options: [], gstPercentage: '' });
                     setIsEditing(true);
                   }}
                   className="whitespace-nowrap w-full sm:w-auto flex justify-center items-center gap-2 px-5 py-2 rounded-lg font-cinzel text-xs uppercase tracking-wide transition-all font-bold shadow-md hover:shadow-lg bg-[#111] text-white"
@@ -468,6 +505,11 @@ const ManageServices = () => {
                                     </div>
                                   ) : (
                                     <span className="font-semibold text-base text-gray-900">₹{service.price}</span>
+                                  )}
+                                  {service.gstPercentage > 0 && (
+                                    <span className="inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded-full text-[0.6rem] font-cinzel font-bold uppercase tracking-wide bg-amber-50 text-amber-700 border border-amber-200">
+                                      GST {service.gstPercentage}%
+                                    </span>
                                   )}
                                 </div>
                                 

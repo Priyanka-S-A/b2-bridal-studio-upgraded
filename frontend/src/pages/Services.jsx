@@ -352,7 +352,8 @@ const Services = () => {
   };
 
   const subtotal = cart.reduce((acc, curr) => acc + curr.price, 0);
-  const total = subtotal; // GST already included in service prices
+  const gstTotal = cart.reduce((acc, curr) => acc + (curr.price * (curr.gstPercentage || 0) / 100), 0);
+  const total = subtotal + gstTotal;
   const hasBridalService = cart.some(item => item.category === 'Bridal Services');
 
   const handleWhatsAppInquiry = () => {
@@ -436,6 +437,7 @@ const Services = () => {
     const serviceData = {
       items: cart.map(item => ({ ...item, quantity: 1 })),
       subtotal,
+      gstTotal,
       total,
       branch: bookingBranch,
       date: bookingDate,
@@ -486,9 +488,10 @@ const Services = () => {
                         const activeOptionId = isDropdown ? (selectedOptions[service._id] || service.options?.[0]?._id) : null;
                         const activeOption = isDropdown ? service.options?.find(opt => opt._id === activeOptionId) : null;
                         const priceToDisplay = isDropdown && activeOption ? activeOption.price : service.price;
+                        const serviceGst = service.gstPercentage || 0;
                         const cartItem = isDropdown
-                          ? { _id: activeOption._id, name: `${service.name} - ${activeOption.name}`, price: activeOption.price, category: category.category }
-                          : { _id: service._id, name: service.name, price: service.price, category: category.category };
+                          ? { _id: activeOption._id, name: `${service.name} - ${activeOption.name}`, price: activeOption.price, category: category.category, gstPercentage: serviceGst }
+                          : { _id: service._id, name: service.name, price: service.price, category: category.category, gstPercentage: serviceGst };
                         const isAdded = cart.find(item => item._id === cartItem._id);
                         return (
                           <div key={service._id} className="glass-dark p-5 rounded-sm flex flex-col justify-between">
@@ -638,7 +641,11 @@ const Services = () => {
             )}
             {cart.length > 0 && (
               <div className="pt-4 mb-4 flex flex-col gap-2 text-sm" style={{ borderTop: '1px solid rgba(255,195,0,0.1)' }}>
-                <div className="flex justify-between font-cinzel text-sm" style={{ color: '#F8F5F0' }}><span>Total</span><span style={{ color: '#FFD700' }}>₹{total.toFixed(2)}</span></div>
+                <div className="flex justify-between font-cormorant text-sm" style={{ color: 'rgba(248,245,240,0.5)' }}><span>Subtotal</span><span>₹{subtotal.toFixed(2)}</span></div>
+                {gstTotal > 0 && (
+                  <div className="flex justify-between font-cormorant text-sm" style={{ color: 'rgba(248,245,240,0.5)' }}><span>GST</span><span>₹{gstTotal.toFixed(2)}</span></div>
+                )}
+                <div className="flex justify-between font-cinzel text-sm pt-2" style={{ color: '#F8F5F0', borderTop: '1px solid rgba(255,195,0,0.08)' }}><span>Total</span><span style={{ color: '#FFD700' }}>₹{total.toFixed(2)}</span></div>
               </div>
             )}
             {hasBridalService ? (

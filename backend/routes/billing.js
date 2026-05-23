@@ -37,13 +37,18 @@ router.post('/generate-from-booking/:id', verifyToken, verifyRole(['staff', 'own
     if (booking.status !== 'Approved') return res.status(400).json({ error: 'Booking must be Approved to generate bill' });
     if (booking.billId) return res.status(400).json({ error: 'Bill already generated for this booking' });
 
+    // Calculate actual GST from per-item rates stored in booking
+    const bookingGst = booking.gstAmount || 0;
+    const billTotal = booking.finalAmount || booking.total;
+    const billSubtotal = billTotal - bookingGst;
+
     // Create a bill entry
     const bill = new Bill({
       type: 'service',
       items: booking.items,
-      subtotal: booking.total / 1.18,
-      gst: booking.total - (booking.total / 1.18),
-      total: booking.total,
+      subtotal: billSubtotal,
+      gst: bookingGst,
+      total: billTotal,
       bookingId: booking._id,
       userId: booking.userId,
       branch: booking.branch,
@@ -63,7 +68,7 @@ router.post('/generate-from-booking/:id', verifyToken, verifyRole(['staff', 'own
       const newRevenue = await Revenue.create({
         date: new Date(),
         customer: booking.name || 'Customer',
-        total: booking.total,
+        total: billTotal,
         source: 'online',
         paymentMethod: paymentMethod || 'upi',
         billId: bill._id,
@@ -88,7 +93,7 @@ router.post('/generate-from-booking/:id', verifyToken, verifyRole(['staff', 'own
 // ─── POST /offline — Create offline bill + Revenue (Admin/Staff) ─────────────
 router.post('/offline', verifyToken, verifyRole(['staff', 'owner']), async (req, res) => {
   try {
-    const { items, total, source, paymentMethod, customer } = req.body;
+    const { items, total, source, paymentMethod, customer, subtotal: reqSubtotal, gst: reqGst } = req.body;
 
     if (!items || items.length === 0) {
       return res.status(400).json({ error: 'At least one item is required' });
@@ -97,12 +102,16 @@ router.post('/offline', verifyToken, verifyRole(['staff', 'owner']), async (req,
       return res.status(400).json({ error: 'Total must be greater than 0' });
     }
 
+    // Use provided subtotal/gst if available, else default to no-GST
+    const billGst = reqGst ? Number(reqGst) : 0;
+    const billSubtotal = reqSubtotal ? Number(reqSubtotal) : (total - billGst);
+
     // Create the bill
     const bill = new Bill({
       type: 'mixed',
       items,
-      subtotal: total,
-      gst: 0,
+      subtotal: billSubtotal,
+      gst: billGst,
       total,
       source: source || 'offline',
       paymentMethod: paymentMethod || 'cash',
