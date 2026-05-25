@@ -66,9 +66,9 @@ const StarRating = ({ count }) => (
 
 const TestimonialCard = ({ testimonial }) => (
   <div
-    className="glass-dark flex-shrink-0 px-8 py-10 flex flex-col items-center text-center rounded-sm"
+    className="glass-dark flex-shrink-0 px-6 py-8 sm:px-8 sm:py-10 flex flex-col items-center text-center rounded-sm"
     style={{
-      width: '380px',
+      width: 'clamp(280px, 85vw, 380px)',
       minHeight: '320px',
       border: '1px solid rgba(255,195,0,0.15)',
     }}
@@ -93,7 +93,7 @@ const TestimonialCard = ({ testimonial }) => (
         fontSize: '1.15rem',
         fontWeight: 500,
         color: 'rgba(248,245,240,0.93)',
-        maxWidth: '320px',
+        maxWidth: '100%',
         display: '-webkit-box',
         WebkitLineClamp: 5,
         WebkitBoxOrient: 'vertical',
@@ -320,8 +320,12 @@ const Testimonials = () => {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 30 }}
               transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-              className="glass-dark max-w-lg w-full p-8 rounded-sm relative border border-[#FFD700]/30 shadow-2xl z-10"
-              style={{ background: 'rgba(10, 10, 12, 0.98)' }}
+              className="glass-dark max-w-lg w-full p-6 sm:p-8 rounded-sm relative border border-[#FFD700]/30 shadow-2xl z-10"
+              style={{
+                background: 'rgba(10, 10, 12, 0.98)',
+                maxHeight: '90vh',
+                overflowY: 'auto',
+              }}
             >
               {/* Close Button */}
               <button

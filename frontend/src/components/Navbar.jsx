@@ -108,9 +108,11 @@ const Navbar = () => {
         transition={{ duration: 0.8, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
         className="fixed top-0 left-0 right-0 z-[100] transition-all duration-500"
         style={{
-          background: scrolled ? 'rgba(0,0,0,0.92)' : 'transparent',
-          backdropFilter: scrolled ? 'blur(20px)' : 'none',
-          borderBottom: scrolled ? '1px solid rgba(255,195,0,0.12)' : 'none',
+          background: scrolled ? '#ffffff' : 'rgba(255, 255, 255, 0.95)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          borderBottom: '1px solid rgba(212, 175, 55, 0.15)',
+          boxShadow: scrolled ? '0 4px 20px rgba(0, 0, 0, 0.05)' : 'none',
         }}
       >
         <div className="max-w-[1400px] mx-auto px-6 lg:px-10">
@@ -125,12 +127,12 @@ const Navbar = () => {
                 <img
                   src="/b2-logo-transparent.svg"
                   alt="B2 Bridal Studio"
-                  style={{ width: 48, height: 48, objectFit: 'contain', filter: 'drop-shadow(0 0 6px rgba(255,195,0,0.45))' }}
+                  style={{ width: 48, height: 48, objectFit: 'contain', filter: 'drop-shadow(0 0 6px rgba(212,175,55,0.3))' }}
                 />
               </div>
               <div>
-                <div className="font-cinzel text-xs tracking-[0.25em] uppercase" style={{ color: '#FFD700' }}>B2 Bridal</div>
-                <div className="font-cormorant text-[0.65rem] tracking-[0.2em] uppercase" style={{ color: 'rgba(248,245,240,0.45)', lineHeight: 1 }}>Studio</div>
+                <div className="font-cinzel text-xs tracking-[0.25em] uppercase font-bold" style={{ color: '#D4AF37' }}>B2 Bridal</div>
+                <div className="font-cormorant text-[0.65rem] tracking-[0.2em] uppercase font-semibold" style={{ color: '#555555', lineHeight: 1 }}>Studio</div>
               </div>
             </Link>
 
@@ -148,15 +150,15 @@ const Navbar = () => {
                     <Link
                       to={link.to}
                       className="relative font-cinzel text-[0.7rem] tracking-[0.2em] uppercase group flex items-center gap-1"
-                      style={{ color: location.pathname.startsWith('/courses') ? '#FFD700' : 'rgba(248,245,240,0.7)', textDecoration: 'none' }}
-                      onMouseEnter={e => e.currentTarget.style.color = '#FFD700'}
-                      onMouseLeave={e => { if (!location.pathname.startsWith('/courses')) e.currentTarget.style.color = 'rgba(248,245,240,0.7)'; }}
+                      style={{ color: location.pathname.startsWith('/courses') ? '#D4AF37' : '#222222', textDecoration: 'none' }}
+                      onMouseEnter={e => e.currentTarget.style.color = '#D4AF37'}
+                      onMouseLeave={e => { if (!location.pathname.startsWith('/courses')) e.currentTarget.style.color = '#222222'; }}
                     >
                       {link.label}
                       <svg width="8" height="8" viewBox="0 0 8 8" fill="none" stroke="currentColor" strokeWidth="1.5" className={`transition-transform duration-200 ${coursesOpen ? 'rotate-180' : ''}`}>
                         <path d="M1 3l3 3 3-3"/>
                       </svg>
-                      <span className="absolute -bottom-1 left-0 h-px transition-all duration-300 group-hover:w-full" style={{ width: 0, background: 'linear-gradient(90deg, #FFD700, #FFE566)' }} />
+                      <span className="absolute -bottom-1 left-0 h-px transition-all duration-300 group-hover:w-full" style={{ width: 0, background: 'linear-gradient(90deg, #D4AF37, #FFED8A)' }} />
                     </Link>
 
                     {/* Dropdown */}
@@ -173,10 +175,10 @@ const Navbar = () => {
                           <div
                             className="rounded-sm py-2"
                             style={{
-                              background: 'rgba(10,8,2,0.96)',
-                              border: '1px solid rgba(255,195,0,0.2)',
+                              background: '#ffffff',
+                              border: '1px solid rgba(212,175,55,0.2)',
                               backdropFilter: 'blur(20px)',
-                              boxShadow: '0 20px 60px rgba(0,0,0,0.6)',
+                              boxShadow: '0 20px 60px rgba(0,0,0,0.08)',
                             }}
                           >
                             {COURSE_CATEGORIES.map((cat, i) => (
@@ -184,27 +186,27 @@ const Navbar = () => {
                                 key={cat.to}
                                 to={cat.to}
                                 className="flex items-center gap-3 px-5 py-3 transition-all duration-200 group"
-                                style={{ borderBottom: i < COURSE_CATEGORIES.length - 1 ? '1px solid rgba(255,195,0,0.06)' : 'none' }}
-                                onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,195,0,0.08)'; }}
+                                style={{ borderBottom: i < COURSE_CATEGORIES.length - 1 ? '1px solid rgba(212,175,55,0.08)' : 'none' }}
+                                onMouseEnter={e => { e.currentTarget.style.background = 'rgba(212,175,55,0.06)'; }}
                                 onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}
                               >
                                 <span className="text-base">{cat.icon}</span>
-                                <span className="font-cormorant text-base" style={{ color: 'rgba(248,245,240,0.7)' }}>
+                                <span className="font-cormorant text-base" style={{ color: '#222222' }}>
                                   {cat.label}
                                 </span>
-                                <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="rgba(255,195,0,0.4)" strokeWidth="1" className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity">
+                                <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="rgba(212,175,55,0.4)" strokeWidth="1" className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity">
                                   <path d="M3 2l4 3-4 3"/>
                                 </svg>
                               </Link>
                             ))}
-                            <div className="px-5 pt-3 pb-2" style={{ borderTop: '1px solid rgba(255,195,0,0.1)' }}>
+                            <div className="px-5 pt-3 pb-2" style={{ borderTop: '1px solid rgba(212,175,55,0.1)' }}>
                               <Link
                                 to="/courses"
                                 className="font-cinzel text-[0.65rem] tracking-[0.2em] uppercase flex items-center gap-2"
-                                style={{ color: '#FFD700' }}
+                                style={{ color: '#D4AF37' }}
                               >
                                 View All Courses
-                                <svg width="10" height="8" viewBox="0 0 10 8" fill="none" stroke="#FFD700" strokeWidth="1">
+                                <svg width="10" height="8" viewBox="0 0 10 8" fill="none" stroke="#D4AF37" strokeWidth="1">
                                   <path d="M1 4h8M5 1l4 3-4 3"/>
                                 </svg>
                               </Link>
@@ -228,9 +230,9 @@ const Navbar = () => {
               <button
                 onClick={openCart}
                 className="relative w-10 h-10 flex items-center justify-center transition-colors duration-200"
-                style={{ color: 'rgba(248,245,240,0.7)' }}
-                onMouseEnter={e => e.currentTarget.style.color = '#FFD700'}
-                onMouseLeave={e => e.currentTarget.style.color = 'rgba(248,245,240,0.7)'}
+                style={{ color: '#222222' }}
+                onMouseEnter={e => e.currentTarget.style.color = '#D4AF37'}
+                onMouseLeave={e => e.currentTarget.style.color = '#222222'}
               >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                   <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" strokeLinecap="round" strokeLinejoin="round"/>
@@ -240,7 +242,7 @@ const Navbar = () => {
                 {itemCount > 0 && (
                   <span
                     className="absolute -top-0.5 -right-0.5 w-4 h-4 flex items-center justify-center rounded-full text-[0.55rem] font-bold"
-                    style={{ background: '#FFD700', color: '#000' }}
+                    style={{ background: '#D4AF37', color: '#fff' }}
                   >
                     {itemCount > 9 ? '9+' : itemCount}
                   </span>
@@ -252,7 +254,7 @@ const Navbar = () => {
                   <button 
                     onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
                     className="w-10 h-10 rounded-full flex items-center justify-center font-cinzel text-lg font-bold"
-                    style={{ background: 'rgba(255,195,0,0.1)', border: '1px solid rgba(255,195,0,0.3)', color: '#FFD700' }}
+                    style={{ background: 'rgba(212,175,55,0.1)', border: '1px solid rgba(212,175,55,0.3)', color: '#D4AF37' }}
                   >
                     {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
                   </button>
@@ -265,20 +267,20 @@ const Navbar = () => {
                         exit={{ opacity: 0, y: 10 }}
                         className="absolute right-0 mt-3 py-2 w-48 rounded-sm"
                         style={{
-                          background: 'rgba(10,8,2,0.96)',
-                          border: '1px solid rgba(255,195,0,0.2)',
+                          background: '#ffffff',
+                          border: '1px solid rgba(212,175,55,0.2)',
                           backdropFilter: 'blur(20px)',
-                          boxShadow: '0 20px 60px rgba(0,0,0,0.6)',
+                          boxShadow: '0 20px 60px rgba(0,0,0,0.08)',
                         }}
                       >
-                        <div className="px-4 py-2 border-b" style={{ borderColor: 'rgba(255,195,0,0.1)' }}>
-                          <p className="font-inter text-sm text-white truncate">{user.name}</p>
-                          <p className="font-inter text-xs text-gray-400 truncate">{user.email}</p>
+                        <div className="px-4 py-2 border-b" style={{ borderColor: 'rgba(212,175,55,0.1)' }}>
+                          <p className="font-inter text-sm text-[#222222] truncate">{user.name}</p>
+                          <p className="font-inter text-xs text-gray-500 truncate">{user.email}</p>
                         </div>
-                        <Link to="/profile" onClick={() => setProfileDropdownOpen(false)} className="block px-4 py-3 font-cinzel text-[0.7rem] tracking-[0.1em] uppercase text-white hover:bg-white/5 transition-colors">
+                        <Link to="/profile" onClick={() => setProfileDropdownOpen(false)} className="block px-4 py-3 font-cinzel text-[0.7rem] tracking-[0.1em] uppercase text-[#222222] hover:bg-black/5 transition-colors">
                           My Profile
                         </Link>
-                        <button onClick={handleLogout} className="w-full text-left px-4 py-3 font-cinzel text-[0.7rem] tracking-[0.1em] uppercase text-red-400 hover:bg-white/5 transition-colors">
+                        <button onClick={handleLogout} className="w-full text-left px-4 py-3 font-cinzel text-[0.7rem] tracking-[0.1em] uppercase text-red-500 hover:bg-black/5 transition-colors">
                           Logout
                         </button>
                       </motion.div>
@@ -290,9 +292,9 @@ const Navbar = () => {
                   <Link
                     to="/login"
                     className="font-cinzel text-[0.7rem] tracking-[0.15em] uppercase px-4 py-2 transition-all duration-300"
-                    style={{ color: 'rgba(248,245,240,0.7)', border: '1px solid rgba(248,245,240,0.15)' }}
-                    onMouseEnter={e => { e.currentTarget.style.color = '#FFD700'; e.currentTarget.style.borderColor = 'rgba(255,195,0,0.4)'; }}
-                    onMouseLeave={e => { e.currentTarget.style.color = 'rgba(248,245,240,0.7)'; e.currentTarget.style.borderColor = 'rgba(248,245,240,0.15)'; }}
+                    style={{ color: '#222222', border: '1px solid rgba(0,0,0,0.15)' }}
+                    onMouseEnter={e => { e.currentTarget.style.color = '#D4AF37'; e.currentTarget.style.borderColor = '#D4AF37'; }}
+                    onMouseLeave={e => { e.currentTarget.style.color = '#222222'; e.currentTarget.style.borderColor = 'rgba(0,0,0,0.15)'; }}
                   >
                     Login
                   </Link>
@@ -308,7 +310,7 @@ const Navbar = () => {
               <button
                 onClick={openCart}
                 className="relative w-10 h-10 flex items-center justify-center"
-                style={{ color: '#FFD700' }}
+                style={{ color: '#D4AF37' }}
               >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                   <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" strokeLinecap="round" strokeLinejoin="round"/>
@@ -316,7 +318,7 @@ const Navbar = () => {
                   <path d="M16 10a4 4 0 01-8 0"/>
                 </svg>
                 {itemCount > 0 && (
-                  <span className="absolute top-0 right-0 w-4 h-4 flex items-center justify-center rounded-full text-[0.55rem] font-bold" style={{ background: '#FFD700', color: '#000' }}>
+                  <span className="absolute top-0 right-0 w-4 h-4 flex items-center justify-center rounded-full text-[0.55rem] font-bold" style={{ background: '#D4AF37', color: '#fff' }}>
                     {itemCount > 9 ? '9+' : itemCount}
                   </span>
                 )}
@@ -327,9 +329,9 @@ const Navbar = () => {
                 className="flex flex-col gap-[5px] p-2 z-50"
                 onClick={() => setMenuOpen(!menuOpen)}
               >
-                <span className="block w-6 h-px transition-all duration-300 origin-center" style={{ background: '#FFD700', transform: menuOpen ? 'rotate(45deg) translateY(6px)' : 'none' }} />
-                <span className="block h-px transition-all duration-300" style={{ background: '#FFD700', width: menuOpen ? 0 : '24px', opacity: menuOpen ? 0 : 1 }} />
-                <span className="block w-6 h-px transition-all duration-300 origin-center" style={{ background: '#FFD700', transform: menuOpen ? 'rotate(-45deg) translateY(-6px)' : 'none' }} />
+                <span className="block w-6 h-px transition-all duration-300 origin-center" style={{ background: '#D4AF37', transform: menuOpen ? 'rotate(45deg) translateY(6px)' : 'none' }} />
+                <span className="block h-px transition-all duration-300" style={{ background: '#D4AF37', width: menuOpen ? 0 : '24px', opacity: menuOpen ? 0 : 1 }} />
+                <span className="block w-6 h-px transition-all duration-300 origin-center" style={{ background: '#D4AF37', transform: menuOpen ? 'rotate(-45deg) translateY(-6px)' : 'none' }} />
               </button>
             </div>
           </div>
@@ -342,7 +344,7 @@ const Navbar = () => {
         animate={{ x: menuOpen ? 0 : '100%' }}
         transition={{ duration: 0.4, ease: [0.76, 0, 0.24, 1] }}
         className="fixed inset-y-0 right-0 z-[99] w-72 flex flex-col lg:hidden"
-        style={{ background: 'rgba(0,0,0,0.97)', borderLeft: '1px solid rgba(255,195,0,0.15)' }}
+        style={{ background: '#ffffff', borderLeft: '1px solid rgba(212,175,55,0.15)' }}
       >
         <div className="flex flex-col gap-1 mt-24 px-8 overflow-y-auto flex-1">
           {NAV_LINKS.map(link => (
@@ -354,14 +356,14 @@ const Navbar = () => {
                       to={link.to}
                       onClick={() => setMenuOpen(false)}
                       className="flex-1 py-4 font-cinzel text-sm tracking-[0.2em] uppercase"
-                      style={{ color: 'rgba(248,245,240,0.7)' }}
+                      style={{ color: '#222222' }}
                     >
                       {link.label}
                     </Link>
                     <button
                       onClick={() => setMobileCoursesOpen(!mobileCoursesOpen)}
                       className="p-2"
-                      style={{ color: '#FFD700' }}
+                      style={{ color: '#D4AF37' }}
                     >
                       <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1.5" className={`transition-transform ${mobileCoursesOpen ? 'rotate-180' : ''}`}>
                         <path d="M2 4l3 3 3-3"/>
@@ -384,7 +386,7 @@ const Navbar = () => {
                               to={cat.to}
                               onClick={() => setMenuOpen(false)}
                               className="flex items-center gap-2 py-2 font-cormorant text-sm"
-                              style={{ color: 'rgba(248,245,240,0.5)' }}
+                              style={{ color: '#555555' }}
                             >
                               <span className="text-xs">{cat.icon}</span>
                               {cat.label}
@@ -400,7 +402,7 @@ const Navbar = () => {
                   to={link.to}
                   onClick={(e) => { if (link.isContact) { scrollToContact(e); } else { setMenuOpen(false); } }}
                   className="block py-4 font-cinzel text-sm tracking-[0.2em] uppercase border-b"
-                  style={{ color: 'rgba(248,245,240,0.7)', borderBottomColor: 'rgba(255,195,0,0.08)' }}
+                  style={{ color: '#222222', borderBottomColor: 'rgba(0,0,0,0.06)' }}
                 >
                   {link.label}
                 </Link>
@@ -408,9 +410,9 @@ const Navbar = () => {
             </div>
           ))}
             {user ? (
-              <div className="mt-8 flex flex-col gap-3 pb-8 border-t pt-4" style={{ borderColor: 'rgba(255,195,0,0.1)' }}>
+              <div className="mt-8 flex flex-col gap-3 pb-8 border-t pt-4" style={{ borderColor: 'rgba(0,0,0,0.08)' }}>
                 <div className="px-2 mb-2">
-                  <p className="font-cinzel text-sm text-gold-gradient">{user.name}</p>
+                  <p className="font-cinzel text-sm font-bold text-[#D4AF37]">{user.name}</p>
                   <p className="font-inter text-xs text-gray-500">{user.email}</p>
                 </div>
                 <Link to="/profile" className="btn-outline-gold text-center text-xs py-3" onClick={() => setMenuOpen(false)}>My Profile</Link>
@@ -427,7 +429,7 @@ const Navbar = () => {
 
       {/* Backdrop */}
       {menuOpen && (
-        <div className="fixed inset-0 z-[98] lg:hidden" style={{ background: 'rgba(0,0,0,0.6)' }} onClick={() => setMenuOpen(false)} />
+        <div className="fixed inset-0 z-[98] lg:hidden" style={{ background: 'rgba(0,0,0,0.4)' }} onClick={() => setMenuOpen(false)} />
       )}
     </>
   );
@@ -438,12 +440,12 @@ const NavLink = ({ to, children, active, onClick }) => (
     to={to}
     onClick={onClick}
     className="relative font-cinzel text-[0.7rem] tracking-[0.2em] uppercase group"
-    style={{ color: active ? '#FFD700' : 'rgba(248,245,240,0.7)', textDecoration: 'none' }}
-    onMouseEnter={e => e.currentTarget.style.color = '#FFD700'}
-    onMouseLeave={e => { if (!active) e.currentTarget.style.color = 'rgba(248,245,240,0.7)'; }}
+    style={{ color: active ? '#D4AF37' : '#222222', textDecoration: 'none' }}
+    onMouseEnter={e => e.currentTarget.style.color = '#D4AF37'}
+    onMouseLeave={e => { if (!active) e.currentTarget.style.color = '#222222'; }}
   >
     {children}
-    <span className="absolute -bottom-1 left-0 h-px transition-all duration-300 group-hover:w-full" style={{ width: active ? '100%' : 0, background: 'linear-gradient(90deg, #FFD700, #FFE566)' }} />
+    <span className="absolute -bottom-1 left-0 h-px transition-all duration-300 group-hover:w-full" style={{ width: active ? '100%' : 0, background: 'linear-gradient(90deg, #D4AF37, #FFED8A)' }} />
   </Link>
 );
 

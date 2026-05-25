@@ -5,14 +5,14 @@ import { fadeUp, staggerContainer } from '../animations/variants';
 import { useCart } from '../context/CartContext';
 const API = import.meta.env.VITE_API_URL;
 const DEMO_PRODUCTS = [
-  { _id: 'p1', name: 'Bridal Makeup Kit Pro', category: 'Makeup', price: 4999, image: 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=600&q=80' },
-  { _id: 'p2', name: 'Silk Thread Jhumka Set', category: 'Jewellery', price: 799, image: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=600&q=80' },
-  { _id: 'p3', name: 'Aari Embroidery Frame', category: 'Tools', price: 1499, image: 'https://images.unsplash.com/photo-1597696929736-6d13bed8e6a8?auto=format&fit=crop&w=600&q=80' },
-  { _id: 'p4', name: 'Gold Leaf Nail Art Kit', category: 'Nails', price: 999, image: 'https://images.unsplash.com/photo-1604654894610-df63bc536371?auto=format&fit=crop&w=600&q=80' },
-  { _id: 'p5', name: 'Mehandi Cone Premium Pack', category: 'Mehandi', price: 599, image: 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=600&q=80' },
-  { _id: 'p6', name: 'Hair Styling Tools Bundle', category: 'Hair', price: 3499, image: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=600&q=80' },
-  { _id: 'p7', name: 'Kundan Making Kit', category: 'Jewellery', price: 1299, image: 'https://images.unsplash.com/photo-1515562141589-67f0d569b41e?auto=format&fit=crop&w=600&q=80' },
-  { _id: 'p8', name: 'Bridal Skincare Collection', category: 'Skincare', price: 2999, image: 'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?auto=format&fit=crop&w=600&q=80' },
+  { _id: 'p1', name: 'Bridal Makeup Kit Pro', category: 'Makeup', price: 4999, image: '/images/bridal4.jpeg' },
+  { _id: 'p2', name: 'Silk Thread Jhumka Set', category: 'Jewellery', price: 799, image: '/images/jewelry.png' },
+  { _id: 'p3', name: 'Aari Embroidery Frame', category: 'Tools', price: 1499, image: '/images/aari1.jpeg' },
+  { _id: 'p4', name: 'Gold Leaf Nail Art Kit', category: 'Nails', price: 999, image: '/images/aari5.jpeg' },
+  { _id: 'p5', name: 'Mehandi Cone Premium Pack', category: 'Mehandi', price: 599, image: '/images/bridal6.jpeg' },
+  { _id: 'p6', name: 'Hair Styling Tools Bundle', category: 'Hair', price: 3499, image: '/images/fashion1.jpeg' },
+  { _id: 'p7', name: 'Kundan Making Kit', category: 'Jewellery', price: 1299, image: '/images/aari7.jpeg' },
+  { _id: 'p8', name: 'Bridal Skincare Collection', category: 'Skincare', price: 2999, image: '/images/bridal10.jpeg' },
 ];
 
 const Products = () => {
@@ -84,7 +84,7 @@ const Products = () => {
                 {/* Image */}
                 <div className="img-zoom-container relative" style={{ height: '240px' }}>
                   <img
-                    src={product.image || 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=600&q=80'}
+                    src={product.image || '/images/bridal4.jpeg'}
                     alt={product.name}
                     className="w-full h-full object-cover"
                     loading="lazy"

@@ -62,25 +62,8 @@ const About = () => {
       <section className="relative overflow-hidden" style={{ padding: '10rem 0 6rem' }} ref={heroRef}>
         <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at center top, rgba(255,195,0,0.06), transparent 60%)' }} />
         <motion.div variants={staggerContainer} initial="hidden" animate={heroInView ? 'visible' : 'hidden'} className="max-w-[1200px] mx-auto px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-          {/* Image */}
-          <motion.div variants={slideLeft} className="relative">
-            <div className="img-zoom-container rounded-sm" style={{ border: '1px solid rgba(255,195,0,0.15)' }}>
-              <img
-                src="/images/about3.jpg"
-                alt="About B2 Bridal Studio"
-                className="w-full aspect-square object-cover"
-                loading="lazy"
-              />
-            </div>
-            {/* Floating stat */}
-            <div className="absolute -bottom-6 -right-4 lg:-right-8 glass-dark px-6 py-4 text-center" style={{ border: '1px solid rgba(255,195,0,0.2)' }}>
-              <div className="font-cinzel font-bold text-lg" style={{ color: '#FFD700' }}>15+</div>
-              <div className="font-cormorant italic text-xs" style={{ color: 'rgba(248,245,240,0.5)' }}>Years of Excellence</div>
-            </div>
-          </motion.div>
-
-          {/* Content */}
-          <motion.div variants={slideRight}>
+          {/* Content — Left side */}
+          <motion.div variants={slideLeft}>
             <div className="flex items-center gap-3 mb-4">
               <div className="gold-divider-left" />
               <span className="font-cinzel text-[0.6rem] tracking-[0.4em] uppercase" style={{ color: '#FFD700' }}>About Our Studio</span>
@@ -97,6 +80,23 @@ const About = () => {
             <p className="font-inter text-base leading-relaxed" style={{ color: 'rgba(248,245,240,0.75)' }}>
               As the founder of B2 Bridal Studio, she has built a legacy of empowering women through beauty and craftsmanship, training thousands of aspiring professionals across Tamil Nadu.
             </p>
+          </motion.div>
+
+          {/* Image — Right side */}
+          <motion.div variants={slideRight} className="relative">
+            <div className="img-zoom-container rounded-sm" style={{ border: '1px solid rgba(255,195,0,0.15)' }}>
+              <img
+                src="/images/about3.jpg"
+                alt="About B2 Bridal Studio"
+                className="w-full aspect-square object-cover"
+                loading="lazy"
+              />
+            </div>
+            {/* Floating stat */}
+            <div className="absolute -bottom-6 -right-4 lg:-right-8 glass-dark px-6 py-4 text-center" style={{ border: '1px solid rgba(255,195,0,0.2)' }}>
+              <div className="font-cinzel font-bold text-lg" style={{ color: '#FFD700' }}>15+</div>
+              <div className="font-cormorant italic text-xs" style={{ color: 'rgba(248,245,240,0.5)' }}>Years of Excellence</div>
+            </div>
           </motion.div>
         </motion.div>
       </section>
@@ -115,38 +115,7 @@ const About = () => {
         </motion.div>
       </section>
 
-      {/* ═══ GALLERY — 3 IMAGE SHOWCASE ═══ */}
-      <section className="relative" style={{ padding: '5rem 0' }}>
-        <div className="absolute top-0 left-0 right-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(255,195,0,0.2), transparent)' }} />
-        <div className="max-w-[1200px] mx-auto px-6 lg:px-12">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-            {[
-              { src: '/images/about1.jpeg', alt: 'B2 Bridal Studio — Artistry in Action' },
-              { src: '/images/about2.jpeg', alt: 'B2 Bridal Studio — Bridal Elegance' },
-              { src: '/images/about4.jpeg', alt: 'B2 Bridal Studio — Professional Training' },
-            ].map((img, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.15, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-                className="overflow-hidden rounded-sm group"
-                style={{ border: '1px solid rgba(255,195,0,0.15)' }}
-              >
-                <div style={{ aspectRatio: '3 / 4', overflow: 'hidden' }}>
-                  <img
-                    src={img.src}
-                    alt={img.alt}
-                    className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                    loading="lazy"
-                  />
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
+
 
       {/* ═══ SECTION 3 — HIGHLIGHTS / STATS ═══ */}
       <section className="relative" style={{ padding: '5rem 0' }} ref={statsRef}>
@@ -223,9 +192,9 @@ const About = () => {
         </div>
         <div className="max-w-[1100px] mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-6">
           {[
-            { title: '10 Bridal Makeup Looks Dominating 2024 Weddings', date: 'April 2024', image: 'https://images.unsplash.com/photo-1457972729786-0411a3b2b626?auto=format&fit=crop&w=600&q=80', excerpt: 'From dewy skin finishes to bold jewel-toned eyes — discover which looks are defining the modern Indian bride.' },
-            { title: 'How to Build a Luxury Bridal Makeup Career', date: 'March 2024', image: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=600&q=80', excerpt: 'Our master trainers share the exact roadmap — from certification to premium clientele.' },
-            { title: 'The Pre-Bridal Skin Care Ritual', date: 'February 2024', image: 'https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?auto=format&fit=crop&w=600&q=80', excerpt: 'The complete countdown for flawless skin on your wedding day.' },
+            { title: '10 Bridal Makeup Looks Dominating 2024 Weddings', date: 'April 2024', image: '/images/bridal5.jpeg', excerpt: 'From dewy skin finishes to bold jewel-toned eyes — discover which looks are defining the modern Indian bride.' },
+            { title: 'How to Build a Luxury Bridal Makeup Career', date: 'March 2024', image: '/images/bridal9.jpeg', excerpt: 'Our master trainers share the exact roadmap — from certification to premium clientele.' },
+            { title: 'The Pre-Bridal Skin Care Ritual', date: 'February 2024', image: '/images/bridal8.jpeg', excerpt: 'The complete countdown for flawless skin on your wedding day.' },
           ].map((post, i) => (
             <motion.article
               key={i}
@@ -249,70 +218,7 @@ const About = () => {
         </div>
       </section>
 
-      {/* ═══ SECTION 6 — BRANCHES ═══ */}
-      <section className="relative" style={{ padding: '6rem 0 8rem' }}>
-        <div className="absolute top-0 left-0 right-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(255,195,0,0.2), transparent)' }} />
-        <div className="text-center mb-12">
-          <span className="font-cinzel text-[0.6rem] tracking-[0.4em] uppercase" style={{ color: '#FFD700' }}>Locations</span>
-          <h2 className="font-cinzel font-bold uppercase mt-3" style={{ fontSize: 'clamp(1.6rem, 3.5vw, 2.5rem)', color: '#F8F5F0', letterSpacing: '0.04em' }}>
-            Our Branches
-          </h2>
-        </div>
 
-        <div className="max-w-[1000px] mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-8">
-          {[
-            { name: 'Chennai Branch', address: 'No: 63, Madavaram Red Hills Rd, Kodungaiyur, Chennai — 600060', phone: '+91 98405 51365', mapUrl: 'https://www.google.com/maps/dir/?api=1&destination=13.1283,80.2410' },
-            { name: 'Madurai Branch', address: 'C6, Santhi Sadan Enclave, Melakkal Main Road, Kochadai, Madurai – 625016', phone: '+91 97908 82561', mapUrl: 'https://www.google.com/maps/dir/?api=1&destination=9.9252,78.0747' },
-          ].map((branch, i) => (
-            <motion.div
-              key={branch.name}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.15 }}
-              className="glass-dark p-8 rounded-sm"
-              style={{ border: '1px solid rgba(255,195,0,0.15)' }}
-            >
-              <h3 className="font-cinzel text-sm tracking-[0.15em] uppercase mb-4" style={{ color: '#FFD700' }}>{branch.name}</h3>
-              <div className="flex flex-col gap-3 mb-6">
-                <div className="flex items-start gap-3">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFD700" strokeWidth="1.5" className="mt-0.5 flex-shrink-0"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                  <span className="font-cormorant text-sm leading-relaxed" style={{ color: 'rgba(248,245,240,0.6)' }}>{branch.address}</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFD700" strokeWidth="1.5" className="flex-shrink-0"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6A19.79 19.79 0 012.12 4.11 2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
-                  <span className="font-cormorant text-sm" style={{ color: 'rgba(248,245,240,0.6)' }}>{branch.phone}</span>
-                </div>
-              </div>
-              <a
-                href={branch.mapUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="btn-outline-gold text-[0.65rem] py-2 px-4 inline-flex items-center gap-2"
-              >
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                Get Directions
-              </a>
-              {/* Embedded Map */}
-              <div className="mt-4 overflow-hidden rounded-sm" style={{ border: '1px solid rgba(255,195,0,0.08)' }}>
-                <iframe
-                  title={`${branch.name} Location`}
-                  src={branch.name === 'Chennai Branch'
-                    ? 'https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&q=No+63+Madavaram+Red+Hills+Rd+Kodungaiyur+Chennai+600060&zoom=16'
-                    : 'https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&q=C6+Santhi+Sadan+Enclave+Melakkal+Main+Road+Kochadai+Madurai+625016&zoom=16'
-                  }
-                  width="100%"
-                  height="180"
-                  style={{ border: 0, filter: 'invert(90%) hue-rotate(180deg) brightness(0.85)' }}
-                  allowFullScreen=""
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                />
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </section>
     </div>
   );
 };

@@ -2,21 +2,33 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { fadeUp, staggerContainer } from '../animations/variants';
 
-const GALLERY_TABS = ['All', 'Bridal', 'Makeup', 'Hair', 'Mehandi', 'Nails', 'Embroidery', 'Fashion'];
+const GALLERY_TABS = ['All', 'Bridal', 'Makeup', 'Fashion', 'Embroidery', 'Crafts'];
 
 const GALLERY_IMAGES = [
-  { id: 1, src: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=600&q=80', category: 'Bridal', title: 'South Indian Bride' },
-  { id: 2, src: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=600&q=80', category: 'Makeup', title: 'HD Bridal Makeup' },
-  { id: 3, src: 'https://images.unsplash.com/photo-1596704017254-9b121068fb31?auto=format&fit=crop&w=600&q=80', category: 'Fashion', title: 'Saree Collection' },
-  { id: 4, src: 'https://images.unsplash.com/photo-1457972729786-0411a3b2b626?auto=format&fit=crop&w=600&q=80', category: 'Nails', title: 'Bridal Nail Art' },
-  { id: 5, src: 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=600&q=80', category: 'Mehandi', title: 'Arabic Mehandi' },
-  { id: 6, src: 'https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?auto=format&fit=crop&w=600&q=80', category: 'Makeup', title: 'Pre-Bridal Glow' },
-  { id: 7, src: 'https://images.unsplash.com/photo-1519699047748-de8e457a634e?auto=format&fit=crop&w=600&q=80', category: 'Hair', title: 'Bridal Bun' },
-  { id: 8, src: 'https://images.unsplash.com/photo-1562322140-8baeacacf376?auto=format&fit=crop&w=600&q=80', category: 'Embroidery', title: 'Aari Work' },
-  { id: 9, src: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=600&q=80', category: 'Bridal', title: 'Bridal Jewellery' },
-  { id: 10, src: 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=600&q=80', category: 'Makeup', title: 'Makeup Tools' },
-  { id: 11, src: 'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?auto=format&fit=crop&w=600&q=80', category: 'Fashion', title: 'Fashion Designing' },
-  { id: 12, src: 'https://images.unsplash.com/photo-1604654894610-df63bc536371?auto=format&fit=crop&w=600&q=80', category: 'Nails', title: 'Gold Nail Art' },
+  { id: 1, src: '/images/bridal1.jpeg', category: 'Bridal', title: 'South Indian Bride' },
+  { id: 2, src: '/images/bridal2.jpeg', category: 'Bridal', title: 'Bridal Elegance' },
+  { id: 3, src: '/images/bridal3.jpeg', category: 'Bridal', title: 'Traditional Bridal' },
+  { id: 4, src: '/images/bridal5.jpeg', category: 'Bridal', title: 'Bridal Makeover' },
+  { id: 5, src: '/images/bridal6.jpeg', category: 'Bridal', title: 'Bridal Jewellery Look' },
+  { id: 6, src: '/images/bridal4.jpeg', category: 'Makeup', title: 'HD Bridal Makeup' },
+  { id: 7, src: '/images/bridal8.jpeg', category: 'Makeup', title: 'Bridal Glow' },
+  { id: 8, src: '/images/bridal9.jpeg', category: 'Makeup', title: 'Reception Makeup' },
+  { id: 9, src: '/images/bridal10.jpeg', category: 'Makeup', title: 'Pre-Bridal Look' },
+  { id: 10, src: '/images/fashion1.jpeg', category: 'Fashion', title: 'Fashion Designing' },
+  { id: 11, src: '/images/fashion2.jpeg', category: 'Fashion', title: 'Designer Collection' },
+  { id: 12, src: '/images/fashion3.jpeg', category: 'Fashion', title: 'Fashion Showcase' },
+  { id: 13, src: '/images/fashion4.jpeg', category: 'Fashion', title: 'Ethnic Wear' },
+  { id: 14, src: '/images/fashion5.jpeg', category: 'Fashion', title: 'Bridal Couture' },
+  { id: 15, src: '/images/aari1.jpeg', category: 'Embroidery', title: 'Aari Work' },
+  { id: 16, src: '/images/aari2.jpeg', category: 'Embroidery', title: 'Zari Embroidery' },
+  { id: 17, src: '/images/aari3.jpeg', category: 'Embroidery', title: 'Thread Art' },
+  { id: 18, src: '/images/aari4.jpeg', category: 'Embroidery', title: 'Motif Design' },
+  { id: 19, src: '/images/aari5.jpeg', category: 'Embroidery', title: 'Designer Embroidery' },
+  { id: 20, src: '/images/bakery1.jpeg', category: 'Crafts', title: 'Bakery Creations' },
+  { id: 21, src: '/images/bakery2.jpeg', category: 'Crafts', title: 'Cake Art' },
+  { id: 22, src: '/images/sareedraping.jpeg', category: 'Fashion', title: 'Saree Draping' },
+  { id: 23, src: '/images/bridal7.jpeg', category: 'Bridal', title: 'Maternity Photoshoot' },
+  { id: 24, src: '/images/bridal12.jpeg', category: 'Bridal', title: 'Studio Session' },
 ];
 
 const Gallery = () => {

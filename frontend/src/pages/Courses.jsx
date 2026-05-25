@@ -16,6 +16,39 @@ const COURSE_IMAGES = {
   special: '/images/specialcourses.png',
 };
 
+/* Per-course image mapping — assigns a relevant real image to each individual course */
+const PER_COURSE_IMAGES = {
+  b1: '/images/bridal8.jpeg',
+  b2: '/images/bridal5.jpeg',
+  b3: '/images/bridal9.jpeg',
+  b4: '/images/bridal6.jpeg',
+  b5: '/images/bridal3.jpeg',
+  b6: '/images/bridal2.jpeg',
+  f1: '/images/fashion1.jpeg',
+  f2: '/images/sareedraping.jpeg',
+  e1: '/images/aari1.jpeg',
+  e2: '/images/aari2.jpeg',
+  e3: '/images/aari3.jpeg',
+  e4: '/images/aari4.jpeg',
+  e5: '/images/aari5.jpeg',
+  e6: '/images/aari6.jpeg',
+  j1: '/images/aari7.jpeg',
+  j2: '/images/aari8.jpeg',
+  j3: '/images/aari9.jpeg',
+  j4: '/images/aari10.jpeg',
+  ba1: '/images/bag.png',
+  ba2: '/images/fashion2.jpeg',
+  ba3: '/images/fashion3.jpeg',
+  ba4: '/images/fashion4.jpeg',
+  k1: '/images/kids.png',
+  k2: '/images/kids.png',
+  k3: '/images/kids.png',
+  k4: '/images/kids.png',
+  s1: '/images/specialcourses.png',
+  s3: '/images/bakery1.jpeg',
+  s4: '/images/specialcourses.png',
+};
+
 const COURSE_DATA = {
   beautician: {
     title: 'Beautician Courses',
@@ -196,14 +229,14 @@ const Courses = () => {
       <div className="max-w-[1300px] mx-auto px-6 lg:px-12 pt-10 pb-4">
         <div className="glass-dark p-4 flex flex-wrap items-center justify-end gap-4" style={{ border: '1px solid rgba(255,195,0,0.1)' }}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFD700" strokeWidth="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" /><circle cx="12" cy="10" r="3" /></svg>
-          <span className="font-cormorant text-sm" style={{ color: 'rgba(248,245,240,0.6)' }}>Select Branch:</span>
+          <span className="font-cormorant text-base" style={{ color: 'rgba(248,245,240,0.6)' }}>Select Branch:</span>
           <select
             value={selectedBranch}
             onChange={e => setSelectedBranch(e.target.value)}
-            className="px-3 py-2 text-sm font-cormorant rounded-sm outline-none"
-            style={{ background: 'rgba(255,195,0,0.08)', border: '1px solid rgba(255,195,0,0.2)', color: '#F8F5F0' }}
+            className="px-4 py-2.5 font-cormorant rounded-sm outline-none"
+            style={{ background: 'rgba(255,195,0,0.08)', border: '1px solid rgba(255,195,0,0.2)', color: '#F8F5F0', fontSize: '1.05rem' }}
           >
-            <option value="branch1" style={{ background: '#111' }}>Chennai — Kodungaiyur</option>
+            <option value="branch1" style={{ background: '#111' }}>Chennai — Moolakaadu</option>
             <option value="branch2" style={{ background: '#111' }}>Madurai Branch</option>
           </select>
         </div>
@@ -223,7 +256,7 @@ const Courses = () => {
             >
               {/* Course image */}
               <div className="img-zoom-container relative" style={{ height: '180px' }}>
-                <img src={COURSE_IMAGES[category]} alt={course.title} className="w-full h-full object-cover" loading="lazy" style={{ opacity: 0.6 }} />
+                <img src={PER_COURSE_IMAGES[course.id] || COURSE_IMAGES[category]} alt={course.title} className="w-full h-full object-cover" loading="lazy" style={{ opacity: 0.6 }} />
                 <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.95), rgba(0,0,0,0.2))' }} />
                 <div className="absolute bottom-3 left-4 flex items-center gap-2">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#FFD700" strokeWidth="1.5"><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></svg>

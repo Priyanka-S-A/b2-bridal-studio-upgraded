@@ -238,8 +238,8 @@ const AdminDashboard = () => {
           </div>
           <footer className="mt-8 pt-4 text-center text-[0.65rem] border-t" style={{ borderColor: 'rgba(0,0,0,0.05)', color: '#888' }}>
             Powered by{' '}
-            <a href="https://cenexa.io" target="_blank" rel="noopener noreferrer" className="font-semibold hover:underline" style={{ color: '#D4AF37' }}>
-              Cenexa Systems
+            <a href="https://cenerasystems.com" target="_blank" rel="noopener noreferrer" className="font-semibold hover:underline" style={{ color: '#D4AF37' }}>
+              Cenera Systems
             </a>{' '}
             © 2026
           </footer>

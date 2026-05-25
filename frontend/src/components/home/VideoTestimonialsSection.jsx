@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const videos = [
@@ -17,7 +17,21 @@ const variants = {
 
 const VideoTestimonialsSection = () => {
     const [[index, dir], setIndex] = useState([0, 0]);
+    const [mobileIndex, setMobileIndex] = useState(0);
+    const [isMobileOrTablet, setIsMobileOrTablet] = useState(false);
+    
     const videoRef = useRef(null);
+    const scrollRef = useRef(null);
+
+    // Detect screen width for mobile/tablet layout
+    useEffect(() => {
+        const handleResize = () => {
+            setIsMobileOrTablet(window.innerWidth < 1024);
+        };
+        handleResize();
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     const paginate = (direction) => {
         setIndex(([prev]) => {
@@ -33,6 +47,30 @@ const VideoTestimonialsSection = () => {
         } else if (info.offset.x > swipeThreshold) {
             paginate(-1);
         }
+    };
+
+    // Track active card center on mobile horizontal scroll
+    const handleScroll = (e) => {
+        const container = e.currentTarget;
+        const scrollLeft = container.scrollLeft;
+        const containerWidth = container.clientWidth;
+        const children = container.children;
+
+        let closestIndex = 0;
+        let minDiff = Infinity;
+
+        for (let i = 0; i < children.length; i++) {
+            const child = children[i];
+            const childCenter = child.offsetLeft + child.clientWidth / 2;
+            const containerCenter = scrollLeft + containerWidth / 2;
+            const diff = Math.abs(childCenter - containerCenter);
+
+            if (diff < minDiff) {
+                minDiff = diff;
+                closestIndex = i;
+            }
+        }
+        setMobileIndex(closestIndex);
     };
 
     const current = videos[index];
@@ -63,98 +101,166 @@ const VideoTestimonialsSection = () => {
                     Video Testimonials
                 </motion.h2>
 
-                {/* Frame */}
-                <div className="relative flex items-center justify-center">
-
-                    {/* LEFT ARROW (DESKTOP ONLY) */}
-                    <button
-                        onClick={() => paginate(-1)}
-                        className="absolute left-0 z-20 w-12 h-12 flex items-center justify-center backdrop-blur-md hidden md:flex cursor-pointer transition-all hover:bg-rgba(212,175,55,0.15) active:scale-95"
-                        style={{
-                            border: '1px solid rgba(212,175,55,0.45)',
-                            color: '#D4AF37',
-                            background: 'rgba(212,175,55,0.06)',
-                        }}
-                    >
-                        ←
-                    </button>
-
-                    {/* GLASS VIDEO CARD WITH DRAG SUPPORT */}
-                    <div
-                        className="relative w-full max-w-3xl overflow-hidden group rounded-sm"
-                        style={{
-                            border: '1px solid rgba(212,175,55,0.5)',
-                            background: 'rgba(212,175,55,0.06)',
-                            backdropFilter: 'blur(16px)',
-                        }}
-                    >
-                        <AnimatePresence initial={false} custom={dir}>
-                            <motion.div
-                                key={index}
-                                custom={dir}
-                                variants={variants}
-                                initial="enter"
-                                animate="center"
-                                exit="exit"
-                                transition={{ duration: 0.6 }}
-                                drag="x"
-                                dragConstraints={{ left: 0, right: 0 }}
-                                dragElastic={0.2}
-                                onDragEnd={handleDragEnd}
-                                className="relative cursor-grab active:cursor-grabbing touch-pan-y"
-                            >
-                                {/* Golden ambient background glow (fixed invalid URL reference for performance) */}
+                {isMobileOrTablet ? (
+                    /* MOBILE & TABLET LAYOUT: Touch Swipe native scroll-snap slider */
+                    <div className="relative w-full">
+                        <div
+                            ref={scrollRef}
+                            onScroll={handleScroll}
+                            className="flex gap-4 overflow-x-auto snap-x snap-mandatory scrollbar-none pb-4 px-2"
+                            style={{
+                                scrollbarWidth: 'none',
+                                msOverflowStyle: 'none',
+                                scrollBehavior: 'smooth',
+                            }}
+                        >
+                            {videos.map((video) => (
                                 <div
-                                    className="absolute inset-0 scale-110 blur-2xl opacity-40 bg-gradient-to-tr from-[#FFD700]/10 via-transparent to-[#FFD700]/5 pointer-events-none"
-                                />
+                                    key={video.id}
+                                    className="snap-center shrink-0 w-[85vw] max-w-[420px]"
+                                >
+                                    <div
+                                        className="relative w-full overflow-hidden rounded-sm"
+                                        style={{
+                                            border: '1px solid rgba(212,175,55,0.4)',
+                                            background: 'rgba(212,175,55,0.06)',
+                                            backdropFilter: 'blur(16px)',
+                                            WebkitBackdropFilter: 'blur(16px)',
+                                        }}
+                                    >
+                                        {/* Golden ambient background glow */}
+                                        <div
+                                            className="absolute inset-0 scale-110 blur-2xl opacity-40 bg-gradient-to-tr from-[#FFD700]/10 via-transparent to-[#FFD700]/5 pointer-events-none"
+                                        />
 
-                                {/* VIDEO (NORMAL CONTROLS ENABLED, RESPONSIVE HEIGHT) */}
-                                <video
-                                    ref={videoRef}
-                                    key={current.src}
-                                    src={current.src}
-                                    controls   // ✅ native controls
-                                    className="relative w-full h-[240px] sm:h-[320px] md:h-[450px] object-cover"
-                                    style={{ background: '#000' }}
-                                />
+                                        {/* VIDEO */}
+                                        <video
+                                            src={video.src}
+                                            controls
+                                            className="relative w-full h-[240px] sm:h-[320px] object-cover"
+                                            style={{ background: '#000' }}
+                                        />
 
-                                {/* Cinematic overlay */}
-                                <div
-                                    className="absolute inset-0 pointer-events-none"
-                                    style={{
-                                        background:
-                                            'linear-gradient(to top, rgba(0,0,0,0.5), transparent 60%)',
-                                    }}
-                                />
-                            </motion.div>
-                        </AnimatePresence>
+                                        {/* Cinematic overlay */}
+                                        <div
+                                            className="absolute inset-0 pointer-events-none"
+                                            style={{
+                                                background:
+                                                    'linear-gradient(to top, rgba(0,0,0,0.5), transparent 60%)',
+                                            }}
+                                        />
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
                     </div>
+                ) : (
+                    /* DESKTOP LAYOUT: Exactly the original design and layout */
+                    <div className="relative flex items-center justify-center">
 
-                    {/* RIGHT ARROW (DESKTOP ONLY) */}
-                    <button
-                        onClick={() => paginate(1)}
-                        className="absolute right-0 z-20 w-12 h-12 flex items-center justify-center backdrop-blur-md hidden md:flex cursor-pointer transition-all hover:bg-rgba(212,175,55,0.15) active:scale-95"
-                        style={{
-                            border: '1px solid rgba(212,175,55,0.45)',
-                            color: '#D4AF37',
-                            background: 'rgba(212,175,55,0.06)',
-                        }}
-                    >
-                        →
-                    </button>
-                </div>
+                        {/* LEFT ARROW */}
+                        <button
+                            onClick={() => paginate(-1)}
+                            className="absolute left-0 z-20 w-12 h-12 flex items-center justify-center backdrop-blur-md cursor-pointer transition-all hover:bg-rgba(212,175,55,0.15) active:scale-95"
+                            style={{
+                                border: '1px solid rgba(212,175,55,0.45)',
+                                color: '#D4AF37',
+                                background: 'rgba(212,175,55,0.06)',
+                            }}
+                        >
+                            ←
+                        </button>
 
-                {/* Indicators */}
+                        {/* GLASS VIDEO CARD WITH DRAG SUPPORT */}
+                        <div
+                            className="relative w-full max-w-3xl overflow-hidden group rounded-sm"
+                            style={{
+                                border: '1px solid rgba(212,175,55,0.5)',
+                                background: 'rgba(212,175,55,0.06)',
+                                backdropFilter: 'blur(16px)',
+                            }}
+                        >
+                            <AnimatePresence initial={false} custom={dir}>
+                                <motion.div
+                                    key={index}
+                                    custom={dir}
+                                    variants={variants}
+                                    initial="enter"
+                                    animate="center"
+                                    exit="exit"
+                                    transition={{ duration: 0.6 }}
+                                    drag="x"
+                                    dragConstraints={{ left: 0, right: 0 }}
+                                    dragElastic={0.2}
+                                    onDragEnd={handleDragEnd}
+                                    className="relative cursor-grab active:cursor-grabbing touch-pan-y"
+                                >
+                                    {/* Golden ambient background glow */}
+                                    <div
+                                        className="absolute inset-0 scale-110 blur-2xl opacity-40 bg-gradient-to-tr from-[#FFD700]/10 via-transparent to-[#FFD700]/5 pointer-events-none"
+                                    />
+
+                                    {/* VIDEO */}
+                                    <video
+                                        ref={videoRef}
+                                        key={current.src}
+                                        src={current.src}
+                                        controls
+                                        className="relative w-full h-[450px] object-cover"
+                                        style={{ background: '#000' }}
+                                    />
+
+                                    {/* Cinematic overlay */}
+                                    <div
+                                        className="absolute inset-0 pointer-events-none"
+                                        style={{
+                                            background:
+                                                'linear-gradient(to top, rgba(0,0,0,0.5), transparent 60%)',
+                                        }}
+                                    />
+                                </motion.div>
+                            </AnimatePresence>
+                        </div>
+
+                        {/* RIGHT ARROW */}
+                        <button
+                            onClick={() => paginate(1)}
+                            className="absolute right-0 z-20 w-12 h-12 flex items-center justify-center backdrop-blur-md cursor-pointer transition-all hover:bg-rgba(212,175,55,0.15) active:scale-95"
+                            style={{
+                                border: '1px solid rgba(212,175,55,0.45)',
+                                color: '#D4AF37',
+                                background: 'rgba(212,175,55,0.06)',
+                            }}
+                        >
+                            →
+                        </button>
+                    </div>
+                )}
+
+                {/* Indicators / Pagination Dots */}
                 <div className="flex justify-center gap-3 mt-8">
                     {videos.map((_, i) => (
                         <div
                             key={i}
-                            onClick={() => setIndex([i, i > index ? 1 : -1])}
+                            onClick={() => {
+                                if (isMobileOrTablet) {
+                                    const container = scrollRef.current;
+                                    if (container && container.children[i]) {
+                                        const target = container.children[i];
+                                        container.scrollTo({
+                                            left: target.offsetLeft - (container.clientWidth - target.clientWidth) / 2,
+                                            behavior: 'smooth',
+                                        });
+                                    }
+                                } else {
+                                    setIndex([i, i > index ? 1 : -1]);
+                                }
+                            }}
                             className="cursor-pointer transition-all duration-300"
                             style={{
-                                width: i === index ? '32px' : '10px',
+                                width: (isMobileOrTablet ? i === mobileIndex : i === index) ? '32px' : '10px',
                                 height: '2px',
-                                background: i === index ? '#FFD700' : 'rgba(255,195,0,0.3)',
+                                background: (isMobileOrTablet ? i === mobileIndex : i === index) ? '#FFD700' : 'rgba(255,195,0,0.3)',
                             }}
                         />
                     ))}
