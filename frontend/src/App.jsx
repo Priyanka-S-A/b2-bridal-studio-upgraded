@@ -27,8 +27,7 @@ import Profile from './pages/Profile';
 import BillView from './pages/BillView';
 
 // Auth Pages
-import Login from './pages/Login';
-import Register from './pages/Register';
+import Auth from './pages/Auth';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import { GoogleOAuthProvider } from '@react-oauth/google';
@@ -97,8 +96,9 @@ function App() {
               <Route path="/bill/:id" element={<PublicLayout><BillView /></PublicLayout>} />
 
               {/* AUTH ROUTES */}
-              <Route path="/login" element={<PublicLayout><Login /></PublicLayout>} />
-              <Route path="/register" element={<PublicLayout><Register /></PublicLayout>} />
+              <Route path="/auth" element={<PublicLayout><Auth /></PublicLayout>} />
+              <Route path="/login" element={<PublicLayout><Auth /></PublicLayout>} />
+              <Route path="/register" element={<PublicLayout><Auth /></PublicLayout>} />
               <Route path="/forgot-password" element={<PublicLayout><ForgotPassword /></PublicLayout>} />
               <Route path="/reset-password" element={<PublicLayout><ResetPassword /></PublicLayout>} />
 

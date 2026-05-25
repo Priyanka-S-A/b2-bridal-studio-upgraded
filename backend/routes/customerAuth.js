@@ -271,4 +271,171 @@ router.post('/reset-password', async (req, res) => {
   }
 });
 
+// 🔹 SEND EMAIL OTP
+router.post('/send-otp', async (req, res) => {
+  try {
+    const { name, email, phone, dob } = req.body;
+
+    if (!email || !name || !phone) {
+      return res.status(400).json({ error: "Name, email, and phone number are required" });
+    }
+
+    // Basic format validations
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ error: "Please enter a valid email address." });
+    }
+
+    const phoneRegex = /^\d{10}$/;
+    if (!phoneRegex.test(phone)) {
+      return res.status(400).json({ error: "Please enter a valid 10-digit mobile number." });
+    }
+
+    // Generate a 6-digit OTP
+    const otpVal = Math.floor(100000 + Math.random() * 900000).toString();
+    
+    // Hash OTP using bcryptjs
+    const otpHash = await bcrypt.hash(otpVal, 10);
+    const otpExpires = Date.now() + 5 * 60 * 1000; // 5 minutes
+
+    // Find or create customer
+    let customer = await Customer.findOne({ email });
+
+    if (customer) {
+      // Update existing customer's details and set OTP
+      customer.name = name;
+      customer.phone = phone;
+      if (dob) customer.dob = dob;
+      customer.otp = otpHash;
+      customer.otpExpires = otpExpires;
+      customer.authProvider = customer.authProvider || 'email-otp';
+      await customer.save();
+    } else {
+      // Create new customer
+      const userData = {
+        name,
+        email,
+        phone,
+        otp: otpHash,
+        otpExpires,
+        authProvider: 'email-otp',
+        isVerified: false
+      };
+      if (dob) userData.dob = dob;
+      
+      customer = new Customer(userData);
+      await customer.save();
+    }
+
+    // Send email using Nodemailer
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+      }
+    });
+
+    const mailOptions = {
+      from: `"B2 Bridal Studio" <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject: 'Your One-Time Password (OTP) - B2 Bridal Studio',
+      html: `
+        <div style="max-width: 600px; margin: 0 auto; font-family: 'Georgia', serif; background-color: #1a1a1a; color: #f5f5f5; padding: 40px; border: 2px solid #c9a84c;">
+          <div style="text-align: center; margin-bottom: 30px;">
+            <h1 style="color: #c9a84c; font-size: 28px; margin: 0; letter-spacing: 2px;">B2 BRIDAL STUDIO</h1>
+            <div style="width: 60px; height: 2px; background-color: #c9a84c; margin: 15px auto;"></div>
+          </div>
+          
+          <h2 style="color: #c9a84c; font-size: 20px; text-align: center; margin-bottom: 20px;">Email Verification OTP</h2>
+          
+          <p style="color: #d4d4d4; line-height: 1.8; font-size: 15px;">Dear ${name || 'Valued Customer'},</p>
+          
+          <p style="color: #d4d4d4; line-height: 1.8; font-size: 15px;">
+            Thank you for choosing B2 Bridal Studio. Please use the following One-Time Password (OTP) to complete your login/registration process. This OTP is valid for <strong style="color: #c9a84c;">5 minutes</strong>.
+          </p>
+          
+          <div style="text-align: center; margin: 35px 0;">
+            <span style="background-color: rgba(201, 168, 76, 0.15); color: #c9a84c; border: 1px dashed #c9a84c; padding: 12px 30px; font-size: 28px; font-weight: bold; letter-spacing: 6px; border-radius: 4px; display: inline-block;">
+              ${otpVal}
+            </span>
+          </div>
+          
+          <p style="color: #888; font-size: 13px; line-height: 1.6;">
+            If you did not request this OTP, please ignore this email or contact support if you have concerns.
+          </p>
+          
+          <div style="border-top: 1px solid #333; margin-top: 30px; padding-top: 20px; text-align: center;">
+            <p style="color: #666; font-size: 12px; margin: 0;">
+              &copy; ${new Date().getFullYear()} B2 Bridal Studio. All rights reserved.
+            </p>
+          </div>
+        </div>
+      `
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    res.json({ message: "OTP sent successfully" });
+
+  } catch (err) {
+    console.error('Send OTP error:', err.message);
+    res.status(500).json({ error: "Failed to send OTP. Please try again." });
+  }
+});
+
+// 🔹 VERIFY EMAIL OTP
+router.post('/verify-otp', async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+
+    if (!email || !otp) {
+      return res.status(400).json({ error: "Email and OTP are required" });
+    }
+
+    const customer = await Customer.findOne({ email });
+    if (!customer) {
+      return res.status(400).json({ error: "User not found" });
+    }
+
+    // Check if OTP is expired
+    if (!customer.otpExpires || Date.now() > customer.otpExpires) {
+      return res.status(400).json({ error: "OTP has expired. Please request a new one." });
+    }
+
+    // Verify OTP hash
+    const match = await bcrypt.compare(otp, customer.otp);
+    if (!match) {
+      return res.status(400).json({ error: "Invalid OTP. Please check and try again." });
+    }
+
+    // OTP is valid! Activate session immediately
+    customer.isVerified = true;
+    customer.otp = undefined;
+    customer.otpExpires = undefined;
+    await customer.save();
+
+    const token = jwt.sign(
+      { id: customer._id, email: customer.email, role: 'customer' },
+      JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    res.json({
+      message: "Authentication successful",
+      user: {
+        name: customer.name,
+        email: customer.email,
+        phone: customer.phone,
+        dob: customer.dob
+      },
+      token
+    });
+
+  } catch (err) {
+    console.error('Verify OTP error:', err.message);
+    res.status(500).json({ error: "Verification failed. Please try again." });
+  }
+});
+
 module.exports = router;

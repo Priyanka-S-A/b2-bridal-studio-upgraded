@@ -63,9 +63,6 @@ const Login = () => {
       >
         {/* Logo */}
         <motion.div variants={fadeUp} className="text-center mb-8">
-          <div className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-3" style={{ border: '1px solid rgba(255,195,0,0.4)', boxShadow: '0 0 20px rgba(255,195,0,0.15)' }}>
-            <span className="font-cinzel text-lg font-bold text-gold-gradient">B2</span>
-          </div>
           <h1 className="font-cinzel text-base tracking-[0.3em] uppercase" style={{ color: '#F8F5F0' }}>Welcome Back</h1>
           <p className="font-cormorant italic text-sm mt-1" style={{ color: 'rgba(248,245,240,0.6)' }}>Sign in to your account</p>
         </motion.div>

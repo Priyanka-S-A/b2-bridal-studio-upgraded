@@ -290,16 +290,13 @@ const Navbar = () => {
               ) : (
                 <>
                   <Link
-                    to="/login"
-                    className="font-cinzel text-[0.7rem] tracking-[0.15em] uppercase px-4 py-2 transition-all duration-300"
-                    style={{ color: '#222222', border: '1px solid rgba(0,0,0,0.15)' }}
-                    onMouseEnter={e => { e.currentTarget.style.color = '#D4AF37'; e.currentTarget.style.borderColor = '#D4AF37'; }}
-                    onMouseLeave={e => { e.currentTarget.style.color = '#222222'; e.currentTarget.style.borderColor = 'rgba(0,0,0,0.15)'; }}
+                    to="/auth"
+                    className="font-cinzel text-[0.7rem] tracking-[0.15em] uppercase px-5 py-2.5 transition-all duration-300"
+                    style={{ color: '#D4AF37', border: '1px solid rgba(212,175,55,0.4)', background: 'transparent' }}
+                    onMouseEnter={e => { e.currentTarget.style.color = '#FFFED8'; e.currentTarget.style.borderColor = '#D4AF37'; e.currentTarget.style.background = 'rgba(212,175,55,0.08)'; }}
+                    onMouseLeave={e => { e.currentTarget.style.color = '#D4AF37'; e.currentTarget.style.borderColor = 'rgba(212,175,55,0.4)'; e.currentTarget.style.background = 'transparent'; }}
                   >
                     Login
-                  </Link>
-                  <Link to="/register" className="btn-gold text-[0.7rem] py-2 px-5">
-                    Enroll Now
                   </Link>
                 </>
               )}
@@ -420,8 +417,7 @@ const Navbar = () => {
               </div>
             ) : (
               <div className="mt-8 flex flex-col gap-3 pb-8">
-                <Link to="/login" className="btn-outline-gold text-center text-xs py-3" onClick={() => setMenuOpen(false)}>Login</Link>
-                <Link to="/register" className="btn-gold text-center text-xs py-3" onClick={() => setMenuOpen(false)}>Enroll Now</Link>
+                <Link to="/auth" className="btn-outline-gold text-center text-xs py-3" onClick={() => setMenuOpen(false)}>Login</Link>
               </div>
             )}
         </div>
