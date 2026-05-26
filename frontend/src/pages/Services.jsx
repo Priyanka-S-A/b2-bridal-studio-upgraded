@@ -522,7 +522,14 @@ const Services = () => {
         {/* Services List */}
         <div className="lg:col-span-2">
           <div className="relative mb-8">
-            <input type="text" placeholder="     Search services..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="input-luxury pl-12 rounded-sm" />
+            <input 
+              type="text" 
+              placeholder="Search services..." 
+              value={searchTerm} 
+              onChange={(e) => setSearchTerm(e.target.value)} 
+              className="input-luxury rounded-sm" 
+              style={{ paddingLeft: '3rem' }}
+            />
             <Search className="absolute left-4 top-4" size={18} style={{ color: 'rgba(255,195,0,0.4)' }} />
           </div>
 
@@ -649,7 +656,8 @@ const Services = () => {
                     value={bookingDate}
                     onChange={(e) => { setBookingDate(e.target.value); setBookingErrors(prev => ({ ...prev, date: '', slot: '' })); }}
                     min={new Date().toISOString().split('T')[0]}
-                    className="input-luxury pl-10 rounded-sm text-sm"
+                    className="input-luxury rounded-sm text-sm"
+                    style={{ paddingLeft: '2.5rem' }}
                   />
                   <Calendar className="absolute left-3 top-3.5" size={16} style={{ color: '#FFD700' }} />
                 </div>
@@ -669,14 +677,15 @@ const Services = () => {
                     value={bookingTime}
                     onChange={(e) => { setBookingTime(e.target.value); setBookingErrors(prev => ({ ...prev, time: '', slot: '' })); }}
                     disabled={isDayBlocked}
-                    className="input-luxury pl-10 rounded-sm text-sm"
+                    className="input-luxury rounded-sm text-sm"
                     style={{ 
                       background: 'rgba(255,255,255,0.03)',
                       opacity: isDayBlocked ? 0.5 : 1,
-                      cursor: isDayBlocked ? 'not-allowed' : 'default'
+                      cursor: isDayBlocked ? 'not-allowed' : 'default',
+                      paddingLeft: '2.5rem'
                     }}
                   >
-                    <option value="" style={{ background: '#111' }}>   Select a time slot</option>
+                    <option value="" style={{ background: '#111' }}>Select a time slot</option>
                     {HOUR_SLOTS.map(slot => {
                       const isFull = fullSlots.includes(slot.value);
                       const isBlocked = blockedSlots.includes(slot.value);
