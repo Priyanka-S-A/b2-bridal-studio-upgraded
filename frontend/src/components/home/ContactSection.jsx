@@ -241,7 +241,7 @@ const ContactSection = () => {
                 {
                   icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFD700" strokeWidth="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>,
                   label: 'Branch 1',
-                  value: 'No. 63, Madavaram Red Hills Rd, Moolakaadu, Chennai — 600060',
+                  value: 'No. 63, Madavaram Red Hills Rd, Moolakaadai, Chennai — 600060',
                   href: 'https://www.google.com/maps/dir/?api=1&destination=13.1283,80.2410',
                 },
                 {

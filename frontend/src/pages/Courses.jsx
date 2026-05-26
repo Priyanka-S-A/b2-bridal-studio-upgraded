@@ -236,8 +236,8 @@ const Courses = () => {
             className="px-4 py-2.5 font-cormorant rounded-sm outline-none"
             style={{ background: 'rgba(255,195,0,0.08)', border: '1px solid rgba(255,195,0,0.2)', color: '#F8F5F0', fontSize: '1.05rem' }}
           >
-            <option value="branch1" style={{ background: '#111' }}>Chennai — Moolakaadu</option>
-            <option value="branch2" style={{ background: '#111' }}>Madurai Branch</option>
+            <option value="branch1" style={{ background: '#111' }}>Chennai — Moolakaadai</option>
+            <option value="branch2" style={{ background: '#111' }}>Madurai — Kochadai</option>
           </select>
         </div>
       </div>
