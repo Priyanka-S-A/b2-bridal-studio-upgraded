@@ -136,7 +136,7 @@ const Products = () => {
                 {/* Image */}
                 <div className="img-zoom-container relative" style={{ height: '240px' }}>
                   <img
-                    src={product.image || '/images/bridal4.jpeg'}
+                    src={product.image ? (product.image.startsWith('data:') || product.image.startsWith('http') ? product.image : `${API}/uploads/${product.image}`) : '/images/bridal4.jpeg'}
                     alt={product.name}
                     className="w-full h-full object-cover"
                     loading="lazy"

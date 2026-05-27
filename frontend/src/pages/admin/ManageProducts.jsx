@@ -277,7 +277,7 @@ const ManageProducts = () => {
               </div>
 
               {(() => {
-                const displaySrc = previewUrl || existingImageUrl;
+                const displaySrc = previewUrl || (existingImageUrl ? (existingImageUrl.startsWith('data:') || existingImageUrl.startsWith('http') ? existingImageUrl : `${API}/uploads/${existingImageUrl}`) : null);
                 return displaySrc ? (
                   <div
                     className="relative w-full rounded-2xl overflow-hidden border border-gray-200 shadow-[0_2px_20px_rgba(0,0,0,0.07)] flex-1"
@@ -362,7 +362,7 @@ const ManageProducts = () => {
               <div className="h-44 bg-gray-50 rounded-lg overflow-hidden mb-3 flex items-center justify-center">
                 {p.image ? (
                   <img
-                    src={p.image}
+                    src={p.image.startsWith('data:') || p.image.startsWith('http') ? p.image : `${API}/uploads/${p.image}`}
                     alt={p.name}
                     className="w-full h-full object-cover"
                   />
