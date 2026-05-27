@@ -11,12 +11,12 @@ const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret';
 
 // Configure the Nodemailer SMTP Transporter once at module level for connection pooling
 const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 465,
-  secure: true, // true for port 465 SSL, false for other ports (e.g. 587 TLS)
+  host: 'smtp-relay.brevo.com',
+  port: 587,
+  secure: false, // true for port 465 SSL, false for other ports (like 587 TLS)
   auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
+    user: process.env.BREVO_SMTP_USER,
+    pass: process.env.BREVO_SMTP_PASS
   },
   connectionTimeout: 15000, // 15 seconds connection timeout
   socketTimeout: 15000,     // 15 seconds socket timeout
@@ -24,7 +24,7 @@ const transporter = nodemailer.createTransport({
 });
 
 // Verify SMTP connection configuration on startup
-if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+if (process.env.BREVO_SMTP_USER && process.env.BREVO_SMTP_PASS) {
   transporter.verify((error, success) => {
     if (error) {
       console.error('[SMTP Transporter] Verification failed on startup:', {
@@ -38,7 +38,7 @@ if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
     }
   });
 } else {
-  console.warn('[SMTP Transporter] Warning: EMAIL_USER or EMAIL_PASS environment variables are not set.');
+  console.warn('[SMTP Transporter] Warning: BREVO_SMTP_USER or BREVO_SMTP_PASS environment variables are not set.');
 }
 
 // 🔹 REGISTER
@@ -211,7 +211,7 @@ router.post('/forgot-password', async (req, res) => {
     const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
 
     const mailOptions = {
-      from: `"B2 Bridal Studio" <${process.env.EMAIL_USER}>`,
+      from: `"B2 Bridal Studio" <${process.env.BREVO_SMTP_USER || process.env.EMAIL_USER}>`,
       to: email,
       subject: 'Password Reset - B2 Bridal Studio',
       html: `
@@ -365,7 +365,7 @@ router.post('/send-otp', async (req, res) => {
 
     // Prepare OTP email options
     const mailOptions = {
-      from: `"B2 Bridal Studio" <${process.env.EMAIL_USER}>`,
+      from: `"B2 Bridal Studio" <${process.env.BREVO_SMTP_USER || process.env.EMAIL_USER}>`,
       to: email,
       subject: 'Your One-Time Password (OTP) - B2 Bridal Studio',
       html: `
