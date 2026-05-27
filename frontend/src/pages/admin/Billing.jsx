@@ -59,8 +59,8 @@ export default function Billing() {
   const catalogueItems = category === 'services'
     ? services.flatMap(svc =>
         svc.options && svc.options.length > 0
-          ? svc.options.map(opt => ({ id: `${svc._id}-${opt._id}`, name: `${svc.name} — ${opt.name}`, price: opt.price, itemType: 'service', gstPercentage: svc.gstPercentage || 0 }))
-          : svc.price ? [{ id: svc._id, name: svc.name, price: svc.price, itemType: 'service', gstPercentage: svc.gstPercentage || 0 }] : []
+          ? svc.options.map(opt => ({ id: `${svc._id}-${opt._id}`, name: `${svc.name} — ${opt.name}`, price: opt.price, itemType: 'service', gstPercentage: 0 }))
+          : svc.price ? [{ id: svc._id, name: svc.name, price: svc.price, itemType: 'service', gstPercentage: 0 }] : []
       )
     : products.map(p => ({ id: p._id, name: p.name, price: p.price, itemType: 'product', gstPercentage: 0 }));
 
@@ -100,8 +100,8 @@ export default function Billing() {
 
   /* ─── totals ───────────────────────────────────────────────── */
   const subtotalBase = billItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
-  const gstAmount = billItems.reduce((sum, i) => sum + (i.price * i.quantity * (i.gstPercentage || 0) / 100), 0);
-  const total = subtotalBase + gstAmount;
+  const gstAmount = 0;
+  const total = subtotalBase;
 
   /* ─── generate bill ────────────────────────────────────────── */
   const handleGenerateBill = async () => {
@@ -197,25 +197,11 @@ export default function Billing() {
     });
 
     const finalY = doc.lastAutoTable.finalY + 8;
-    doc.setFillColor(248, 246, 242);
-    if (bill.gst > 0) {
-      doc.rect(120, finalY, 75, 32, 'F');
-      doc.setFontSize(10);
-      doc.setFont('helvetica', 'normal');
-      doc.setTextColor(80, 80, 80);
-      doc.text(`Subtotal: Rs.${(bill.subtotal || 0).toFixed(2)}`, 193, finalY + 8, { align: 'right' });
-      doc.text(`GST: Rs.${(bill.gst || 0).toFixed(2)}`, 193, finalY + 16, { align: 'right' });
-      doc.setFontSize(13);
-      doc.setFont('helvetica', 'bold');
-      doc.setTextColor(20, 20, 20);
-      doc.text(`Total: Rs.${bill.total.toFixed(2)}`, 193, finalY + 27, { align: 'right' });
-    } else {
-      doc.rect(120, finalY, 75, 18, 'F');
-      doc.setFontSize(13);
-      doc.setFont('helvetica', 'bold');
-      doc.setTextColor(20, 20, 20);
-      doc.text(`Total: Rs.${bill.total.toFixed(2)}`, 193, finalY + 12, { align: 'right' });
-    }
+    doc.rect(120, finalY, 75, 18, 'F');
+    doc.setFontSize(13);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(20, 20, 20);
+    doc.text(`Total: Rs.${bill.total.toFixed(2)}`, 193, finalY + 12, { align: 'right' });
 
     // Footer
     doc.setFontSize(8);
@@ -508,12 +494,7 @@ export default function Billing() {
               <span className="text-sm font-cinzel font-bold uppercase tracking-wide text-gray-700">Total</span>
               <span className="text-2xl font-bold text-gray-900 font-cinzel">₹{total.toLocaleString()}</span>
             </div>
-            {gstAmount > 0 && (
-              <div className="flex justify-between items-center mb-2 text-xs text-gray-600">
-                <span>Subtotal: <strong className="text-gray-900">₹{subtotalBase.toLocaleString()}</strong></span>
-                <span>GST: <strong className="text-gray-900">₹{gstAmount.toFixed(2)}</strong></span>
-              </div>
-            )}
+
             <div className="flex items-center justify-between text-xs text-gray-600 mb-4">
               <span>Source: <strong className="text-gray-900 capitalize">{source}</strong> | Payment: <strong className="text-gray-900 capitalize">{paymentMethod}</strong></span>
               <span>Customer: <strong className="text-gray-900">{customer || 'Walk-in'}</strong></span>

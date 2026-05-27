@@ -37,10 +37,10 @@ router.post('/generate-from-booking/:id', verifyToken, verifyRole(['staff', 'own
     if (booking.status !== 'Approved') return res.status(400).json({ error: 'Booking must be Approved to generate bill' });
     if (booking.billId) return res.status(400).json({ error: 'Bill already generated for this booking' });
 
-    // Calculate actual amounts
-    const bookingGst = booking.gstAmount || 0;
-    const billTotal = booking.finalAmount || booking.total; // actual amount paid
-    const billSubtotal = billTotal - bookingGst;
+    // Force GST to 0 and set correct totals
+    const bookingGst = 0;
+    const billTotal = booking.finalAmount || booking.total; // actual amount paid after coupon discounts
+    const billSubtotal = booking.total; // original service price
     const hasDiscount = booking.couponCode && booking.discountAmount > 0;
 
     // Create a bill entry
@@ -48,7 +48,7 @@ router.post('/generate-from-booking/:id', verifyToken, verifyRole(['staff', 'own
       type: 'service',
       items: booking.items,
       subtotal: billSubtotal,
-      gst: bookingGst,
+      gst: 0,
       total: billTotal,
       // Coupon / discount info
       couponCode: booking.couponCode || undefined,
@@ -108,16 +108,16 @@ router.post('/offline', verifyToken, verifyRole(['staff', 'owner']), async (req,
       return res.status(400).json({ error: 'Total must be greater than 0' });
     }
 
-    // Use provided subtotal/gst if available, else default to no-GST
-    const billGst = reqGst ? Number(reqGst) : 0;
-    const billSubtotal = reqSubtotal ? Number(reqSubtotal) : (total - billGst);
+    // Force GST to 0 and set subtotal to total
+    const billGst = 0;
+    const billSubtotal = total;
 
     // Create the bill
     const bill = new Bill({
       type: 'mixed',
       items,
       subtotal: billSubtotal,
-      gst: billGst,
+      gst: 0,
       total,
       source: source || 'offline',
       paymentMethod: paymentMethod || 'cash',

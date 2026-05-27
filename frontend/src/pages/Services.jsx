@@ -370,8 +370,8 @@ const Services = () => {
   };
 
   const subtotal = cart.reduce((acc, curr) => acc + curr.price, 0);
-  const gstTotal = cart.reduce((acc, curr) => acc + (curr.price * (curr.gstPercentage || 0) / 100), 0);
-  const total = subtotal + gstTotal;
+  const gstTotal = 0;
+  const total = subtotal;
   const hasBridalService = cart.some(item => item.category === 'Bridal Services');
 
   const handleSingleServiceWhatsAppInquiry = (service, activeOption, categoryName) => {
@@ -732,11 +732,7 @@ const Services = () => {
             )}
             {cart.length > 0 && (
               <div className="pt-4 mb-4 flex flex-col gap-2 text-sm" style={{ borderTop: '1px solid rgba(255,195,0,0.1)' }}>
-                <div className="flex justify-between font-cormorant text-sm" style={{ color: 'rgba(248,245,240,0.8)' }}><span>Subtotal</span><span>₹{subtotal.toFixed(2)}</span></div>
-                {gstTotal > 0 && (
-                  <div className="flex justify-between font-cormorant text-sm" style={{ color: 'rgba(248,245,240,0.8)' }}><span>GST</span><span>₹{gstTotal.toFixed(2)}</span></div>
-                )}
-                <div className="flex justify-between font-cinzel text-sm pt-2" style={{ color: '#F8F5F0', borderTop: '1px solid rgba(255,195,0,0.08)' }}><span>Total</span><span style={{ color: '#FFD700' }}>₹{total.toFixed(2)}</span></div>
+                <div className="flex justify-between font-cinzel text-sm pt-2" style={{ color: '#F8F5F0' }}><span>Total</span><span style={{ color: '#FFD700' }}>₹{total.toFixed(2)}</span></div>
               </div>
             )}
             {hasBridalService ? (

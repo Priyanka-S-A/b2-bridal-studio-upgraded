@@ -20,7 +20,7 @@ const ConfirmBooking = () => {
   const isServiceFlow = !!serviceData && cartItems.length === 0;
   const items = isServiceFlow ? (serviceData.items || []) : cartItems;
   const total = isServiceFlow ? (serviceData.total || 0) : cartTotal;
-  const gstTotal = isServiceFlow ? (serviceData?.gstTotal || 0) : 0;
+  const gstTotal = 0;
   const appliedCoupon = serviceData?.coupon || null;
 
   const [form, setForm] = useState({
@@ -67,7 +67,7 @@ const ConfirmBooking = () => {
       formData.append('userId', user?.email || '');
       formData.append('email', user?.email || '');
       formData.append('total', total);
-      formData.append('gstAmount', gstTotal);
+      formData.append('gstAmount', 0);
       if (appliedCoupon) {
         formData.append('couponCode', appliedCoupon.code);
         formData.append('discountPercentage', appliedCoupon.discountPercentage);
@@ -321,13 +321,8 @@ const ConfirmBooking = () => {
 
             <div className="mt-6 flex flex-col gap-2" style={{ borderTop: '1px solid rgba(255,195,0,0.1)', paddingTop: '16px' }}>
               <div className="flex justify-between font-cormorant text-sm" style={{ color: 'rgba(248,245,240,0.5)' }}>
-                <span>Subtotal</span><span>₹{(total - gstTotal).toFixed(2)}</span>
+                <span>Service Total</span><span>₹{total.toFixed(2)}</span>
               </div>
-              {gstTotal > 0 && (
-                <div className="flex justify-between font-cormorant text-sm" style={{ color: 'rgba(248,245,240,0.5)' }}>
-                  <span>GST</span><span>₹{gstTotal.toFixed(2)}</span>
-                </div>
-              )}
               {appliedCoupon && (
                 <div className="flex justify-between font-cormorant text-sm text-green-500">
                   <span>Discount ({appliedCoupon.discountPercentage}%)</span>
