@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { Plus, Trash2, Edit2, Save, X, Package, ImageIcon } from 'lucide-react';
 const API = import.meta.env.VITE_API_URL;
@@ -13,6 +13,11 @@ const ManageProducts = () => {
     stock: '',
     image: null
   });
+  // previewUrl  = object URL for a newly selected file
+  // existingImageUrl = the already-saved URL when editing a product
+  const [previewUrl, setPreviewUrl] = useState(null);
+  const [existingImageUrl, setExistingImageUrl] = useState(null);
+  const objectUrlRef = useRef(null);
 
   const fetchProducts = async () => {
     try {
@@ -65,6 +70,13 @@ const ManageProducts = () => {
         stock: '',
         image: null
       });
+      // clean up preview state
+      if (objectUrlRef.current) {
+        URL.revokeObjectURL(objectUrlRef.current);
+        objectUrlRef.current = null;
+      }
+      setPreviewUrl(null);
+      setExistingImageUrl(null);
 
       fetchProducts();
 
@@ -113,6 +125,8 @@ const ManageProducts = () => {
                 stock: '',
                 image: null
               });
+              setPreviewUrl(null);
+              setExistingImageUrl(null);
               setIsEditing(true);
             }}
             className="flex items-center gap-2 px-5 py-2 rounded-lg font-cinzel text-xs font-bold uppercase tracking-wide transition-all shadow-md hover:shadow-lg bg-[#111] text-white"
@@ -172,14 +186,58 @@ const ManageProducts = () => {
               required
             />
 
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(e) =>
-                setCurrentProduct({ ...currentProduct, image: e.target.files[0] })
-              }
-              className="w-full text-sm file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-cinzel file:font-bold file:uppercase file:tracking-wide file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200 file:cursor-pointer file:transition-colors"
-            />
+            {/* ── IMAGE PREVIEW ── */}
+            {(() => {
+              const displaySrc = previewUrl || existingImageUrl;
+              return displaySrc ? (
+                <div className="relative w-full rounded-xl overflow-hidden border border-gray-200 shadow-sm" style={{ height: '180px', background: '#F9F9F9' }}>
+                  <img
+                    src={displaySrc}
+                    alt="Preview"
+                    className="w-full h-full object-cover"
+                  />
+                  {/* Label badge */}
+                  <span
+                    className="absolute bottom-2 left-2 text-[10px] font-cinzel uppercase tracking-wider px-2 py-0.5 rounded"
+                    style={{ background: 'rgba(0,0,0,0.55)', color: '#fff' }}
+                  >
+                    {previewUrl ? 'New Image' : 'Current Image'}
+                  </span>
+                </div>
+              ) : (
+                <div
+                  className="w-full rounded-xl border border-dashed border-gray-300 flex flex-col items-center justify-center gap-2"
+                  style={{ height: '140px', background: '#FAFAFA' }}
+                >
+                  <ImageIcon size={32} strokeWidth={1.2} className="text-gray-300" />
+                  <span className="text-xs text-gray-400 font-cinzel tracking-wide">No Image Selected</span>
+                </div>
+              );
+            })()}
+
+            {/* ── FILE INPUT ── */}
+            <div className="flex flex-col gap-1">
+              <label className="text-[11px] font-cinzel uppercase tracking-wide text-gray-500">
+                {existingImageUrl && !previewUrl ? 'Replace Image (optional)' : 'Select Image'}
+              </label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files[0];
+                  if (!file) return;
+                  // revoke previous object URL to avoid memory leaks
+                  if (objectUrlRef.current) {
+                    URL.revokeObjectURL(objectUrlRef.current);
+                  }
+                  const url = URL.createObjectURL(file);
+                  objectUrlRef.current = url;
+                  setPreviewUrl(url);
+                  setCurrentProduct({ ...currentProduct, image: file });
+                }}
+                className="w-full text-sm file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-cinzel file:font-bold file:uppercase file:tracking-wide file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200 file:cursor-pointer file:transition-colors"
+              />
+            </div>
 
             <div className="flex gap-3 pt-2">
               <button className="flex items-center gap-2 px-5 py-2 rounded-lg font-cinzel text-xs font-bold uppercase tracking-wide transition-all shadow-md hover:shadow-lg bg-[#111] text-white">
@@ -261,6 +319,13 @@ const ManageProducts = () => {
                       stock: p.stock || '',
                       image: null
                     });
+                    // show existing image in preview; clear any previous object URL
+                    if (objectUrlRef.current) {
+                      URL.revokeObjectURL(objectUrlRef.current);
+                      objectUrlRef.current = null;
+                    }
+                    setPreviewUrl(null);
+                    setExistingImageUrl(p.image || null);
                     setIsEditing(true);
                   }}
                   className="p-2 rounded-md text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition-colors"
