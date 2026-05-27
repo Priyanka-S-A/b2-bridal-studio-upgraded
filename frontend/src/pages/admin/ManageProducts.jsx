@@ -198,71 +198,88 @@ const ManageProducts = () => {
         </div>
       )}
 
-      {/* PRODUCT GRID */}
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-        {products.map(p => (
+      {/* PRODUCT GRID or EMPTY STATE */}
+      {products.length === 0 ? (
+        <div className="flex flex-col items-center justify-center text-center py-20">
           <div
-            key={p._id}
-            className="bg-white rounded-xl shadow-[0_2px_15px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-all p-3 border border-gray-100"
+            className="w-20 h-20 rounded-full flex items-center justify-center mb-5"
+            style={{ background: '#F9F7F2', border: '1.5px dashed #D4AF37' }}
           >
-            <div className="h-44 bg-gray-50 rounded-lg overflow-hidden mb-3 flex items-center justify-center">
-              {p.image ? (
-                <img
-                  src={p.image}
-                  alt={p.name}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="flex flex-col items-center gap-2 text-gray-300">
-                  <ImageIcon size={36} strokeWidth={1.2} />
-                  <span className="text-xs text-gray-400">No Image</span>
-                </div>
-              )}
-            </div>
-
-            <h3 className="font-semibold text-base text-gray-900">{p.name}</h3>
-            <p className="text-xs text-gray-500 mt-0.5">{p.category}</p>
-
-            <div className="flex justify-between items-center mt-2">
-              <span className="text-amber-700 font-bold text-sm font-cinzel">
-                ₹{p.price}
-              </span>
-              <span className="text-xs bg-green-100 text-green-600 px-2 py-0.5 rounded-full font-medium">
-                {p.stock} left
-              </span>
-            </div>
-
-            {/* ✅ FIXED BUTTONS */}
-            <div className="flex justify-end gap-2 mt-3 pt-2 border-t border-gray-50">
-
-              <button
-                onClick={() => {
-                  setCurrentProduct({
-                    _id: p._id,
-                    name: p.name || '',
-                    category: p.category || '',
-                    price: p.price || '',
-                    stock: p.stock || '',
-                    image: null
-                  });
-                  setIsEditing(true);
-                }}
-                className="p-2 rounded-md text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition-colors"
-              >
-                <Edit2 size={16} />
-              </button>
-
-              <button
-                onClick={() => handleDelete(p._id)}
-                className="p-2 rounded-md text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors"
-              >
-                <Trash2 size={16} />
-              </button>
-
-            </div>
+            <Package size={32} strokeWidth={1.2} style={{ color: '#D4AF37' }} />
           </div>
-        ))}
-      </div>
+          <h2 className="text-lg font-bold font-cinzel uppercase tracking-wide text-gray-800 mb-2">
+            No Products Found
+          </h2>
+          <p className="text-sm text-gray-500 max-w-xs leading-relaxed">
+            Click <span className="font-semibold text-gray-700">'Add Product'</span> to create your first product.
+          </p>
+        </div>
+      ) : (
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {products.map(p => (
+            <div
+              key={p._id}
+              className="bg-white rounded-xl shadow-[0_2px_15px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-all p-3 border border-gray-100"
+            >
+              <div className="h-44 bg-gray-50 rounded-lg overflow-hidden mb-3 flex items-center justify-center">
+                {p.image ? (
+                  <img
+                    src={p.image}
+                    alt={p.name}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="flex flex-col items-center gap-2 text-gray-300">
+                    <ImageIcon size={36} strokeWidth={1.2} />
+                    <span className="text-xs text-gray-400">No Image</span>
+                  </div>
+                )}
+              </div>
+
+              <h3 className="font-semibold text-base text-gray-900">{p.name}</h3>
+              <p className="text-xs text-gray-500 mt-0.5">{p.category}</p>
+
+              <div className="flex justify-between items-center mt-2">
+                <span className="text-amber-700 font-bold text-sm font-cinzel">
+                  ₹{p.price}
+                </span>
+                <span className="text-xs bg-green-100 text-green-600 px-2 py-0.5 rounded-full font-medium">
+                  {p.stock} left
+                </span>
+              </div>
+
+              {/* ✅ FIXED BUTTONS */}
+              <div className="flex justify-end gap-2 mt-3 pt-2 border-t border-gray-50">
+
+                <button
+                  onClick={() => {
+                    setCurrentProduct({
+                      _id: p._id,
+                      name: p.name || '',
+                      category: p.category || '',
+                      price: p.price || '',
+                      stock: p.stock || '',
+                      image: null
+                    });
+                    setIsEditing(true);
+                  }}
+                  className="p-2 rounded-md text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition-colors"
+                >
+                  <Edit2 size={16} />
+                </button>
+
+                <button
+                  onClick={() => handleDelete(p._id)}
+                  className="p-2 rounded-md text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors"
+                >
+                  <Trash2 size={16} />
+                </button>
+
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
     </div>
   );
