@@ -6,6 +6,26 @@ import autoTable from 'jspdf-autotable';
 
 const API = import.meta.env.VITE_API_URL;
 
+const HOUR_LABELS = { '10':'10 AM','11':'11 AM','12':'12 PM','13':'1 PM','14':'2 PM','15':'3 PM','16':'4 PM','17':'5 PM','18':'6 PM','19':'7 PM' };
+
+const getScheduledDetails = (dateTimeStr) => {
+  if (!dateTimeStr) return { date: '', time: '' };
+  try {
+    const d = new Date(dateTimeStr);
+    if (isNaN(d.getTime())) return { date: dateTimeStr, time: '' };
+    const day = String(d.getDate()).padStart(2, '0');
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const month = monthNames[d.getMonth()];
+    const year = d.getFullYear();
+    const dateVal = `${day} ${month} ${year}`;
+    const hour = String(d.getHours());
+    const timeVal = HOUR_LABELS[hour] || d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+    return { date: dateVal, time: timeVal };
+  } catch {
+    return { date: dateTimeStr, time: '' };
+  }
+};
+
 const BillView = () => {
   const { id } = useParams();
   const [bill, setBill] = useState(null);
@@ -45,6 +65,12 @@ const BillView = () => {
     if (bill.customerDetails?.name) {
       doc.text(`Customer: ${bill.customerDetails.name}`, 120, 52);
       if (bill.customerDetails.phone) doc.text(`Phone: ${bill.customerDetails.phone}`, 120, 59);
+      
+      if (bill.source === 'online' && bill.customerDetails.date) {
+        const { date, time } = getScheduledDetails(bill.customerDetails.date);
+        doc.text(`Scheduled Date: ${date}`, 120, 66);
+        doc.text(`Scheduled Time: ${time}`, 120, 73);
+      }
     }
 
     // Table
@@ -183,12 +209,24 @@ const BillView = () => {
               )}
             </div>
 
-            {/* Customer */}
+            {/* Customer & Scheduled Appointment */}
             {bill.customerDetails?.name && (
-              <div className="px-6 py-4" style={{ borderBottom: '1px solid rgba(255,195,0,0.06)' }}>
-                <span className="font-cinzel text-[0.5rem] tracking-[0.2em] uppercase block mb-2" style={{ color: 'rgba(255,195,0,0.4)' }}>Customer</span>
-                <span className="font-inter text-sm block" style={{ color: '#F8F5F0' }}>{bill.customerDetails.name}</span>
-                {bill.customerDetails.phone && <span className="font-inter text-xs" style={{ color: 'rgba(248,245,240,0.4)' }}>{bill.customerDetails.phone}</span>}
+              <div className="px-6 py-4 flex flex-col md:flex-row md:justify-between md:items-start gap-4" style={{ borderBottom: '1px solid rgba(255,195,0,0.06)' }}>
+                <div>
+                  <span className="font-cinzel text-[0.5rem] tracking-[0.2em] uppercase block mb-2" style={{ color: 'rgba(255,195,0,0.4)' }}>Customer</span>
+                  <span className="font-inter text-sm block" style={{ color: '#F8F5F0' }}>{bill.customerDetails.name}</span>
+                  {bill.customerDetails.phone && <span className="font-inter text-xs" style={{ color: 'rgba(248,245,240,0.4)' }}>{bill.customerDetails.phone}</span>}
+                </div>
+                {bill.source === 'online' && bill.customerDetails?.date && (() => {
+                  const { date, time } = getScheduledDetails(bill.customerDetails.date);
+                  return (
+                    <div>
+                      <span className="font-cinzel text-[0.5rem] tracking-[0.2em] uppercase block mb-2" style={{ color: 'rgba(255,195,0,0.4)' }}>Appointment Slot</span>
+                      <span className="font-inter text-xs block" style={{ color: '#F8F5F0' }}>Scheduled Date: <strong style={{ color: '#FFD700' }}>{date}</strong></span>
+                      <span className="font-inter text-xs block mt-1" style={{ color: '#F8F5F0' }}>Scheduled Time: <strong style={{ color: '#FFD700' }}>{time}</strong></span>
+                    </div>
+                  );
+                })()}
               </div>
             )}
 
