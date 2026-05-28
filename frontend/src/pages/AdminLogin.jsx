@@ -123,7 +123,7 @@ const AdminLogin = () => {
           className="font-semibold hover:underline transition-all duration-300" 
           style={{ color: '#D4AF37' }}
         >
-          Cenera Systems
+          Cenexa Systems
         </a>{' '}
         © 2026
       </footer>
