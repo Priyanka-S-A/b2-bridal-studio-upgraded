@@ -120,7 +120,7 @@ const Navbar = () => {
           borderBottom: '1px solid rgba(212, 175, 55, 0.18)',
         }}
       >
-        <div className="max-w-[1400px] mx-auto px-6 lg:px-10">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-10">
           <div className="flex items-center justify-between h-20">
 
             {/* Logo */}

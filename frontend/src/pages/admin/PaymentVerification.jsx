@@ -234,8 +234,8 @@ const PaymentVerification = () => {
 
       {/* Payment Proof Modal */}
       {proofModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm" onClick={() => setProofModal(null)}>
-          <div className="bg-white rounded-2xl p-6 max-w-lg max-h-[80vh] overflow-auto shadow-2xl border border-gray-100" onClick={e => e.stopPropagation()}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4" onClick={() => setProofModal(null)}>
+          <div className="bg-white rounded-2xl p-6 w-full max-w-lg max-h-[80vh] overflow-auto shadow-2xl border border-gray-100" onClick={e => e.stopPropagation()}>
             <div className="flex justify-between items-center mb-4">
               <h3 className="font-bold text-gray-900 font-cinzel uppercase tracking-wide">Payment Proof</h3>
               <button onClick={() => setProofModal(null)} className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">

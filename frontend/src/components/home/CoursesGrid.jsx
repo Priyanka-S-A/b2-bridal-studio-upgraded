@@ -102,9 +102,10 @@ const CourseCard = ({ course, delay }) => {
 
       <div className="p-7 flex flex-col flex-1">
         {/* Image + Category */}
-        <div className="flex items-start justify-between mb-5">
+        <div className="course-card-header flex items-start justify-between mb-5">
           {/* IMAGE instead of icon */}
           <div
+            className="course-card-img-wrap"
             style={{
               width: '240px',
               height: '170px',
@@ -126,7 +127,7 @@ const CourseCard = ({ course, delay }) => {
           </div>
 
           <span
-            className="font-cinzel text-[0.55rem] tracking-[0.3em] uppercase px-3 py-1"
+            className="font-cinzel text-[0.55rem] tracking-[0.3em] uppercase px-3 py-1 text-center"
             style={{
               color: '#FFD700',
               border: '1px solid rgba(255,195,0,0.25)',
