@@ -6,114 +6,75 @@ import { fadeUp, staggerContainer, slideUp } from '../animations/variants';
 
 const API = import.meta.env.VITE_API_URL;
 
-const COURSE_IMAGES = {
-  beautician: '/images/bridal4.jpeg',
-  fashion: '/images/fashion.jpeg',
-  embroidery: '/images/embroidary.jpeg',
-  jewellery: '/images/jewelry.png',
-  bags: '/images/bags.png',
-  kids: '/images/kids.png',
-  special: '/images/specialcourses.png',
-};
-
-/* Per-course image mapping — assigns a relevant real image to each individual course */
-const PER_COURSE_IMAGES = {
-  b1: '/images/bridal8.jpeg',
-  b2: '/images/bridal5.jpeg',
-  b3: '/images/courses/nail-art.png',
-  b4: '/images/courses/mehandi.png',
-  b5: '/images/courses/hair-extension.png',
-  b6: '/images/courses/hairstyling.png',
-  f1: '/images/fashion1.jpeg',
-  f2: '/images/sareedraping.jpeg',
-  e1: '/images/aari1.jpeg',
-  e2: '/images/aari2.jpeg',
-  e3: '/images/aari3.jpeg',
-  e4: '/images/aari4.jpeg',
-  e5: '/images/aari5.jpeg',
-  e6: '/images/aari6.jpeg',
-  j1: '/images/courses/silk-thread-jewellery.png',
-  j2: '/images/courses/kundan-jewellery.png',
-  j3: '/images/courses/crystal-jewellery.png',
-  j4: '/images/courses/terracotta-jewellery.png',
-  ba1: '/images/bag.png',
-  ba2: '/images/courses/cloth-bag.png',
-  ba3: '/images/courses/wire-bag.png',
-  ba4: '/images/courses/macrame-bag.png',
-  k1: '/images/courses/abacus.png',
-  k2: '/images/courses/kids-tuition.png',
-  k3: '/images/courses/hindi-language.png',
-  k4: '/images/courses/kids-tuition.png',
-  s1: '/images/courses/soft-toys.png',
-  s3: '/images/bakery1.jpeg',
-  s4: '/images/courses/palm-leaf-craft.png',
-};
-
-const COURSE_DATA = {
+const CATEGORIES = {
   beautician: {
     title: 'Beautician Courses',
-    courses: [
-      { id: 'b1', title: 'Beautician Salon Course', duration: '15 Days', learn: ['Facials & skincare', 'Threading & waxing', 'Manicure & pedicure'] },
-      { id: 'b2', title: 'Makeup Artist Course', duration: '15 Days', learn: ['Contouring & highlighting', 'Bridal & party makeup', 'Product & brush knowledge'] },
-      { id: 'b3', title: 'Nail Artist Course', duration: '3 or 5 Days', learn: ['Gel & acrylic nails', 'Nail art designs', 'French manicure'] },
-      { id: 'b4', title: 'Mehandi Artist Course', duration: '3 or 5 Days', learn: ['Arabic & Indian designs', 'Cone making', 'Speed practice'] },
-      { id: 'b5', title: 'Hair Extension Course', duration: '3 Days', learn: ['Clip-in & keratin extensions', 'Color blending', 'Hair care & removal'] },
-      { id: 'b6', title: 'Hairstyle Course', duration: '1 or 2 Days', learn: ['Buns, curls & braids', 'Tool-based styling', 'Accessory placement'] },
-    ]
+    image: '/images/bridal4.jpeg',
   },
   fashion: {
     title: 'Fashion & Design',
-    courses: [
-      { id: 'f1', title: 'Fashion Designing Course', duration: 'Weekly Ongoing', learn: ['Blouse Design', 'Kurtis & Frocks', 'Western Wear', 'Kids Dress'] },
-      { id: 'f2', title: 'Saree Draping & Pre-Pleating', duration: '1 or 2 Days', learn: ['Bridal Draping', 'Party Draping', 'Pre-Pleating Techniques'] },
-    ]
+    image: '/images/fashion.jpeg',
   },
   embroidery: {
     title: 'Embroidery & Crafts',
-    courses: [
-      { id: 'e1', title: 'Aari Embroidery Course', duration: '5, 10 or 25 Days', learn: ['Basic stitches', 'Zari & stone work', 'Advanced designer motifs'] },
-      { id: 'e2', title: 'Aari Brooches Work', duration: '3 Days', learn: ['Patch & motif brooch', 'Zardosi brooch', 'Jewellery-style brooch'] },
-      { id: 'e3', title: 'Machine Embroidery', duration: '5 Days', learn: ['Thread tension control', 'Motif embroidery', 'Border & neckline designs'] },
-      { id: 'e4', title: 'Hand Embroidery', duration: '3 Days', learn: ['French knot & satin stitch', 'Mirror work', 'Simple motif making'] },
-      { id: 'e5', title: 'Fabric Painting', duration: '3 Days', learn: ['Fabric color mixing', 'Floral & motif painting', 'Block & stencil design'] },
-      { id: 'e6', title: 'Simple Chemical Work', duration: '5 Days', learn: ['Chemical lace technique', 'Oxidation effect', 'Fabric texture designs'] },
-    ]
+    image: '/images/embroidary.jpeg',
   },
   jewellery: {
     title: 'Jewellery Making',
-    courses: [
-      { id: 'j1', title: 'Silk Thread Jewellery', duration: '3 Days', learn: ['Matte finishing', 'Jhumka making', 'Silk chokers & chains'] },
-      { id: 'j2', title: 'Kundan Jewellery', duration: '3 Days', learn: ['Stone setting', 'Kundan rings & chokers', 'Color combination patterns'] },
-      { id: 'j3', title: 'Crystal Jewellery', duration: '3 Days', learn: ['Bead weaving', 'Wire looping technique', 'Party & casual wear sets'] },
-      { id: 'j4', title: 'Terracotta Jewellery', duration: '3 Days', learn: ['Clay molding', 'Color baking', 'Necklace & studs creation'] },
-    ]
+    image: '/images/jewelry.png',
   },
   bags: {
     title: 'Bags & Accessories',
-    courses: [
-      { id: 'ba1', title: 'Jute Bag Making', duration: '5 Days', learn: ['Basic & designer jute bags', 'Lining & finishing', 'Handle and zip attachment'] },
-      { id: 'ba2', title: 'Cloth Bag Making', duration: '5 Days', learn: ['Cutting & stitching', 'Pattern-based bags', 'Reversible & foldable designs'] },
-      { id: 'ba3', title: 'Wire Bags', duration: '5 Days', learn: ['Wire frame basics', 'Bead fixing & pattern design', 'Handle & closure techniques'] },
-      { id: 'ba4', title: 'Macramé Bags', duration: '3 Days', learn: ['Basic macramé knots', 'Bag structure & shaping', 'Fringe & decorative finishing'] },
-    ]
+    image: '/images/bags.png',
   },
   kids: {
     title: 'Kids Learning Programs',
-    courses: [
-      { id: 'k1', title: 'Abacus Training', duration: '3 / 6 Months', learn: ['Visual calculation', 'Brain development', 'Confidence building'] },
-      { id: 'k2', title: 'Kids Tuition', duration: 'Monthly', learn: ['All subjects', 'Homework assistance', 'Exam preparation'] },
-      { id: 'k3', title: 'Hindi Language Course', duration: '1 – 3 Months', learn: ['Basic grammar', 'Conversation skills', 'Writing practice'] },
-      { id: 'k4', title: 'Phonics Training', duration: '2 Months', learn: ['Sound recognition', 'Word building', 'Reading fluency'] },
-    ]
+    image: '/images/kids.png',
   },
   special: {
     title: 'Special Skill Courses',
-    courses: [
-      { id: 's1', title: 'Soft Toys Making', duration: '3 Days', learn: ['Doll & teddy making', 'Pattern cutting', 'Stuffing & finishing'] },
-      { id: 's3', title: 'Bakery Products Course', duration: '5 Days', learn: ['Cake & cupcake baking', 'Bread & bun making', 'Decorating basics'] },
-      { id: 's4', title: 'Palm Leaf Craft Course', duration: '5 Days', learn: ['Basket & box weaving', 'Decorative crafts', 'Natural dye finishing'] },
-    ]
+    image: '/images/specialcourses.png',
   },
+};
+
+/* Per-course image mapping — assigns a relevant real image to each individual course based on its title */
+const COURSE_IMAGES_BY_TITLE = {
+  'beautician salon course': '/images/courses/beautician-salon.jpeg',
+  'makeup artist course': '/images/courses/makeup-artist.jpeg',
+  'nail artist course': '/images/courses/nail-art.png',
+  'mehandi artist course': '/images/courses/mehandi.png',
+  'hair extension course': '/images/courses/hair-extension.png',
+  'hairstyle course': '/images/courses/hairstyling.png',
+  'fashion designing course': '/images/courses/fashion-designing.jpeg',
+  'saree draping & pre-pleating course': '/images/courses/saree-draping.jpeg',
+  'saree draping & pre-pleating': '/images/courses/saree-draping.jpeg',
+  'aari embroidery course': '/images/courses/aari-embroidery.jpeg',
+  'aari brooches work': '/images/courses/aari-brooches.jpeg',
+  'machine embroidery': '/images/courses/machine-embroidery.jpeg',
+  'hand embroidery': '/images/courses/hand-embroidery.jpeg',
+  'fabric painting': '/images/courses/fabric-painting.jpeg',
+  'simple chemical work': '/images/courses/chemical-work.jpeg',
+  'silk thread jewellery': '/images/courses/silk-thread-jewellery.png',
+  'kundan jewellery': '/images/courses/kundan-jewellery.png',
+  'crystal jewellery': '/images/courses/crystal-jewellery.png',
+  'terracotta jewellery': '/images/courses/terracotta-jewellery.png',
+  'jute bag making': '/images/courses/jute-bag.png',
+  'cloth bag making': '/images/courses/cloth-bag.png',
+  'wire bags': '/images/courses/wire-bag.png',
+  'macramé bags': '/images/courses/macrame-bag.png',
+  'tatting': '/images/courses/tatting.png',
+  'knitting': '/images/courses/knitting.png',
+  'crochet': '/images/courses/crochet.png',
+  'brooches making': '/images/courses/brooches.png',
+  'abacus training': '/images/courses/abacus.png',
+  'kids tuition': '/images/courses/kids-tuition.png',
+  'hindi language course': '/images/courses/hindi-language.png',
+  'phonics training': '/images/courses/kids-tuition.png',
+  'silambam training': '/images/courses/silambam.png',
+  'karate training': '/images/courses/karate.png',
+  'soft toys making': '/images/courses/soft-toys.png',
+  'bakery products course': '/images/courses/bakery-products.jpeg',
+  'palm leaf craft course': '/images/courses/palm-leaf-craft.png',
 };
 
 const Courses = () => {
@@ -128,11 +89,10 @@ const Courses = () => {
   }, []);
 
   const categoryData = category ? {
-    title: COURSE_DATA[category]?.title || category,
-    courses: [
-      ...dbCourses.filter(c => c.category?.toLowerCase() === category?.toLowerCase()).map(c => ({ id: c._id, title: c.title, duration: c.duration, learn: c.learnings || [] })),
-      ...(COURSE_DATA[category]?.courses || [])
-    ]
+    title: CATEGORIES[category]?.title || category,
+    courses: dbCourses
+      .filter(c => c.category?.toLowerCase() === category?.toLowerCase())
+      .map(c => ({ id: c._id, title: c.title, duration: c.duration, learn: c.learnings || [] }))
   } : null;
 
   const handleEnroll = (course) => {
@@ -167,34 +127,37 @@ const Courses = () => {
         {/* Category Grid */}
         <div className="max-w-[1300px] mx-auto px-6 lg:px-12 py-16">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {Object.entries(COURSE_DATA).map(([key, data], i) => (
-              <motion.div
-                key={key}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: i * 0.1 }}
-              >
-                <Link to={`/courses/${key}`} className="block card-luxury rounded-sm group" style={{ textDecoration: 'none' }}>
-                  <div className="img-zoom-container relative" style={{ height: '220px' }}>
-                    <img src={COURSE_IMAGES[key]} alt={data.title} className="w-full h-full object-cover" loading="lazy" />
-                    <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 60%)' }} />
-                    <div className="absolute bottom-4 left-5 right-5">
-                      <span className="font-cinzel text-[0.55rem] tracking-[0.3em] uppercase" style={{ color: '#FFD700' }}>
-                        {data.courses.length} Courses
+            {Object.entries(CATEGORIES).map(([key, data], i) => {
+              const count = dbCourses.filter(c => c.category?.toLowerCase() === key.toLowerCase()).length;
+              return (
+                <motion.div
+                  key={key}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: i * 0.1 }}
+                >
+                  <Link to={`/courses/${key}`} className="block card-luxury rounded-sm group" style={{ textDecoration: 'none' }}>
+                    <div className="img-zoom-container relative" style={{ height: '220px' }}>
+                      <img src={data.image} alt={data.title} className="w-full h-full object-cover" loading="lazy" />
+                      <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 60%)' }} />
+                      <div className="absolute bottom-4 left-5 right-5">
+                        <span className="font-cinzel text-[0.55rem] tracking-[0.3em] uppercase" style={{ color: '#FFD700' }}>
+                          {count} Courses
+                        </span>
+                      </div>
+                    </div>
+                    <div className="p-5">
+                      <h3 className="font-playfair text-lg mb-2" style={{ color: '#F8F5F0' }}>{data.title}</h3>
+                      <span className="font-cinzel text-[0.6rem] tracking-[0.2em] uppercase flex items-center gap-2 group-hover:gap-3 transition-all" style={{ color: '#FFD700' }}>
+                        Explore Courses
+                        <svg width="12" height="8" viewBox="0 0 12 8" fill="none" stroke="#FFD700" strokeWidth="1.2"><path d="M1 4h10M7 1l4 3-4 3" strokeLinecap="round" /></svg>
                       </span>
                     </div>
-                  </div>
-                  <div className="p-5">
-                    <h3 className="font-playfair text-lg mb-2" style={{ color: '#F8F5F0' }}>{data.title}</h3>
-                    <span className="font-cinzel text-[0.6rem] tracking-[0.2em] uppercase flex items-center gap-2 group-hover:gap-3 transition-all" style={{ color: '#FFD700' }}>
-                      Explore Courses
-                      <svg width="12" height="8" viewBox="0 0 12 8" fill="none" stroke="#FFD700" strokeWidth="1.2"><path d="M1 4h10M7 1l4 3-4 3" strokeLinecap="round" /></svg>
-                    </span>
-                  </div>
-                </Link>
-              </motion.div>
-            ))}
+                  </Link>
+                </motion.div>
+              );
+            })}
           </div>
         </div>
       </div>
@@ -206,7 +169,7 @@ const Courses = () => {
     <div style={{ background: '#000', minHeight: '100vh' }} ref={ref}>
       {/* Hero */}
       <div className="page-hero relative">
-        <div className="absolute inset-0" style={{ backgroundImage: `url(${COURSE_IMAGES[category]})`, backgroundSize: 'cover', backgroundPosition: 'center', opacity: 0.15 }} />
+        <div className="absolute inset-0" style={{ backgroundImage: `url(${CATEGORIES[category]?.image})`, backgroundSize: 'cover', backgroundPosition: 'center', opacity: 0.15 }} />
         <motion.div variants={staggerContainer} initial="hidden" animate="visible" className="relative max-w-3xl mx-auto">
           <motion.div variants={fadeUp} className="flex items-center justify-center gap-4 mb-4">
             <div className="gold-divider" style={{ width: '40px' }} />
@@ -256,7 +219,7 @@ const Courses = () => {
             >
               {/* Course image */}
               <div className="img-zoom-container relative" style={{ height: '180px' }}>
-                <img src={PER_COURSE_IMAGES[course.id] || COURSE_IMAGES[category]} alt={course.title} className="w-full h-full object-cover" loading="lazy" style={{ opacity: 0.6 }} />
+                <img src={COURSE_IMAGES_BY_TITLE[course.title?.toLowerCase().trim()] || CATEGORIES[category]?.image} alt={course.title} className="w-full h-full object-cover" loading="lazy" style={{ opacity: 0.6 }} />
                 <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.95), rgba(0,0,0,0.2))' }} />
                 <div className="absolute bottom-3 left-4 flex items-center gap-2">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#FFD700" strokeWidth="1.5"><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></svg>
