@@ -71,7 +71,7 @@ const Register = () => {
             </div>
             <div>
               <label className="block font-cinzel text-[0.6rem] tracking-[0.2em] uppercase mb-2 font-semibold" style={{ color: 'rgba(255,195,0,0.75)' }}>Phone</label>
-              <input type="tel" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} placeholder="+91 00000 00000" required className="input-luxury rounded-sm" />
+              <input type="tel" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} placeholder="00000 00000" required className="input-luxury rounded-sm" />
             </div>
             <div>
               <label className="block font-cinzel text-[0.6rem] tracking-[0.2em] uppercase mb-2 font-semibold" style={{ color: 'rgba(255,195,0,0.75)' }}>Date of Birth <span className="font-cormorant italic text-[0.65rem] normal-case tracking-normal font-normal" style={{ color: 'rgba(248,245,240,0.4)' }}>(optional — to avail offers in future)</span></label>

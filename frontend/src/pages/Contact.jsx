@@ -67,7 +67,7 @@ const Contact = () => {
                 </div>
                 <div>
                   <label className="block font-cinzel text-[0.65rem] tracking-[0.2em] uppercase mb-2 font-semibold" style={{ color: 'rgba(255,195,0,0.85)' }}>Phone</label>
-                  <input type="tel" name="phone" value={form.phone} onChange={handleChange} placeholder="+91 00000 00000" required className="input-luxury rounded-sm" />
+                  <input type="tel" name="phone" value={form.phone} onChange={handleChange} placeholder="00000 00000" required className="input-luxury rounded-sm" />
                 </div>
                 <div>
                   <label className="block font-cinzel text-[0.65rem] tracking-[0.2em] uppercase mb-2 font-semibold" style={{ color: 'rgba(255,195,0,0.85)' }}>Message</label>
