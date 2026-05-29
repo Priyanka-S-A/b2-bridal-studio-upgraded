@@ -123,7 +123,7 @@ const Profile = () => {
                       </div>
 
                       {/* Footer */}
-                      <div className="flex items-center justify-between pt-3" style={{ borderTop: '1px solid rgba(255,195,0,0.08)' }}>
+                      <div className="flex flex-wrap items-center justify-between gap-3 pt-3" style={{ borderTop: '1px solid rgba(255,195,0,0.08)' }}>
                         <div>
                           <span className="font-cinzel text-[0.5rem] tracking-[0.15em] uppercase" style={{ color: 'rgba(248,245,240,0.35)' }}>Transaction: </span>
                           <span className="font-inter text-xs" style={{ color: 'rgba(248,245,240,0.5)' }}>{booking.transactionId}</span>

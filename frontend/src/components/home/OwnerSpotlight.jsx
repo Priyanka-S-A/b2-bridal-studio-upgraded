@@ -81,7 +81,7 @@ const OwnerSpotlight = () => {
               initial={{ opacity: 0, scale: 0.8 }}
               animate={isInView ? { opacity: 1, scale: 1 } : {}}
               transition={{ duration: 0.6, delay: 0.6 }}
-              className="absolute -bottom-6 -right-6 glass-gold px-6 py-4"
+              className="absolute -bottom-6 -right-6 glass-gold px-6 py-4 owner-floating-badge"
               style={{ border: '1px solid rgba(255,195,0,0.3)' }}
             >
               <div className="font-cinzel text-[0.6rem] tracking-[0.3em] uppercase" style={{ color: '#FFD700' }}>

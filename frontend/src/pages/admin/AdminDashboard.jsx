@@ -187,7 +187,7 @@ const AdminDashboard = () => {
         {/* Mobile Nav Dropdown */}
         {mobileMenuOpen && (
           <div className="md:hidden absolute top-14 left-0 right-0 z-50 shadow-xl" style={{ background: '#FFFFFF', borderBottom: '1px solid rgba(0,0,0,0.08)' }}>
-            <nav className="p-3 grid grid-cols-3 gap-2">
+            <nav className="admin-nav-mobile-grid p-3 grid grid-cols-3 gap-2">
               {navItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = location.pathname.includes(item.path);

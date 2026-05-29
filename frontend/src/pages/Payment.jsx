@@ -104,7 +104,7 @@ const Payment = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7 }}
-            className="glass-dark p-8 rounded-sm text-center"
+            className="glass-dark p-4 sm:p-8 rounded-sm text-center"
             style={{ border: '1px solid rgba(255,195,0,0.15)' }}
           >
             <span className="font-cinzel text-[0.55rem] tracking-[0.3em] uppercase block mb-6" style={{ color: '#FFD700' }}>Scan to Pay</span>
@@ -174,7 +174,7 @@ const Payment = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.15 }}
-            className="glass-dark p-8 rounded-sm flex flex-col"
+            className="glass-dark p-4 sm:p-8 rounded-sm flex flex-col"
             style={{ border: '1px solid rgba(255,195,0,0.15)' }}
           >
             <span className="font-cinzel text-[0.55rem] tracking-[0.3em] uppercase block mb-6" style={{ color: '#FFD700' }}>Order Summary</span>

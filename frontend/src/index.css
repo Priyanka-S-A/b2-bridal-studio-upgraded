@@ -1482,3 +1482,72 @@ body {
   scrollbar-width: none;  /* Firefox */
 }
 
+/* ─── Mobile Responsiveness Enhancements (max-width: 768px) ─── */
+@media (max-width: 768px) {
+  /* Prevent fixed mobile navbar from overlapping hero section */
+  .hero-section {
+    padding-top: 64px !important;
+  }
+  .hero-inner-container {
+    padding-top: 40px !important;
+    padding-left: 24px !important;
+    padding-right: 24px !important;
+  }
+
+  /* Prevent horizontal text overflows in Hero */
+  .typewriter {
+    white-space: normal !important;
+    width: auto !important;
+    overflow: visible !important;
+    border-right: none !important;
+    animation: none !important;
+    font-size: clamp(2.2rem, 8vw, 3rem) !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .hero-section {
+    padding-top: 64px !important;
+  }
+  .hero-inner-container {
+    padding-top: 30px !important;
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+
+  /* Hero button group stacking */
+  .hero-btn-group {
+    flex-direction: column !important;
+    width: 100%;
+  }
+  .hero-btn-group a {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Course Card image vertical stacking */
+  .course-card-header {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 12px !important;
+  }
+  .course-card-img-wrap {
+    width: 100% !important;
+    height: 180px !important;
+  }
+
+  /* Owner Spotlight badge repositioning */
+  .owner-floating-badge {
+    right: 0 !important;
+    bottom: -16px !important;
+    transform: scale(0.95) !important;
+  }
+}
+
+@media (max-width: 380px) {
+  /* Admin Dashboard menu layout */
+  .admin-nav-mobile-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+

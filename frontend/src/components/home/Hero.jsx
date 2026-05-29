@@ -40,6 +40,7 @@ const Hero = () => {
   return (
     <section
       ref={ref}
+      className="hero-section"
       style={{
         minHeight: '100vh',
         background: '#0B0B0D',
@@ -85,14 +86,16 @@ const Hero = () => {
       ))}
 
       {/* Content */}
-      <div style={{
-        maxWidth: 1360,
-        margin: '0 auto',
-        padding: '70px 40px 40px',
-        width: '100%',
-        position: 'relative',
-        zIndex: 5
-      }}>
+      <div
+        className="hero-inner-container"
+        style={{
+          maxWidth: 1360,
+          margin: '0 auto',
+          padding: '70px 40px 40px',
+          width: '100%',
+          position: 'relative',
+          zIndex: 5
+        }}>
 
         <motion.div
           className="hero-content-wrap"
@@ -186,6 +189,7 @@ const Hero = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 5.8 }}
+              className="hero-btn-group"
               style={{ display: 'flex', gap: 16 }}
             >
               <Link to="/services" className="btn-gold">Book Appointment</Link>
