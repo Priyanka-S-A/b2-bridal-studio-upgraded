@@ -12,10 +12,6 @@ const getTodayStr = () => {
   return `${year}-${month}-${day}`;
 };
 
-/* ─── tiny helper ─────────────────────────────────────────── */
-const isLeaveEntry = (leaveReason) =>
-  typeof leaveReason === 'string' && leaveReason.trim().length > 0;
-
 const Attendance = () => {
   const [staffList, setStaffList] = useState([]);
   const [records, setRecords]     = useState([]);
@@ -30,6 +26,7 @@ const Attendance = () => {
     entryTime:   '',
     exitTime:    '',
     leaveReason: '',
+    status:      'Present',
   });
   const [errors, setErrors] = useState({});
 
@@ -60,9 +57,14 @@ const Attendance = () => {
     if (!form.staffId) newErrors.staffId = 'Please select a staff member';
     if (!form.date)    newErrors.date    = 'Please select a date';
 
-    // Entry time is required ONLY when it is NOT a leave entry
-    if (!isLeaveEntry(form.leaveReason) && !form.entryTime) {
-      newErrors.entryTime = 'Entry time is required for Present records';
+    if (form.status === 'Present') {
+      if (!form.entryTime) {
+        newErrors.entryTime = 'Entry time is required for Present records';
+      }
+    } else if (form.status === 'Leave') {
+      if (!form.leaveReason || !form.leaveReason.trim()) {
+        newErrors.leaveReason = 'Leave reason is required for Leave records';
+      }
     }
 
     setErrors(newErrors);
@@ -73,17 +75,16 @@ const Attendance = () => {
   const handleAdd = async () => {
     if (!validate()) return;
 
-    const leaveMode = isLeaveEntry(form.leaveReason);
+    const isLeave = form.status === 'Leave';
 
     // Build a clean, explicit payload — no undefined values sent
-    const payload = leaveMode
+    const payload = isLeave
       ? {
           staffId:     form.staffId,
           date:        form.date,
           status:      'Leave',
           leaveReason: form.leaveReason.trim(),
           exitLocked:  false,
-          // entryTime / exitTime intentionally omitted
         }
       : {
           staffId:    form.staffId,
@@ -92,7 +93,6 @@ const Attendance = () => {
           entryTime:  form.entryTime,
           exitTime:   form.exitTime || undefined,
           exitLocked: !!form.exitTime,
-          // leaveReason intentionally omitted
         };
 
     try {
@@ -105,6 +105,7 @@ const Attendance = () => {
         entryTime:   '',
         exitTime:    '',
         leaveReason: '',
+        status:      'Present',
       });
       setErrors({});
       fetchAttendance();
@@ -138,7 +139,7 @@ const Attendance = () => {
   });
 
   /* ─── derived: is the current form in leave mode? ──────── */
-  const leaveMode = isLeaveEntry(form.leaveReason);
+  const leaveMode = form.status === 'Leave';
 
   /* ═══════════════════════════════════════════════════════════
      RENDER
@@ -168,16 +169,6 @@ const Attendance = () => {
         </div>
       </div>
 
-      {/* ── Leave-mode banner ── */}
-      {leaveMode && (
-        <div className="mb-6 flex items-center gap-3 px-5 py-3 rounded-xl border border-amber-200 bg-amber-50">
-          <AlertCircle size={18} className="text-amber-600 shrink-0" />
-          <p className="text-xs font-cinzel font-semibold uppercase tracking-wide text-amber-800">
-            Leave Mode Active — Entry &amp; Exit time fields are disabled. This record will be saved as <strong>Leave</strong>.
-          </p>
-        </div>
-      )}
-
       {/* ── Form card ── */}
       <div className="bg-white rounded-xl shadow-[0_2px_15px_rgba(0,0,0,0.04)] p-6 mb-8 border border-gray-100">
         <h2
@@ -187,8 +178,8 @@ const Attendance = () => {
           {leaveMode ? 'Log Staff Leave' : 'Mark Attendance'}
         </h2>
 
-        {/* Row 1 — always-visible fields */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+        {/* Row 1 — always-visible fields (Staff & Date) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
 
           {/* Staff dropdown */}
           <div className="flex flex-col gap-1.5">
@@ -242,71 +233,111 @@ const Attendance = () => {
             )}
           </div>
 
-          {/* Entry time — disabled in leave mode */}
-          <div className="flex flex-col gap-1.5">
-            <label className={`text-xs font-cinzel font-semibold uppercase tracking-wider ${leaveMode ? 'text-gray-300' : 'text-gray-500'}`}>
-              Entry Time{!leaveMode && <span className="text-amber-600"> *</span>}
-            </label>
-            <input
-              type="time"
-              value={form.entryTime}
-              onChange={(e) => {
-                setForm({ ...form, entryTime: e.target.value });
+        </div>
+
+        {/* Row 2 — Attendance Type Selection */}
+        <div className="flex flex-col gap-1.5 mb-6">
+          <label className="text-xs font-cinzel font-bold uppercase tracking-wide text-gray-700">
+            Attendance Type <span className="text-amber-600">*</span>
+          </label>
+          <div className="flex bg-gray-50 p-1 rounded-xl w-full max-w-md border border-gray-200">
+            <button
+              type="button"
+              onClick={() => {
+                setForm({ ...form, status: 'Present' });
+                if (errors.leaveReason) setErrors({ ...errors, leaveReason: null });
+              }}
+              className={`flex-1 py-2.5 px-6 rounded-lg font-cinzel text-xs font-bold uppercase tracking-widest transition-all ${
+                form.status === 'Present'
+                  ? 'bg-[#111] text-white shadow-md'
+                  : 'text-gray-600 hover:text-gray-900 bg-transparent'
+              }`}
+            >
+              Present
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setForm({ ...form, status: 'Leave' });
                 if (errors.entryTime) setErrors({ ...errors, entryTime: null });
               }}
-              disabled={leaveMode}
-              className={`w-full p-3 rounded-lg border focus:outline-none focus:ring-1 bg-gray-50 font-cormorant text-lg text-gray-800 transition-colors ${
-                leaveMode
-                  ? 'border-gray-100 text-gray-300 cursor-not-allowed opacity-40'
-                  : errors.entryTime
+              className={`flex-1 py-2.5 px-6 rounded-lg font-cinzel text-xs font-bold uppercase tracking-widest transition-all ${
+                form.status === 'Leave'
+                  ? 'bg-[#111] text-white shadow-md'
+                  : 'text-gray-600 hover:text-gray-900 bg-transparent'
+              }`}
+            >
+              Leave
+            </button>
+          </div>
+        </div>
+
+        {/* Row 3 — Present Flow Fields */}
+        {form.status === 'Present' && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            {/* Entry time */}
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-cinzel font-semibold uppercase tracking-wide text-gray-700">
+                Entry Time <span className="text-amber-600">*</span>
+              </label>
+              <input
+                type="time"
+                value={form.entryTime}
+                onChange={(e) => {
+                  setForm({ ...form, entryTime: e.target.value });
+                  if (errors.entryTime) setErrors({ ...errors, entryTime: null });
+                }}
+                className={`w-full p-3 rounded-lg border focus:outline-none focus:ring-1 bg-gray-50 font-cormorant text-lg text-gray-800 transition-colors ${
+                  errors.entryTime
                     ? 'border-red-300 focus:border-red-400 focus:ring-red-200'
                     : 'border-gray-200 focus:border-[#FFD700] focus:ring-[#FFD700]/30'
-              }`}
-            />
-            {errors.entryTime && !leaveMode && (
-              <span className="text-red-500 text-xs font-medium mt-0.5">{errors.entryTime}</span>
-            )}
-          </div>
+                }`}
+              />
+              {errors.entryTime && (
+                <span className="text-red-500 text-xs font-medium mt-0.5">{errors.entryTime}</span>
+              )}
+            </div>
 
-          {/* Exit time — disabled in leave mode */}
-          <div className="flex flex-col gap-1.5">
-            <label className={`text-xs font-cinzel font-semibold uppercase tracking-wide ${leaveMode ? 'text-gray-300' : 'text-gray-700'}`}>
-              Exit Time <span className="text-xs font-normal text-gray-400 ml-1">(Optional)</span>
+            {/* Exit time */}
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-cinzel font-semibold uppercase tracking-wide text-gray-700">
+                Exit Time <span className="text-xs font-normal text-gray-400 ml-1">(Optional)</span>
+              </label>
+              <input
+                type="time"
+                value={form.exitTime}
+                onChange={(e) => setForm({ ...form, exitTime: e.target.value })}
+                className="w-full p-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-1 focus:ring-[#FFD700]/30 bg-gray-50 font-cormorant text-lg text-gray-800 transition-colors"
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Row 3 — Leave Flow Fields */}
+        {form.status === 'Leave' && (
+          <div className="flex flex-col gap-1.5 mb-6">
+            <label className="text-xs font-cinzel font-semibold uppercase tracking-wide text-gray-700">
+              Leave Reason <span className="text-amber-600">*</span>
             </label>
-            <input
-              type="time"
-              value={form.exitTime}
-              onChange={(e) => setForm({ ...form, exitTime: e.target.value })}
-              disabled={leaveMode}
-              className={`w-full p-3 rounded-lg border focus:outline-none focus:ring-1 bg-gray-50 font-cormorant text-lg text-gray-800 transition-colors ${
-                leaveMode
-                  ? 'border-gray-100 text-gray-300 cursor-not-allowed opacity-40'
+            <textarea
+              placeholder="e.g. Sick leave, Personal emergency..."
+              value={form.leaveReason}
+              onChange={(e) => {
+                setForm({ ...form, leaveReason: e.target.value });
+                if (errors.leaveReason) setErrors({ ...errors, leaveReason: null });
+              }}
+              rows={3}
+              className={`w-full p-3 rounded-lg border focus:outline-none focus:ring-1 bg-gray-50 font-cormorant text-lg text-gray-800 transition-colors resize-none ${
+                errors.leaveReason
+                  ? 'border-red-300 focus:border-red-400 focus:ring-red-200'
                   : 'border-gray-200 focus:border-[#FFD700] focus:ring-[#FFD700]/30'
               }`}
             />
+            {errors.leaveReason && (
+              <span className="text-red-500 text-xs font-medium mt-0.5">{errors.leaveReason}</span>
+            )}
           </div>
-        </div>
-
-        {/* Row 2 — Leave Reason (full width, separate row) */}
-        <div className="flex flex-col gap-1.5 mb-6">
-          <label className="text-xs font-cinzel font-semibold uppercase tracking-wide text-gray-700">
-            Leave Reason
-            <span className="text-xs font-normal normal-case tracking-normal text-gray-400 ml-2">
-              (optional — filling this field marks the record as Leave and disables entry/exit times)
-            </span>
-          </label>
-          <textarea
-            placeholder="e.g. Sick leave, Personal emergency..."
-            value={form.leaveReason}
-            onChange={(e) => {
-              setForm({ ...form, leaveReason: e.target.value });
-              // Dismiss any entryTime error when switching to leave mode
-              if (errors.entryTime) setErrors({ ...errors, entryTime: null });
-            }}
-            rows={2}
-            className="w-full p-3 rounded-lg border border-gray-200 focus:outline-none focus:border-[#FFD700] focus:ring-1 focus:ring-[#FFD700]/30 bg-gray-50 font-cormorant text-lg text-gray-800 transition-colors resize-none"
-          />
-        </div>
+        )}
 
         <div className="flex justify-end pt-2 border-t border-gray-100">
           <button
