@@ -74,10 +74,10 @@ const About = () => {
             <p className="font-cormorant italic text-xl mb-4" style={{ color: 'rgba(255,195,0,0.7)' }}>
               A legacy of beauty, artistry, and transformation
             </p>
-            <p className="font-cormorant italic text-lg md:text-xl leading-relaxed mb-4" style={{ color: 'rgba(248,245,240,0.95)' }}>
+            <p className="font-cormorant italic leading-relaxed text-[1.1rem] md:text-xl text-ivory/95 md:text-ivory/95 mb-4 md:mb-4">
               Shanmugavadivu Sabarinathan is a professional makeup artist, creative entrepreneur, and certified trainer with 20+ certifications. She is recognized for expertise in bridal makeup artistry and skill-based education.
             </p>
-            <p className="font-cormorant italic text-lg md:text-xl leading-relaxed" style={{ color: 'rgba(248,245,240,0.92)' }}>
+            <p className="font-cormorant italic leading-relaxed text-[1.1rem] md:text-xl text-ivory/95 md:text-ivory/95 mb-4 md:mb-0">
               As the founder of B2 Bridal Studio, she has built a legacy of empowering women through beauty and craftsmanship, training thousands of aspiring professionals across Tamil Nadu.
             </p>
           </motion.div>
@@ -135,7 +135,7 @@ const About = () => {
           {[
             { src: '/images/about1.jpeg', alt: 'B2 Bridal Studio — Bridal Artistry' },
             { src: '/images/about4.jpeg', alt: 'B2 Bridal Studio — Academy Training' },
-            { src: '/images/about2.jpg', alt: 'B2 Bridal Studio — Founder' },
+            { src: '/images/about2.JPG', alt: 'B2 Bridal Studio — Founder' },
           ].map((img, i) => (
             <motion.div
               key={i}
@@ -236,7 +236,7 @@ const About = () => {
           {[
             { title: '10 Bridal Makeup Looks Dominating 2024 Weddings', image: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=800&q=80', excerpt: 'From dewy skin finishes to bold jewel-toned eyes — discover which looks are defining the modern Indian bride.' },
             { title: 'How to Build a Luxury Bridal Makeup Career', image: 'https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&w=800&q=80', excerpt: 'Our master trainers share the exact roadmap — from certification to premium clientele.' },
-            { title: 'The Pre-Bridal Skin Care Ritual', image: 'https://images.unsplash.com/photo-1608248597481-496100c80836?auto=format&fit=crop&w=800&q=80', excerpt: 'The complete countdown for flawless skin on your wedding day.' },
+            { title: 'The Pre-Bridal Skin Care Ritual', image: 'https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?auto=format&fit=crop&w=800&q=80', excerpt: 'The complete countdown for flawless skin on your wedding day.' },
           ].map((post, i) => (
             <motion.article
               key={i}
