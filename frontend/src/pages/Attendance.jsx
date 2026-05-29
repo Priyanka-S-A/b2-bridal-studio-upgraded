@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { CalendarCheck, Plus, Save, AlertCircle, Lock } from 'lucide-react';
+import { CalendarCheck, Plus, Save, AlertCircle, Lock, Download, Search, RotateCcw } from 'lucide-react';
 
 const API = import.meta.env.VITE_API_URL;
 
@@ -17,7 +17,19 @@ const Attendance = () => {
   const [records, setRecords]     = useState([]);
 
   const todayStr = getTodayStr();
-  const [filterDate, setFilterDate] = useState(todayStr);
+
+  /* ── filter form and active applied state ── */
+  const [filterForm, setFilterForm] = useState({
+    fromDate: todayStr,
+    toDate:   '',
+    staffId:  '',
+  });
+
+  const [appliedFilters, setAppliedFilters] = useState({
+    fromDate: todayStr,
+    toDate:   '',
+    staffId:  '',
+  });
 
   /* ── form state ── */
   const [form, setForm] = useState({
@@ -101,7 +113,7 @@ const Attendance = () => {
       // Reset form
       setForm({
         staffId:     '',
-        date:        filterDate || todayStr,
+        date:        filterForm.fromDate || todayStr,
         entryTime:   '',
         exitTime:    '',
         leaveReason: '',
@@ -131,11 +143,99 @@ const Attendance = () => {
     }
   };
 
-  /* ─── date filter ───────────────────────────────────────── */
+  /* ─── filter handlers ─────────────────────────────────────── */
+  const handleApplyFilter = () => {
+    setAppliedFilters({ ...filterForm });
+  };
+
+  const handleResetFilter = () => {
+    const resetForm = {
+      fromDate: todayStr,
+      toDate:   '',
+      staffId:  '',
+    };
+    setFilterForm(resetForm);
+    setAppliedFilters(resetForm);
+  };
+
+  /* ─── Excel / CSV download handler ───────────────────────── */
+  const handleExportExcel = () => {
+    const headers = ['Staff ID', 'Staff Name', 'Date', 'Status', 'Entry Time', 'Exit Time', 'Leave Reason'];
+    
+    const rows = filteredRecords.map(r => {
+      const isLeave = r.status === 'Leave';
+      const staffId = r.staffId?.staffId || '-';
+      const staffName = r.staffId?.name || 'Unknown';
+      const formattedDate = new Date(r.date).toLocaleDateString(undefined, {
+        year: 'numeric', month: 'short', day: 'numeric',
+      });
+      const status = r.status || 'Present';
+      const entryTime = isLeave ? '-' : (r.entryTime || '-');
+      const exitTime = isLeave ? '-' : (r.exitTime || '-');
+      const leaveReason = isLeave ? (r.leaveReason || '-') : '-';
+      
+      return [
+        staffId,
+        staffName,
+        formattedDate,
+        status,
+        entryTime,
+        exitTime,
+        leaveReason
+      ];
+    });
+    
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => 
+        row.map(value => {
+          const stringVal = String(value);
+          if (stringVal.includes(',') || stringVal.includes('"') || stringVal.includes('\n')) {
+            return `"${stringVal.replace(/"/g, '""')}"`;
+          }
+          return stringVal;
+        }).join(',')
+      )
+    ].join('\n');
+    
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `Staff_Attendance_Report_${new Date().toISOString().slice(0, 10)}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  /* ─── records list filtering logic ────────────────────────── */
   const filteredRecords = records.filter((r) => {
-    if (!filterDate) return true;
     if (!r.date) return false;
-    return r.date.split('T')[0] === filterDate;
+    
+    const recordDateStr = r.date.split('T')[0];
+    
+    // 1. From Date is mandatory
+    if (appliedFilters.fromDate) {
+      if (recordDateStr < appliedFilters.fromDate) return false;
+    } else {
+      return false;
+    }
+    
+    // 2. To Date is optional
+    if (appliedFilters.toDate) {
+      if (recordDateStr > appliedFilters.toDate) return false;
+    } else {
+      // If only From Date is selected, show records from that date until today
+      if (recordDateStr > todayStr) return false;
+    }
+    
+    // 3. Staff is optional
+    if (appliedFilters.staffId) {
+      if (r.staffId?._id !== appliedFilters.staffId) return false;
+    }
+    
+    return true;
   });
 
   /* ─── derived: is the current form in leave mode? ──────── */
@@ -157,15 +257,97 @@ const Attendance = () => {
           <p className="text-sm text-gray-600 mt-1">Track daily staff check-ins, check-outs, and leaves.</p>
         </div>
 
-        {/* Date filter */}
-        <div className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-white border border-gray-200 shadow-sm">
-          <label className="text-xs font-cinzel font-bold uppercase tracking-wide text-gray-700">Filter:</label>
-          <input
-            type="date"
-            value={filterDate}
-            onChange={(e) => setFilterDate(e.target.value)}
-            className="border-none bg-transparent focus:outline-none focus:ring-0 font-cormorant text-lg text-gray-800 cursor-pointer"
-          />
+      </div>
+
+      {/* ── Advanced Filter & Export Panel ── */}
+      <div className="bg-white rounded-xl shadow-[0_2px_15px_rgba(0,0,0,0.04)] p-6 mb-8 border border-gray-100">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-5 pb-3 border-b border-gray-100 gap-3">
+          <h2 className="text-sm font-cinzel font-bold uppercase tracking-wide text-gray-700">
+            Search &amp; Filter History
+          </h2>
+          {/* Excel Export Button */}
+          <button
+            onClick={handleExportExcel}
+            disabled={filteredRecords.length === 0}
+            className={`flex items-center gap-2 px-5 py-2 rounded-lg font-cinzel text-xs font-bold uppercase tracking-widest transition-all border ${
+              filteredRecords.length > 0
+                ? 'bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100 cursor-pointer'
+                : 'bg-gray-50 text-gray-400 border-gray-200 cursor-not-allowed opacity-50'
+            }`}
+          >
+            <Download size={14} className={filteredRecords.length > 0 ? 'text-emerald-600' : 'text-gray-400'} />
+            Excel Export
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
+          {/* From Date */}
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-cinzel font-semibold uppercase tracking-wide text-gray-700">
+              From Date <span className="text-amber-600">*</span>
+            </label>
+            <input
+              type="date"
+              value={filterForm.fromDate}
+              onChange={(e) => setFilterForm({ ...filterForm, fromDate: e.target.value })}
+              className="w-full p-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-1 focus:ring-[#FFD700]/30 bg-gray-50 font-cormorant text-lg text-gray-800 transition-colors"
+            />
+          </div>
+
+          {/* To Date */}
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-cinzel font-semibold uppercase tracking-wide text-gray-700">
+              To Date <span className="text-xs font-normal text-gray-400 ml-1">(Optional)</span>
+            </label>
+            <input
+              type="date"
+              value={filterForm.toDate}
+              onChange={(e) => setFilterForm({ ...filterForm, toDate: e.target.value })}
+              className="w-full p-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-1 focus:ring-[#FFD700]/30 bg-gray-50 font-cormorant text-lg text-gray-800 transition-colors"
+            />
+          </div>
+
+          {/* Staff filter */}
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-cinzel font-semibold uppercase tracking-wide text-gray-700">
+              Select Staff <span className="text-xs font-normal text-gray-400 ml-1">(Optional)</span>
+            </label>
+            <select
+              value={filterForm.staffId}
+              onChange={(e) => setFilterForm({ ...filterForm, staffId: e.target.value })}
+              className="w-full p-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-1 focus:ring-[#FFD700]/30 bg-gray-50 font-cormorant text-lg text-gray-800 transition-colors"
+            >
+              <option value="">-- All Staff --</option>
+              {staffList.map((s) => (
+                <option key={s._id} value={s._id}>
+                  {s.name}{s.staffId ? ` - ${s.staffId}` : ''}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Action buttons */}
+          <div className="flex gap-3">
+            <button
+              onClick={handleApplyFilter}
+              disabled={!filterForm.fromDate}
+              className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg font-cinzel text-xs font-bold uppercase tracking-wider transition-colors shadow-sm ${
+                filterForm.fromDate
+                  ? 'bg-[#111] text-white hover:bg-gray-800 cursor-pointer'
+                  : 'bg-gray-100 text-gray-400 cursor-not-allowed border border-gray-200'
+              }`}
+            >
+              <Search size={14} className={filterForm.fromDate ? 'text-[#FFD700]' : 'text-gray-400'} />
+              Apply
+            </button>
+            <button
+              onClick={handleResetFilter}
+              className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg font-cinzel text-xs font-bold uppercase tracking-wider border border-gray-200 text-gray-600 bg-white hover:bg-gray-50 transition-colors cursor-pointer"
+            >
+              <RotateCcw size={14} />
+              Reset
+            </button>
+          </div>
         </div>
       </div>
 
