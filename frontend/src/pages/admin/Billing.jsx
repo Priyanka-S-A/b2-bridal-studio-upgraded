@@ -36,6 +36,15 @@ export default function Billing() {
   const [successBill, setSuccessBill] = useState(null); // { bill, revenueCreated }
   const [error, setError] = useState('');
 
+  /* discount states */
+  const [discountType, setDiscountType] = useState('none'); // 'none' | 'coupon' | 'manual'
+  const [couponCode, setCouponCode] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState(null);
+  const [couponError, setCouponError] = useState('');
+  const [isCouponValidating, setIsCouponValidating] = useState(false);
+  const [manualDiscount, setManualDiscount] = useState('');
+
+
   /* ─── fetch catalogue ──────────────────────────────────────── */
   const fetchCatalogue = useCallback(async () => {
     setLoadingCat(true);
@@ -98,6 +107,44 @@ export default function Billing() {
   /* ─── remove item ──────────────────────────────────────────── */
   const removeItem = (id) => setBillItems(prev => prev.filter(i => i.id !== id));
 
+  // Reset or adjust manual discount if it exceeds new originalTotal
+  useEffect(() => {
+    const totalRaw = billItems.reduce((sum, item) => sum + (item.price * (item.quantity || 1)), 0);
+    if (discountType === 'manual' && Number(manualDiscount) > totalRaw) {
+      setManualDiscount('');
+      setCouponError('');
+    }
+  }, [billItems, discountType, manualDiscount]);
+
+  const handleApplyCoupon = async () => {
+    setCouponError('');
+    if (!couponCode.trim()) return;
+    setIsCouponValidating(true);
+    try {
+      const res = await fetch(`${API}/api/coupons/validate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: couponCode.trim() }),
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Invalid coupon code');
+      }
+      const data = await res.json();
+      setAppliedCoupon({
+        code: couponCode.trim().toUpperCase(),
+        discountPercentage: data.discountPercentage
+      });
+      setCouponError('');
+    } catch (err) {
+      setCouponError(err.message);
+      setAppliedCoupon(null);
+    } finally {
+      setIsCouponValidating(false);
+    }
+  };
+
+
   /* ─── totals ───────────────────────────────────────────────── */
   const calculatedTotals = billItems.reduce((acc, item) => {
     const qty = item.quantity || 1;
@@ -114,9 +161,20 @@ export default function Billing() {
     return acc;
   }, { subtotal: 0, gst: 0, total: 0 });
 
-  const subtotalBase = Math.round(calculatedTotals.subtotal * 100) / 100;
-  const gstAmount = Math.round(calculatedTotals.gst * 100) / 100;
-  const total = Math.round(calculatedTotals.total * 100) / 100;
+  const originalAmount = Math.round(calculatedTotals.total * 100) / 100;
+  
+  let discountAmount = 0;
+  if (discountType === 'coupon' && appliedCoupon) {
+    discountAmount = Math.round((originalAmount * appliedCoupon.discountPercentage / 100) * 100) / 100;
+  } else if (discountType === 'manual' && manualDiscount) {
+    discountAmount = Number(manualDiscount) || 0;
+  }
+
+  const discountRatio = originalAmount > 0 ? (originalAmount - discountAmount) / originalAmount : 1;
+  const subtotalBase = Math.round(calculatedTotals.subtotal * discountRatio * 100) / 100;
+  const gstAmount = Math.round(calculatedTotals.gst * discountRatio * 100) / 100;
+  const finalTotal = Math.round((originalAmount - discountAmount) * 100) / 100;
+
 
   /* ─── generate bill ────────────────────────────────────────── */
   const handleGenerateBill = async () => {
@@ -128,10 +186,15 @@ export default function Billing() {
         items: billItems.map(i => ({ name: i.name, price: i.price, quantity: i.quantity, itemType: i.itemType, gstPercentage: i.gstPercentage || 0 })),
         subtotal: subtotalBase,
         gst: gstAmount,
-        total,
+        total: finalTotal,
         source,
         paymentMethod,
         customer: customer.trim() || 'Walk-in',
+        originalAmount,
+        discountType,
+        couponCode: discountType === 'coupon' && appliedCoupon ? appliedCoupon.code : undefined,
+        discountAmount,
+        finalAmountPaid: finalTotal
       };
 
       const res = await fetch(`${API}/api/billing/offline`, {
@@ -216,16 +279,34 @@ export default function Billing() {
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(100, 100, 100);
     let cursorY = finalY + 6;
-    if (bill.gst && bill.gst > 0) {
-      doc.text(`Service Total: Rs.${bill.subtotal.toFixed(2)}`, 193, cursorY, { align: 'right' });
+
+    // Service Total (Original pre-discount total)
+    const displayOriginalAmount = bill.originalAmount || bill.total + (bill.discountAmount || 0);
+    doc.text(`Service Total: Rs.${displayOriginalAmount.toFixed(2)}`, 193, cursorY, { align: 'right' });
+    cursorY += 6;
+
+    // Coupon or manual discount line-items
+    if (bill.discountAmount && bill.discountAmount > 0) {
+      doc.setTextColor(34, 139, 34); // Forest green
+      if (bill.discountType === 'coupon' || bill.couponCode) {
+        doc.text(`Coupon Applied (${bill.couponCode}): -Rs.${bill.discountAmount.toFixed(2)}`, 193, cursorY, { align: 'right' });
+      } else if (bill.discountType === 'manual') {
+        doc.text(`Manual Discount: -Rs.${bill.discountAmount.toFixed(2)}`, 193, cursorY, { align: 'right' });
+      }
       cursorY += 6;
+    }
+
+    if (bill.gst && bill.gst > 0) {
+      doc.setTextColor(100, 100, 100);
       doc.text(`GST Included: Rs.${bill.gst.toFixed(2)}`, 193, cursorY, { align: 'right' });
       cursorY += 6;
     }
+    
+    cursorY += 2;
     doc.setFontSize(13);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(20, 20, 20);
-    doc.text(`Total: Rs.${bill.total.toFixed(2)}`, 193, cursorY + 2, { align: 'right' });
+    doc.text(`Final Amount Paid: Rs.${bill.total.toFixed(2)}`, 193, cursorY, { align: 'right' });
 
     // Footer
     doc.setFontSize(8);
@@ -347,6 +428,101 @@ export default function Billing() {
                 <option value="upi">UPI</option>
                 <option value="card">Card</option>
               </select>
+            </div>
+
+            {/* Discount selector & input */}
+            <div className="pt-4 mt-2" style={{ borderTop: '1px solid rgba(0,0,0,0.06)' }}>
+              <label className="block text-xs font-cinzel font-semibold uppercase tracking-wide text-gray-700 mb-2">Discount Option</label>
+              <div className="flex gap-2 mb-3">
+                {[
+                  { key: 'none', label: 'None' },
+                  { key: 'coupon', label: 'Coupon' },
+                  { key: 'manual', label: 'Manual' }
+                ].map(opt => (
+                  <button
+                    key={opt.key}
+                    type="button"
+                    onClick={() => {
+                      setDiscountType(opt.key);
+                      setCouponError('');
+                      if (opt.key !== 'coupon') {
+                        setCouponCode('');
+                        setAppliedCoupon(null);
+                      }
+                      if (opt.key !== 'manual') {
+                        setManualDiscount('');
+                      }
+                    }}
+                    className={`flex-grow py-2 rounded-lg font-cinzel text-[0.65rem] font-bold uppercase tracking-wider transition-all border ${
+                      discountType === opt.key
+                        ? 'bg-[#111] text-amber-400 border-black shadow-sm'
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200 border-transparent'
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+
+              {discountType === 'coupon' && (
+                <div className="space-y-2 p-3 bg-amber-50/40 border border-amber-200/40 rounded-lg">
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      placeholder="ENTER COUPON CODE"
+                      value={couponCode}
+                      onChange={e => setCouponCode(e.target.value.toUpperCase())}
+                      className="flex-grow border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white text-gray-900 focus:outline-none focus:border-amber-400 font-cinzel uppercase"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleApplyCoupon}
+                      disabled={isCouponValidating || !couponCode.trim()}
+                      className="px-4 py-2 rounded-lg font-cinzel text-xs font-bold uppercase bg-[#111] text-white disabled:opacity-50"
+                    >
+                      {isCouponValidating ? 'Checking...' : 'Apply'}
+                    </button>
+                  </div>
+                  {couponError && <p className="text-red-500 text-xs font-inter">{couponError}</p>}
+                  {appliedCoupon && (
+                    <p className="text-green-600 text-xs font-semibold font-inter flex items-center gap-1">
+                      <CheckCircle size={12} /> Coupon "{appliedCoupon.code}" applied! ({appliedCoupon.discountPercentage}% off)
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {discountType === 'manual' && (
+                <div className="p-3 bg-amber-50/40 border border-amber-200/40 rounded-lg space-y-2">
+                  <label className="block text-xs font-cinzel font-semibold text-gray-500 uppercase">Discount Amount (₹)</label>
+                  <input
+                    type="number"
+                    min={0}
+                    max={originalAmount}
+                    placeholder="Enter discount amount"
+                    value={manualDiscount}
+                    onChange={e => {
+                      const val = e.target.value;
+                      if (val === '') {
+                        setManualDiscount(val);
+                        setCouponError('');
+                      } else {
+                        const num = Number(val);
+                        if (num >= 0 && num <= originalAmount) {
+                          setManualDiscount(val);
+                          setCouponError('');
+                        } else if (num < 0) {
+                          setCouponError('Negative values not allowed');
+                        } else {
+                          setCouponError(`Discount cannot exceed total amount (₹${originalAmount})`);
+                        }
+                      }
+                    }}
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2.5 bg-white text-gray-900 focus:outline-none focus:border-amber-400 text-sm"
+                  />
+                  {couponError && <p className="text-red-500 text-xs font-inter">{couponError}</p>}
+                </div>
+              )}
             </div>
           </div>
 
@@ -514,21 +690,30 @@ export default function Billing() {
 
           {/* Total + generate */}
           <div className="border-t border-gray-100 p-5">
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-xs font-cinzel font-bold uppercase tracking-wide text-gray-500">Service Total</span>
+              <span className="text-sm font-semibold text-gray-900">₹{originalAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+            </div>
+
+            {discountAmount > 0 && (
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-xs font-cinzel font-bold uppercase tracking-wide text-green-600">
+                  {discountType === 'coupon' ? `Coupon Applied (${appliedCoupon?.code})` : 'Manual Discount'}
+                </span>
+                <span className="text-sm font-semibold text-green-600">-₹{discountAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+              </div>
+            )}
+
             {gstAmount > 0 ? (
-              <>
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-xs font-cinzel font-bold uppercase tracking-wide text-gray-500">Service Total</span>
-                  <span className="text-sm font-semibold text-gray-900">₹{subtotalBase.toLocaleString()}</span>
-                </div>
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-xs font-cinzel font-bold uppercase tracking-wide text-gray-500">GST Included</span>
-                  <span className="text-sm font-semibold text-gray-900">₹{gstAmount.toLocaleString()}</span>
-                </div>
-              </>
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-xs font-cinzel font-bold uppercase tracking-wide text-gray-500">GST Included</span>
+                <span className="text-sm font-semibold text-gray-900">₹{gstAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+              </div>
             ) : null}
-            <div className="flex justify-between items-center mb-4 pt-2" style={{ borderTop: gstAmount > 0 ? '1px solid rgba(0,0,0,0.06)' : 'none' }}>
-              <span className="text-sm font-cinzel font-bold uppercase tracking-wide text-gray-700">Total</span>
-              <span className="text-2xl font-bold text-gray-900 font-cinzel">₹{total.toLocaleString()}</span>
+
+            <div className="flex justify-between items-center mb-4 pt-2" style={{ borderTop: '1px solid rgba(0,0,0,0.06)' }}>
+              <span className="text-sm font-cinzel font-bold uppercase tracking-wide text-gray-700">Final Amount Paid</span>
+              <span className="text-2xl font-bold text-gray-900 font-cinzel">₹{finalTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
             </div>
 
             <div className="flex items-center justify-between text-xs text-gray-600 mb-4">

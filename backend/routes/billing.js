@@ -126,12 +126,28 @@ router.post('/generate-from-booking/:id', verifyToken, verifyRole(['staff', 'own
 // ─── POST /offline — Create offline bill + Revenue (Admin/Staff) ─────────────
 router.post('/offline', verifyToken, verifyRole(['staff', 'owner']), async (req, res) => {
   try {
-    const { items, total, source, paymentMethod, customer, subtotal: reqSubtotal, gst: reqGst } = req.body;
+    const { 
+      items, 
+      total, 
+      source, 
+      paymentMethod, 
+      customer,
+      originalAmount,
+      discountType,
+      couponCode,
+      discountAmount,
+      finalAmountPaid
+    } = req.body;
 
     if (!items || items.length === 0) {
       return res.status(400).json({ error: 'At least one item is required' });
     }
-    if (!total || total <= 0) {
+    
+    const preDiscountTotal = originalAmount || total;
+    const finalTotal = finalAmountPaid !== undefined ? finalAmountPaid : total;
+    const discountAmt = discountAmount || 0;
+
+    if (finalTotal <= 0 && preDiscountTotal <= 0) {
       return res.status(400).json({ error: 'Total must be greater than 0' });
     }
 
@@ -151,8 +167,17 @@ router.post('/offline', verifyToken, verifyRole(['staff', 'owner']), async (req,
       }
     });
 
-    const billSubtotal = Math.round(calculatedSubtotal * 100) / 100;
-    const billGst = Math.round(calculatedGst * 100) / 100;
+    let billSubtotal = calculatedSubtotal;
+    let billGst = calculatedGst;
+
+    if (discountAmt > 0 && preDiscountTotal > 0) {
+      const discountRatio = finalTotal / preDiscountTotal;
+      billSubtotal = calculatedSubtotal * discountRatio;
+      billGst = calculatedGst * discountRatio;
+    }
+
+    billSubtotal = Math.round(billSubtotal * 100) / 100;
+    billGst = Math.round(billGst * 100) / 100;
 
     // Create the bill
     const bill = new Bill({
@@ -160,11 +185,17 @@ router.post('/offline', verifyToken, verifyRole(['staff', 'owner']), async (req,
       items,
       subtotal: billSubtotal,
       gst: billGst,
-      total,
+      total: finalTotal,
       source: source || 'offline',
       paymentMethod: paymentMethod || 'cash',
       customer: customer || 'Walk-in',
-      customerDetails: { name: customer || 'Walk-in' }
+      customerDetails: { name: customer || 'Walk-in' },
+      originalAmount: preDiscountTotal,
+      originalTotal: preDiscountTotal,
+      discountType: discountType || 'none',
+      couponCode: couponCode || undefined,
+      discountAmount: discountAmt,
+      finalAmountPaid: finalTotal
     });
     await bill.save();
     console.log("Bill created:", bill._id);
@@ -174,7 +205,7 @@ router.post('/offline', verifyToken, verifyRole(['staff', 'owner']), async (req,
       const newRevenue = await Revenue.create({
         date: bill.date,
         customer: customer || 'Walk-in',
-        total,
+        total: finalTotal,
         source: source || 'offline',
         paymentMethod: paymentMethod || 'cash',
         billId: bill._id,

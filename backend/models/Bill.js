@@ -16,6 +16,9 @@ const billSchema = new mongoose.Schema({
   discountPercentage: { type: Number },
   discountAmount: { type: Number },
   originalTotal: { type: Number }, // pre-discount service total
+  originalAmount: { type: Number },
+  discountType: { type: String, enum: ['coupon', 'manual', 'none'], default: 'none' },
+  finalAmountPaid: { type: Number },
   date: { type: Date, default: Date.now },
   customerDetails: {
     name: String,

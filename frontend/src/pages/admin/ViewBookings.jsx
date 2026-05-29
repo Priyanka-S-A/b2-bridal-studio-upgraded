@@ -96,13 +96,18 @@ const ViewBookings = () => {
                     </span>
                   </td>
                   <td className="p-4 pr-6 text-right">
-                    <div className="font-bold text-gray-900 text-lg font-cinzel">₹{bill.total.toFixed(2)}</div>
-                    {bill.couponCode && bill.discountAmount > 0 && (
+                    <div className="font-bold text-gray-900 text-lg font-cinzel">
+                      ₹{(bill.finalAmountPaid !== undefined ? bill.finalAmountPaid : bill.total).toFixed(2)}
+                    </div>
+                    {bill.discountAmount && bill.discountAmount > 0 ? (
                       <div className="text-xs text-green-600 mt-1 font-medium">
-                        🏷️ {bill.couponCode} (-₹{bill.discountAmount.toFixed(2)})
+                        {bill.discountType === 'manual' ? (
+                          <span>💸 Manual Discount (-₹{bill.discountAmount.toFixed(2)})</span>
+                        ) : (
+                          <span>🏷️ {bill.couponCode} (-₹{bill.discountAmount.toFixed(2)})</span>
+                        )}
                       </div>
-                    )}
-
+                    ) : null}
                   </td>
                 </tr>
               ))}
