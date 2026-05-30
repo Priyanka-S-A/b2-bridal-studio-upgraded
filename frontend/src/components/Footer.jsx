@@ -198,7 +198,7 @@ const Footer = () => {
                     {item.text}
                   </a>
                 ) : (
-                  <span className="font-cormorant leading-snug" style={{ fontSize: '0.95rem', color: 'rgba(248,245,240,0.92)' }}>
+                  <span className="font-cormorant leading-snug" style={{ fontSize: '0.95rem', color: 'rgba(248,245,240,0.92)', fontFamily: /^\d/.test(item.text) ? '"Times New Roman", Times, serif' : undefined }}>
                     {item.text}
                   </span>
                 )}
