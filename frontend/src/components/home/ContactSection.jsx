@@ -214,11 +214,11 @@ const ContactSection = () => {
                   label: 'Phone',
                   value: (
                     <span className="flex flex-col sm:flex-row sm:flex-wrap items-start sm:items-center gap-1 sm:gap-2" style={{ fontFamily: '"Times New Roman", Times, serif' }}>
-                      <span>99628 38303</span>
+                      <span>9361527951</span>
                       <span className="hidden sm:inline opacity-40">/</span>
-                      <span>97908 82561</span>
+                      <span>9962838303</span>
                       <span className="hidden sm:inline opacity-40">/</span>
-                      <span>93615 27951</span>
+                      <span>9790882561</span>
                     </span>
                   ),
                 },
