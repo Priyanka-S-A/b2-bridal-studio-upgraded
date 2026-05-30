@@ -47,9 +47,6 @@ const ConfirmBooking = () => {
     const e = {};
     if (!form.name.trim()) e.name = 'Name is required';
     if (!/^\d{10}$/.test(form.phone)) e.phone = 'Enter valid 10-digit WhatsApp number';
-    if (!form.upiId.trim()) e.upiId = 'UPI ID is required';
-    if (!form.transactionId.trim()) e.transactionId = 'Transaction ID is required';
-    if (!paymentProof) e.paymentProof = 'Payment proof is required';
     if (items.length === 0) e.items = 'Cart is empty';
     setErrors(e);
     return Object.keys(e).length === 0;
@@ -183,14 +180,14 @@ const ConfirmBooking = () => {
 
               {/* UPI ID */}
               <div>
-                <label className="block font-cinzel text-[0.55rem] tracking-[0.2em] uppercase mb-2" style={{ color: 'rgba(255,195,0,0.5)' }}>Your UPI ID *</label>
+                <label className="block font-cinzel text-[0.55rem] tracking-[0.2em] uppercase mb-2" style={{ color: 'rgba(255,195,0,0.5)' }}>Your UPI ID (Optional)</label>
                 <input type="text" value={form.upiId} onChange={e => setForm({...form, upiId: e.target.value})} className="input-luxury rounded-sm" placeholder="yourname@upi" />
                 {errors.upiId && <span className="text-xs mt-1 block" style={{ color: '#ef4444' }}>{errors.upiId}</span>}
               </div>
 
               {/* Transaction ID */}
               <div>
-                <label className="block font-cinzel text-[0.55rem] tracking-[0.2em] uppercase mb-2" style={{ color: 'rgba(255,195,0,0.5)' }}>Transaction ID *</label>
+                <label className="block font-cinzel text-[0.55rem] tracking-[0.2em] uppercase mb-2" style={{ color: 'rgba(255,195,0,0.5)' }}>Transaction ID (Optional)</label>
                 <input type="text" value={form.transactionId} onChange={e => setForm({...form, transactionId: e.target.value})} className="input-luxury rounded-sm" placeholder="UPI transaction reference" />
                 {errors.transactionId && <span className="text-xs mt-1 block" style={{ color: '#ef4444' }}>{errors.transactionId}</span>}
               </div>
@@ -206,7 +203,7 @@ const ConfirmBooking = () => {
 
               {/* Payment Proof */}
               <div>
-                <label className="block font-cinzel text-[0.55rem] tracking-[0.2em] uppercase mb-2" style={{ color: 'rgba(255,195,0,0.5)' }}>Payment Proof (Screenshot/PDF) *</label>
+                <label className="block font-cinzel text-[0.55rem] tracking-[0.2em] uppercase mb-2" style={{ color: 'rgba(255,195,0,0.5)' }}>Payment Proof (Screenshot/PDF) (Optional)</label>
                 
                 <label 
                   htmlFor="paymentProofInput"

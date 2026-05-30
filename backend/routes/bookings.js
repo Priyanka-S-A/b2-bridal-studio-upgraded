@@ -36,7 +36,7 @@ router.post('/', upload.single('paymentProof'), async (req, res) => {
       gstAmount
     } = req.body;
 
-    if (!name || !phone || !upiId || !transactionId || !branch || !total) {
+    if (!name || !phone || !branch || !total) {
       return res.status(400).json({ error: 'Missing required booking fields' });
     }
 

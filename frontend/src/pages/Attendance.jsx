@@ -68,17 +68,17 @@ const Attendance = () => {
     const newErrors = {};
     if (!form.staffId) newErrors.staffId = 'Please select a staff member';
     if (!form.date)    newErrors.date    = 'Please select a date';
-
+ 
     if (form.status === 'Present') {
       if (!form.entryTime) {
         newErrors.entryTime = 'Entry time is required for Present records';
       }
-    } else if (form.status === 'Leave') {
+    } else if (['Leave', 'Absent', 'Permission'].includes(form.status)) {
       if (!form.leaveReason || !form.leaveReason.trim()) {
-        newErrors.leaveReason = 'Leave reason is required for Leave records';
+        newErrors.leaveReason = `${form.status} details/reason are required`;
       }
     }
-
+ 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -87,14 +87,14 @@ const Attendance = () => {
   const handleAdd = async () => {
     if (!validate()) return;
 
-    const isLeave = form.status === 'Leave';
-
+    const isPresent = form.status === 'Present';
+ 
     // Build a clean, explicit payload — no undefined values sent
-    const payload = isLeave
+    const payload = !isPresent
       ? {
           staffId:     form.staffId,
           date:        form.date,
-          status:      'Leave',
+          status:      form.status,
           leaveReason: form.leaveReason.trim(),
           exitLocked:  false,
         }
@@ -239,7 +239,7 @@ const Attendance = () => {
   });
 
   /* ─── derived: is the current form in leave mode? ──────── */
-  const leaveMode = form.status === 'Leave';
+  const leaveMode = form.status !== 'Present';
 
   /* ═══════════════════════════════════════════════════════════
      RENDER
@@ -357,7 +357,7 @@ const Attendance = () => {
           className="text-sm font-cinzel font-bold uppercase tracking-wide mb-5 pb-3 text-gray-700"
           style={{ borderBottom: '1px solid rgba(0,0,0,0.06)' }}
         >
-          {leaveMode ? 'Log Staff Leave' : 'Mark Attendance'}
+          {form.status === 'Present' ? 'Mark Attendance' : `Log Staff ${form.status}`}
         </h2>
 
         {/* Row 1 — always-visible fields (Staff & Date) */}
@@ -422,35 +422,28 @@ const Attendance = () => {
           <label className="text-xs font-cinzel font-bold uppercase tracking-wide text-gray-700">
             Attendance Type <span className="text-amber-600">*</span>
           </label>
-          <div className="flex bg-gray-50 p-1 rounded-xl w-full max-w-md border border-gray-200">
-            <button
-              type="button"
-              onClick={() => {
-                setForm({ ...form, status: 'Present' });
-                if (errors.leaveReason) setErrors({ ...errors, leaveReason: null });
-              }}
-              className={`flex-1 py-2.5 px-6 rounded-lg font-cinzel text-xs font-bold uppercase tracking-widest transition-all ${
-                form.status === 'Present'
-                  ? 'bg-[#111] text-white shadow-md'
-                  : 'text-gray-600 hover:text-gray-900 bg-transparent'
-              }`}
-            >
-              Present
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setForm({ ...form, status: 'Leave' });
-                if (errors.entryTime) setErrors({ ...errors, entryTime: null });
-              }}
-              className={`flex-1 py-2.5 px-6 rounded-lg font-cinzel text-xs font-bold uppercase tracking-widest transition-all ${
-                form.status === 'Leave'
-                  ? 'bg-[#111] text-white shadow-md'
-                  : 'text-gray-600 hover:text-gray-900 bg-transparent'
-              }`}
-            >
-              Leave
-            </button>
+          <div className="flex bg-gray-50 p-1 rounded-xl w-full max-w-2xl border border-gray-200 flex-wrap gap-1 md:gap-0">
+            {['Present', 'Leave', 'Absent', 'Permission'].map((type) => (
+              <button
+                key={type}
+                type="button"
+                onClick={() => {
+                  setForm({ ...form, status: type });
+                  if (type === 'Present') {
+                    if (errors.leaveReason) setErrors({ ...errors, leaveReason: null });
+                  } else {
+                    if (errors.entryTime) setErrors({ ...errors, entryTime: null });
+                  }
+                }}
+                className={`flex-1 py-2.5 px-4 rounded-lg font-cinzel text-[0.65rem] font-bold uppercase tracking-widest transition-all min-w-[100px] ${
+                  form.status === type
+                    ? 'bg-[#111] text-white shadow-md'
+                    : 'text-gray-600 hover:text-gray-900 bg-transparent'
+                }`}
+              >
+                {type}
+              </button>
+            ))}
           </div>
         </div>
 
@@ -496,13 +489,13 @@ const Attendance = () => {
         )}
 
         {/* Row 3 — Leave Flow Fields */}
-        {form.status === 'Leave' && (
+        {form.status !== 'Present' && (
           <div className="flex flex-col gap-1.5 mb-6">
             <label className="text-xs font-cinzel font-semibold uppercase tracking-wide text-gray-700">
-              Leave Reason <span className="text-amber-600">*</span>
+              {form.status} Reason/Details <span className="text-amber-600">*</span>
             </label>
             <textarea
-              placeholder="e.g. Sick leave, Personal emergency..."
+              placeholder={`e.g. Reason for ${form.status.toLowerCase()}...`}
               value={form.leaveReason}
               onChange={(e) => {
                 setForm({ ...form, leaveReason: e.target.value });
@@ -573,8 +566,12 @@ const Attendance = () => {
                       {/* Status badge */}
                       <td className="p-4">
                         <span className={`px-2.5 py-1 rounded-full text-xs font-bold border ${
-                          isLeave
+                          r.status === 'Leave'
                             ? 'bg-amber-50 text-amber-700 border-amber-300'
+                            : r.status === 'Absent'
+                            ? 'bg-red-50 text-red-700 border-red-200'
+                            : r.status === 'Permission'
+                            ? 'bg-indigo-50 text-indigo-700 border-indigo-200'
                             : 'bg-green-50 text-green-700 border-green-200'
                         }`}>
                           {r.status || 'Present'}
@@ -627,10 +624,18 @@ const Attendance = () => {
 
                       {/* Actions */}
                       <td className="p-4 pr-6 text-right">
-                        {isLeave ? (
-                          /* ── Leave records: never show edit exit ── */
-                          <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-600 border border-amber-200">
-                            Leave
+                        {r.status !== 'Present' ? (
+                          /* ── Non-present records: never show edit exit ── */
+                          <span className={`px-2.5 py-1 rounded-full text-xs font-bold border ${
+                            r.status === 'Leave'
+                              ? 'bg-amber-50 text-amber-600 border-amber-200'
+                              : r.status === 'Absent'
+                              ? 'bg-red-50 text-red-600 border-red-200'
+                              : r.status === 'Permission'
+                              ? 'bg-indigo-50 text-indigo-600 border-indigo-200'
+                              : 'bg-green-50 text-green-600 border-green-200'
+                          }`}>
+                            {r.status}
                           </span>
                         ) : r.exitLocked ? (
                           /* ── Locked present records ── */
