@@ -200,12 +200,12 @@ const Footer = () => {
                     target="_blank"
                     rel="noopener noreferrer"
                     className="font-cormorant leading-snug transition-colors duration-200 hover:text-[#FFD700]"
-                    style={{ fontSize: '0.95rem', color: 'rgba(248,245,240,0.92)', textDecoration: 'none' }}
+                    style={{ fontSize: '0.95rem', color: 'rgba(248,245,240,0.92)', textDecoration: 'none', fontFamily: '"Times New Roman", Times, serif' }}
                   >
                     {item.text}
                   </a>
                 ) : (
-                  <span className="font-cormorant leading-snug" style={{ fontSize: '0.95rem', color: 'rgba(248,245,240,0.92)', fontFamily: /^\d/.test(item.text) ? '"Times New Roman", Times, serif' : undefined }}>
+                  <span className="font-cormorant leading-snug" style={{ fontSize: '0.95rem', color: 'rgba(248,245,240,0.92)', fontFamily: '"Times New Roman", Times, serif' }}>
                     {item.text}
                   </span>
                 )}

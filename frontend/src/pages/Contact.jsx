@@ -109,12 +109,12 @@ const Contact = () => {
                         target="_blank"
                         rel="noopener noreferrer"
                         className="font-cormorant text-lg leading-snug transition-colors duration-200 hover:text-[#FFD700]"
-                        style={{ color: 'rgba(248,245,240,0.9)', textDecoration: 'none' }}
+                        style={{ color: 'rgba(248,245,240,0.9)', textDecoration: 'none', fontFamily: '"Times New Roman", Times, serif' }}
                       >
                         {item.value}
                       </a>
                     ) : (
-                      <div className="font-cormorant text-lg leading-snug" style={{ color: 'rgba(248,245,240,0.9)' }}>{item.value}</div>
+                      <div className="font-cormorant text-lg leading-snug" style={{ color: 'rgba(248,245,240,0.9)', fontFamily: '"Times New Roman", Times, serif' }}>{item.value}</div>
                     )}
                   </div>
                 </div>
