@@ -108,13 +108,13 @@ const Contact = () => {
                         href={item.href}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-lg leading-snug transition-colors duration-200 hover:text-[#FFD700]"
-                        style={{ color: 'rgba(248,245,240,0.9)', textDecoration: 'none', fontFamily: '"Times New Roman", Times, serif', fontWeight: 'normal', fontStyle: 'normal', letterSpacing: 'normal' }}
+                        className="font-cormorant leading-snug transition-colors duration-200 hover:text-[#FFD700]"
+                        style={{ fontSize: '0.95rem', color: 'rgba(248,245,240,0.92)', textDecoration: 'none', fontFamily: '"Times New Roman", Times, serif' }}
                       >
                         {item.value}
                       </a>
                     ) : (
-                      <div className="text-lg leading-snug" style={{ color: 'rgba(248,245,240,0.9)', fontFamily: '"Times New Roman", Times, serif', fontWeight: 'normal', fontStyle: 'normal', letterSpacing: 'normal' }}>{item.value}</div>
+                      <span className="font-cormorant leading-snug" style={{ fontSize: '0.95rem', color: 'rgba(248,245,240,0.92)', fontFamily: '"Times New Roman", Times, serif' }}>{item.value}</span>
                     )}
                   </div>
                 </div>
