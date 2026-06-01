@@ -81,12 +81,29 @@ const Courses = () => {
   const { category } = useParams();
   const [selectedBranch, setSelectedBranch] = useState('branch1');
   const [dbCourses, setDbCourses] = useState([]);
+  const [toast, setToast] = useState({ show: false, message: '' });
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: '-5%' });
+
+  const triggerAuthToast = (message) => {
+    setToast({ show: true, message });
+    setTimeout(() => {
+      window.location.href = '/auth';
+    }, 2500);
+  };
 
   useEffect(() => {
     axios.get(`${API}/api/courses`).then(res => setDbCourses(res.data)).catch(() => { });
   }, []);
+
+  useEffect(() => {
+    if (toast.show) {
+      const timer = setTimeout(() => {
+        setToast(prev => ({ ...prev, show: false }));
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [toast]);
 
   const categoryData = category ? {
     title: CATEGORIES[category]?.title || category,
@@ -96,9 +113,22 @@ const Courses = () => {
   } : null;
 
   const handleEnroll = (course) => {
-    const userData = localStorage.getItem('user');
-    if (!userData) { alert('Please login first'); window.location.href = '/login'; return; }
-    const user = JSON.parse(userData);
+    const stored = localStorage.getItem('user');
+    let user = null;
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        if (parsed && parsed.name && (parsed.email || parsed.phone)) {
+          user = parsed;
+        }
+      } catch (e) {}
+    }
+
+    if (!user) {
+      triggerAuthToast('Please login with your account details to enroll.');
+      return;
+    }
+
     const message = `*Course Enrollment*%0A%0A*Customer:* ${user.name}%0APhone: ${user.phone}%0AEmail: ${user.email}%0A%0A*Category:* ${categoryData.title}%0A*Course:* ${course.title}%0A*Duration:* ${course.duration}%0A*Branch:* ${selectedBranch === 'branch1' ? 'Chennai' : 'Madurai'}%0A%0APlease send QR code for fee payment.`;
     window.open(`https://wa.me/919361527951?text=${message}`, '_blank');
   };
@@ -260,6 +290,71 @@ const Courses = () => {
           ))}
         </div>
       </div>
+      <AnimatePresence>
+        {toast.show && (
+          <>
+            {/* Mobile Toast */}
+            <motion.div
+              key="mobile-toast"
+              initial={{ opacity: 0, y: 50, x: '-50%' }}
+              animate={{ opacity: 1, y: 0, x: '-50%' }}
+              exit={{ opacity: 0, y: 20, x: '-50%' }}
+              transition={{ duration: 0.3, ease: 'easeOut' }}
+              className="fixed bottom-6 left-1/2 z-[9999] lg:hidden w-[90%] max-w-md"
+            >
+              <div className="glass-dark border-gold-glow px-4 py-3 rounded-md flex items-center justify-between shadow-2xl relative overflow-hidden" style={{ background: 'rgba(10, 10, 10, 0.95)' }}>
+                <div className="flex items-center gap-3">
+                  <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center" style={{ background: 'rgba(248,113,113,0.1)', border: '1px solid rgba(248,113,113,0.3)' }}>
+                    <span style={{ color: '#f87171', fontSize: '16px' }}>⚠</span>
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-playfair text-[0.85rem] font-semibold leading-snug" style={{ color: '#F8F5F0' }}>
+                      {toast.message}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setToast(prev => ({ ...prev, show: false }))}
+                  className="ml-3 transition-colors text-xs font-sans px-2 py-1 rounded"
+                  style={{ color: 'rgba(248, 245, 240, 0.5)' }}
+                >
+                  ✕
+                </button>
+              </div>
+            </motion.div>
+
+            {/* Desktop Toast */}
+            <motion.div
+              key="desktop-toast"
+              initial={{ opacity: 0, x: 100 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 50 }}
+              transition={{ duration: 0.3, ease: 'easeOut' }}
+              className="fixed top-24 right-6 z-[9999] hidden lg:block w-full max-w-sm"
+            >
+              <div className="glass-dark border-gold-glow px-4 py-3 rounded-md flex items-center justify-between shadow-2xl relative overflow-hidden" style={{ background: 'rgba(10, 10, 10, 0.95)' }}>
+                <div className="flex items-center gap-3">
+                  <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center" style={{ background: 'rgba(248,113,113,0.1)', border: '1px solid rgba(248,113,113,0.3)' }}>
+                    <span style={{ color: '#f87171', fontSize: '16px' }}>⚠</span>
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-playfair text-[0.85rem] font-semibold leading-snug" style={{ color: '#F8F5F0' }}>
+                      {toast.message}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setToast(prev => ({ ...prev, show: false }))}
+                  className="ml-3 transition-colors text-xs font-sans px-2 py-1 rounded"
+                  style={{ color: 'rgba(248, 245, 240, 0.5)' }}
+                >
+                  ✕
+                </button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

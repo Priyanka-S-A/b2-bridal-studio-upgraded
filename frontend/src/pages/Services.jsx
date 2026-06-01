@@ -253,6 +253,13 @@ const Services = () => {
   const [selectedOptions, setSelectedOptions] = useState({});
   const [toast, setToast] = useState({ show: false, message: '', serviceName: '' });
 
+  const triggerAuthToast = (message) => {
+    setToast({ show: true, message, serviceName: '', isWarning: true });
+    setTimeout(() => {
+      navigate('/auth');
+    }, 2500);
+  };
+
   // Sync state to localStorage
   useEffect(() => {
     localStorage.setItem('services_cart', JSON.stringify(cart));
@@ -374,7 +381,23 @@ const Services = () => {
   };
 
   const handleHairExtensionWhatsAppInquiry = (service) => {
-    const message = `Hello B2 Bridal Studio! I would like to inquire about the Hair Extension service "${service.name}". Please let me know the pricing and availability. Thank you!`;
+    const stored = localStorage.getItem('user');
+    let user = null;
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        if (parsed && parsed.name && (parsed.email || parsed.phone)) {
+          user = parsed;
+        }
+      } catch (e) {}
+    }
+
+    if (!user) {
+      triggerAuthToast('Please login with your account details to book or enquire.');
+      return;
+    }
+
+    const message = `Hello B2 Bridal Studio! I would like to inquire about the Hair Extension service "${service.name}". Prefilled Customer Info: Name: ${user.name}, Phone: ${user.phone || 'N/A'}, Email: ${user.email || 'N/A'}. Please let me know the pricing and availability. Thank you!`;
     const whatsappUrl = `https://wa.me/919361527951?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
   };
@@ -389,6 +412,22 @@ const Services = () => {
   const hasBridalService = cart.some(item => item.category === 'Bridal Services');
 
   const handleSingleServiceWhatsAppInquiry = (service, activeOption, categoryName) => {
+    const stored = localStorage.getItem('user');
+    let user = null;
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        if (parsed && parsed.name && (parsed.email || parsed.phone)) {
+          user = parsed;
+        }
+      } catch (e) {}
+    }
+
+    if (!user) {
+      triggerAuthToast('Please login with your account details to book or enquire.');
+      return;
+    }
+
     const serviceName = activeOption 
       ? `${service.name} - ${activeOption.name}` 
       : service.name;
@@ -422,12 +461,28 @@ const Services = () => {
       }
     }
 
-    const message = `Hello B2 Bridal Studio! I would like to inquire about booking the service "${serviceName}" (Price: ₹${price})${dateTimeInfo}.`;
+    const message = `Hello B2 Bridal Studio! I would like to inquire about booking the service "${serviceName}" (Price: ₹${price})${dateTimeInfo}. Prefilled Customer Info: Name: ${user.name}, Phone: ${user.phone || 'N/A'}, Email: ${user.email || 'N/A'}.`;
     const whatsappUrl = `https://wa.me/919361527951?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
   };
 
   const handleWhatsAppInquiry = () => {
+    const stored = localStorage.getItem('user');
+    let user = null;
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        if (parsed && parsed.name && (parsed.email || parsed.phone)) {
+          user = parsed;
+        }
+      } catch (e) {}
+    }
+
+    if (!user) {
+      triggerAuthToast('Please login with your account details to book or enquire.');
+      return;
+    }
+
     if (cart.length === 0) return;
 
     // Validation
@@ -455,7 +510,7 @@ const Services = () => {
     
     const timeLabel = HOUR_SLOTS.find(slot => slot.value === bookingTime)?.label || bookingTime;
 
-    const message = `Hello B2 Bridal Studio! I would like to inquire about Bridal Services (${bridalNames}) for ${formattedDate} at the ${bookingBranch} branch around ${timeLabel}.`;
+    const message = `Hello B2 Bridal Studio! I would like to inquire about Bridal Services (${bridalNames}) for ${formattedDate} at the ${bookingBranch} branch around ${timeLabel}. Prefilled Customer Info: Name: ${user.name}, Phone: ${user.phone || 'N/A'}, Email: ${user.email || 'N/A'}.`;
     
     const whatsappUrl = `https://wa.me/919361527951?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
