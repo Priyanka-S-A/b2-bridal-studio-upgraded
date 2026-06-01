@@ -227,15 +227,15 @@ const Auth = () => {
               style={{ width: '42px', height: '42px', objectFit: 'contain', filter: 'drop-shadow(0 0 4px rgba(212,175,55,0.4))' }}
             />
           </div>
-          <h1 className="font-cinzel text-lg tracking-[0.25em] uppercase font-bold" style={{ color: '#D4AF37' }}>B2 BRIDAL STUDIO</h1>
-          <p className="font-cormorant italic text-sm mt-1" style={{ color: 'rgba(248,245,240,0.6)' }}>Premium Salon & Academy Experience</p>
+          <h1 className="font-cinzel text-lg tracking-[0.25em] uppercase font-bold" style={{ color: '#FFD700' }}>B2 BRIDAL STUDIO</h1>
+          <p className="font-cormorant italic mt-1" style={{ color: '#ffffff', fontSize: '15px' }}>Premium Salon & Academy Experience</p>
         </motion.div>
 
         {/* Auth Card Container */}
         <motion.div
           variants={fadeUp}
           className="glass-dark p-8 rounded-sm transition-all duration-300"
-          style={{ border: '1px solid rgba(212,175,55,0.18)' }}
+          style={{ border: '1px solid rgba(255,215,0,0.18)' }}
         >
           {generalError && (
             <div className="mb-6 p-4 rounded-sm text-sm font-inter text-center" style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', color: '#ef4444' }}>
@@ -256,7 +256,7 @@ const Auth = () => {
               >
                 <div className="text-center mb-2">
                   <h2 className="font-cinzel text-sm tracking-[0.15em] uppercase" style={{ color: '#F8F5F0' }}>Sign In / Enroll</h2>
-                  <p className="font-cormorant italic text-xs mt-1" style={{ color: 'rgba(248,245,240,0.5)' }}>Select your preferred authentication method</p>
+                  <p className="font-cormorant italic mt-1" style={{ color: '#ffffff', fontSize: '13px' }}>Select your preferred authentication method</p>
                 </div>
 
                 {/* Google Button */}
@@ -272,15 +272,26 @@ const Auth = () => {
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <div className="flex-1 h-px" style={{ background: 'rgba(212,175,55,0.15)' }} />
-                  <span className="font-cormorant text-xs italic" style={{ color: 'rgba(248,245,240,0.4)' }}>or</span>
-                  <div className="flex-1 h-px" style={{ background: 'rgba(212,175,55,0.15)' }} />
+                  <div className="flex-1 h-px" style={{ background: 'rgba(255,215,0,0.15)' }} />
+                  <span className="font-cormorant italic" style={{ color: '#ffffff', fontSize: '13px' }}>or</span>
+                  <div className="flex-1 h-px" style={{ background: 'rgba(255,215,0,0.15)' }} />
                 </div>
 
                 {/* Continue with Email CTA */}
                 <button
                   onClick={() => setStep('emailForm')}
                   className="btn-outline-gold w-full justify-center text-xs py-3"
+                  style={{ color: '#FFD700', borderColor: 'rgba(255, 215, 0, 0.7)' }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.background = 'rgba(255, 215, 0, 0.14)';
+                    e.currentTarget.style.color = '#FFED8A';
+                    e.currentTarget.style.borderColor = '#FFD700';
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.background = 'transparent';
+                    e.currentTarget.style.color = '#FFD700';
+                    e.currentTarget.style.borderColor = 'rgba(255, 215, 0, 0.7)';
+                  }}
                 >
                   Continue with Email
                 </button>
@@ -300,7 +311,7 @@ const Auth = () => {
               >
                 <div className="text-center mb-2">
                   <h2 className="font-cinzel text-sm tracking-[0.15em] uppercase" style={{ color: '#F8F5F0' }}>Enter Details</h2>
-                  <p className="font-cormorant italic text-xs mt-1" style={{ color: 'rgba(248,245,240,0.5)' }}>Verify your email to continue</p>
+                  <p className="font-cormorant italic mt-1" style={{ color: '#ffffff', fontSize: '13px' }}>Verify your email to continue</p>
                 </div>
 
                 {/* Full Name */}
@@ -351,7 +362,7 @@ const Auth = () => {
                       (optional)
                     </span>
                   </label>
-                  <p className="font-cormorant italic text-[0.75rem] text-gray-400 mb-2">Enter DOB to receive offers in future</p>
+                  <p className="font-cormorant italic mb-2" style={{ color: '#ffffff', fontSize: '13px' }}>Enter DOB to receive offers in future</p>
                   <input
                     type="date"
                     value={form.dob}
@@ -379,7 +390,7 @@ const Auth = () => {
                       setGeneralError('');
                     }}
                     className="text-center font-cormorant text-sm italic py-1 transition-all duration-300 hover:text-[#FFD700] font-semibold"
-                    style={{ color: 'rgba(248,245,240,0.8)' }}
+                    style={{ color: '#ffffff' }}
                   >
                     Back to options
                   </button>
@@ -400,7 +411,7 @@ const Auth = () => {
               >
                 <div className="text-center">
                   <h2 className="font-cinzel text-sm tracking-[0.15em] uppercase" style={{ color: '#F8F5F0' }}>Verify Code</h2>
-                  <p className="font-cormorant italic text-xs mt-1" style={{ color: 'rgba(248,245,240,0.5)' }}>
+                  <p className="font-cormorant italic mt-1" style={{ color: '#ffffff', fontSize: '13px' }}>
                     Enter the 6-digit OTP sent to
                   </p>
                   <p className="font-inter text-xs text-gold-300 mt-0.5 select-all font-semibold">
@@ -476,7 +487,7 @@ const Auth = () => {
                       setGeneralError('');
                     }}
                     className="text-center font-cormorant text-sm italic py-1 transition-all duration-300 hover:text-[#FFD700] font-semibold"
-                    style={{ color: 'rgba(248,245,240,0.8)' }}
+                    style={{ color: '#ffffff' }}
                   >
                     Edit details or email
                   </button>
