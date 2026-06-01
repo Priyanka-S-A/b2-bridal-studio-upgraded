@@ -589,7 +589,7 @@ const Services = () => {
                                   )}
                                 </div>
                                 <span className="font-cinzel text-sm font-bold min-w-max ml-3 text-right" style={{ color: '#FFD700' }}>
-                                  {`₹${priceToDisplay}`}
+                                  {isHairExtensionCategory(category.category) ? `Starting From ₹${priceToDisplay}` : `₹${priceToDisplay}`}
                                   {serviceGst > 0 && (
                                     <span style={{ fontSize: '0.65rem', color: 'rgba(248,245,240,0.5)', display: 'block', textAlign: 'right', fontWeight: 'normal', textTransform: 'none' }}>
                                       (incl. GST)
