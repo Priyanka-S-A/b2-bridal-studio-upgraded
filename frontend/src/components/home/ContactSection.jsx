@@ -243,13 +243,25 @@ const ContactSection = () => {
                         href={item.href}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="font-cormorant text-base leading-snug transition-colors duration-200 hover:text-[#FFD700]"
-                        style={{ color: 'rgba(248,245,240,0.9)', textDecoration: 'none' }}
+                        className="leading-snug transition-colors duration-200 hover:text-[#FFD700]"
+                        style={{
+                          fontFamily: '"Times New Roman", Times, serif',
+                          fontSize: '17px',
+                          color: 'rgba(248,245,240,0.9)',
+                          textDecoration: 'none'
+                        }}
                       >
                         {item.value}
                       </a>
                     ) : (
-                      <div className="font-cormorant text-base leading-snug" style={{ color: 'rgba(248,245,240,0.9)' }}>
+                      <div
+                        className="leading-snug"
+                        style={{
+                          fontFamily: '"Times New Roman", Times, serif',
+                          fontSize: '17px',
+                          color: 'rgba(248,245,240,0.9)'
+                        }}
+                      >
                         {item.value}
                       </div>
                     )}
