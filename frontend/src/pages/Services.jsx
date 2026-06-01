@@ -589,10 +589,8 @@ const Services = () => {
                                   )}
                                 </div>
                                 <span className="font-cinzel text-sm font-bold min-w-max ml-3 text-right" style={{ color: '#FFD700' }}>
-                                  {isHairExtensionCategory(category.category)
-                                    ? 'Starting From ₹10,000'
-                                    : `₹${priceToDisplay}`}
-                                  {!isHairExtensionCategory(category.category) && serviceGst > 0 && (
+                                  {`₹${priceToDisplay}`}
+                                  {serviceGst > 0 && (
                                     <span style={{ fontSize: '0.65rem', color: 'rgba(248,245,240,0.5)', display: 'block', textAlign: 'right', fontWeight: 'normal', textTransform: 'none' }}>
                                       (incl. GST)
                                     </span>
@@ -607,7 +605,7 @@ const Services = () => {
                             </div>
                             {isHairExtensionCategory(category.category) ? (
                               <button
-                                onClick={() => handleHairExtensionWhatsAppInquiry(service)}
+                                onClick={() => handleSingleServiceWhatsAppInquiry(service, activeOption, category.category)}
                                 className="w-full py-2.5 font-cinzel text-[0.6rem] tracking-[0.15em] uppercase flex items-center justify-center gap-2 mt-2 transition-all rounded-sm"
                                 style={{
                                   border: 'none',
