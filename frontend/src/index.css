@@ -1551,3 +1551,89 @@ body {
   }
 }
 
+/* ═══════════════════════════════════════════════════════════
+   LARGE SCREEN RESPONSIVENESS
+   Progressive container scaling for larger displays.
+   At 1366px (14" laptop), current max-widths already fill
+   the viewport optimally — no changes needed there.
+   These min-width breakpoints scale containers upward so
+   the UI utilizes available space on bigger screens.
+   ═══════════════════════════════════════════════════════════ */
+
+/* ─── 1440px — 15" Laptops ─────────────────────────────── */
+@media (min-width: 1440px) {
+  .max-w-\[1100px\] { max-width: 1220px; }
+  .max-w-\[1200px\] { max-width: 1320px; }
+  .max-w-7xl        { max-width: 1380px; }
+  .max-w-\[1300px\] { max-width: 1380px; }
+  .hero-inner-container { max-width: 1400px !important; }
+  /* max-w-[1400px] already fits at this viewport, no override needed */
+}
+
+/* ─── 1536px — 15.6" Laptops ───────────────────────────── */
+@media (min-width: 1536px) {
+  .max-w-\[1100px\] { max-width: 1300px; }
+  .max-w-\[1200px\] { max-width: 1400px; }
+  .max-w-7xl        { max-width: 1460px; }
+  .max-w-\[1300px\] { max-width: 1460px; }
+  .hero-inner-container { max-width: 1480px !important; }
+  .max-w-\[1400px\] { max-width: 1500px; }
+}
+
+/* ─── 1600px — 16" Laptops ─────────────────────────────── */
+@media (min-width: 1600px) {
+  .max-w-\[1100px\] { max-width: 1380px; }
+  .max-w-\[1200px\] { max-width: 1460px; }
+  .max-w-7xl        { max-width: 1520px; }
+  .max-w-\[1300px\] { max-width: 1520px; }
+  .hero-inner-container { max-width: 1540px !important; }
+  .max-w-\[1400px\] { max-width: 1560px; }
+}
+
+/* ─── 1920px — 24" FHD Monitors ────────────────────────── */
+@media (min-width: 1920px) {
+  .max-w-\[1100px\] { max-width: 1580px; }
+  .max-w-\[1200px\] { max-width: 1680px; }
+  .max-w-7xl        { max-width: 1740px; }
+  .max-w-\[1300px\] { max-width: 1760px; }
+  .hero-inner-container { max-width: 1800px !important; }
+  .max-w-\[1400px\] { max-width: 1820px; }
+
+  /* Scale readable-width sub-containers proportionally */
+  .max-w-3xl { max-width: 920px; }
+  .max-w-4xl { max-width: 1080px; }
+
+  /* Increase section padding for visual breathing room */
+  .section-wrapper {
+    padding-left: 2.5rem;
+    padding-right: 2.5rem;
+  }
+  .page-hero {
+    padding-left: 2.5rem;
+    padding-right: 2.5rem;
+  }
+}
+
+/* ─── 2560px — 27" QHD / Ultra-wide Monitors ───────────── */
+@media (min-width: 2560px) {
+  .max-w-\[1100px\] { max-width: 1940px; }
+  .max-w-\[1200px\] { max-width: 2060px; }
+  .max-w-7xl        { max-width: 2160px; }
+  .max-w-\[1300px\] { max-width: 2240px; }
+  .hero-inner-container { max-width: 2360px !important; }
+  .max-w-\[1400px\] { max-width: 2400px; }
+
+  /* Scale sub-containers for ultra-wide readability */
+  .max-w-3xl { max-width: 1100px; }
+  .max-w-4xl { max-width: 1320px; }
+
+  /* Wider section padding at ultra-wide */
+  .section-wrapper {
+    padding-left: 3.5rem;
+    padding-right: 3.5rem;
+  }
+  .page-hero {
+    padding-left: 3.5rem;
+    padding-right: 3.5rem;
+  }
+}

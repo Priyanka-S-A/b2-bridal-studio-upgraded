@@ -341,9 +341,12 @@ const Services = () => {
     .sort((a, b) => {
       const aB = isBridalCategory(a.category);
       const bB = isBridalCategory(b.category);
-      if (aB && !bB) return -1;
-      if (!aB && bB) return 1;
-      return 0;
+      const aH = isHairExtensionCategory(a.category);
+      const bH = isHairExtensionCategory(b.category);
+      // Bridal first, then Hair Extension, then everything else
+      const aPriority = aB ? 0 : aH ? 1 : 2;
+      const bPriority = bB ? 0 : bH ? 1 : 2;
+      return aPriority - bPriority;
     });
 
 
@@ -614,7 +617,7 @@ const Services = () => {
                                   boxShadow: '0 2px 10px rgba(37,211,102,0.25)'
                                 }}
                               >
-                                <MessageCircle size={14} /> Inquire via WhatsApp
+                                <MessageCircle size={14} /> Book via WhatsApp
                               </button>
                             ) : isBridalCategory(category.category) ? (
                               <button
