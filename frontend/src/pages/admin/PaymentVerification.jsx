@@ -151,7 +151,7 @@ const PaymentVerification = () => {
                 <tr key={b._id} className="hover:bg-[#FFFCF5] transition-colors">
                   <td className="p-4 pl-6">
                     <div className="font-medium text-gray-900 font-playfair">{b.name}</div>
-                    <div className="font-cormorant mt-0.5" style={{ fontSize: '15px', color: '#000000', fontWeight: 600 }}>{b.phone}</div>
+                    <div className="mt-0.5" style={{ fontSize: '18px', color: '#000000', fontWeight: 500, fontFamily: 'Arial, Helvetica, sans-serif', lineHeight: 1.5 }}>{b.phone}</div>
                     {b.dateTime && (
                       <div className="text-xs text-indigo-600 mt-1 font-medium">
                         📅 {formatScheduled(b.dateTime)}
@@ -167,10 +167,10 @@ const PaymentVerification = () => {
                     <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs font-medium">{b.branch}</span>
                   </td>
                   <td className="p-4 text-sm text-gray-600">
-                    <ul className="list-disc pl-4 space-y-1.5 font-cormorant">
+                    <ul className="list-disc pl-4 space-y-2">
                       {b.items.map((item, i) => (
-                        <li key={i} style={{ fontSize: '15px', color: '#000000', fontWeight: 500 }}>
-                          {item.name} <span style={{ fontSize: '14px', color: '#000000', fontWeight: 500, marginLeft: '4px' }}>(₹{item.price})</span>
+                        <li key={i} style={{ fontSize: '18px', color: '#000000', fontWeight: 500, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                          {item.name} <span style={{ fontSize: '17px', color: '#000000', fontWeight: 500, fontFamily: 'Arial, Helvetica, sans-serif', marginLeft: '4px' }}>(₹{item.price})</span>
                         </li>
                       ))}
                     </ul>
