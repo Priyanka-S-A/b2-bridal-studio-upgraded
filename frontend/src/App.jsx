@@ -85,9 +85,9 @@ function App() {
               <Route path="/certificates" element={<PublicLayout><Certificates /></PublicLayout>} />
               <Route path="/about" element={<PublicLayout><About /></PublicLayout>} />
               <Route path="/contact" element={<PublicLayout><ContactRedirect /></PublicLayout>} />
-              {/* Blog routes removed — content integrated into About page */}
-              {/* <Route path="/blog" element={<PublicLayout><BlogList /></PublicLayout>} /> */}
-              {/* <Route path="/blog/:slug" element={<PublicLayout><BlogDetail /></PublicLayout>} /> */}
+              {/* Blog routes */}
+              <Route path="/blog" element={<PublicLayout><BlogList /></PublicLayout>} />
+              <Route path="/blog/:slug" element={<PublicLayout><BlogDetail /></PublicLayout>} />
 
               {/* BOOKING / PAYMENT ROUTES */}
               <Route path="/payment" element={<PublicLayout><Payment /></PublicLayout>} />

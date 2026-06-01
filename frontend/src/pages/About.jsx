@@ -1,4 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { motion, useInView } from 'framer-motion';
 import { fadeUp, staggerContainer, slideLeft, slideRight, blurIn } from '../animations/variants';
 
@@ -234,9 +235,9 @@ const About = () => {
         </div>
         <div className="max-w-[1100px] mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-6">
           {[
-            { title: '10 Bridal Makeup Looks Dominating 2024 Weddings', image: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=800&q=80', excerpt: 'From dewy skin finishes to bold jewel-toned eyes — discover which looks are defining the modern Indian bride.' },
-            { title: 'How to Build a Luxury Bridal Makeup Career', image: 'https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&w=800&q=80', excerpt: 'Our master trainers share the exact roadmap — from certification to premium clientele.' },
-            { title: 'The Pre-Bridal Skin Care Ritual', image: 'https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?auto=format&fit=crop&w=800&q=80', excerpt: 'The complete countdown for flawless skin on your wedding day.' },
+            { title: '10 Bridal Makeup Looks Dominating 2024 Weddings', image: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=800&q=80', excerpt: 'From dewy skin finishes to bold jewel-toned eyes — discover which looks are defining the modern Indian bride.', slug: '10-bridal-makeup-looks-dominating-2024-weddings' },
+            { title: 'How to Build a Luxury Bridal Makeup Career', image: 'https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&w=800&q=80', excerpt: 'Our master trainers share the exact roadmap — from certification to premium clientele.', slug: 'build-luxury-bridal-makeup-career' },
+            { title: 'The Pre-Bridal Skin Care Ritual', image: 'https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?auto=format&fit=crop&w=800&q=80', excerpt: 'The complete countdown for flawless skin on your wedding day.', slug: 'pre-bridal-skincare-ritual' },
           ].map((post, i) => (
             <motion.article
               key={i}
@@ -244,15 +245,25 @@ const About = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: i * 0.12 }}
-              className="card-luxury rounded-sm group"
+              className="card-luxury rounded-sm group flex flex-col justify-between"
             >
-              <div className="img-zoom-container" style={{ height: '180px' }}>
-                <img src={post.image} alt={post.title} className="w-full h-full object-cover" loading="lazy" />
-              </div>
-              <div className="p-5">
-                <h3 className="font-playfair text-base mb-2 leading-tight" style={{ color: '#F8F5F0' }}>{post.title}</h3>
-                <div className="gold-divider-left mb-3" />
-                <p className="font-cormorant text-sm leading-relaxed" style={{ color: 'rgba(248,245,240,0.9)' }}>{post.excerpt}</p>
+              <Link to={`/blog/${post.slug}`} className="block overflow-hidden">
+                <div className="img-zoom-container" style={{ height: '180px' }}>
+                  <img src={post.image} alt={post.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" />
+                </div>
+              </Link>
+              <div className="p-5 flex flex-col flex-1 justify-between">
+                <div>
+                  <Link to={`/blog/${post.slug}`}>
+                    <h3 className="font-playfair text-base mb-2 leading-tight transition-colors duration-300 group-hover:text-gold-500" style={{ color: '#F8F5F0' }}>{post.title}</h3>
+                  </Link>
+                  <div className="gold-divider-left mb-3" />
+                  <p className="font-cormorant text-sm leading-relaxed mb-4" style={{ color: 'rgba(248,245,240,0.9)' }}>{post.excerpt}</p>
+                </div>
+                <Link to={`/blog/${post.slug}`} className="flex items-center gap-2 font-cinzel text-[0.6rem] tracking-[0.2em] uppercase transition-all duration-300 group-hover:gap-3 mt-auto self-start animate-pulse-subtle" style={{ color: '#FFD700', textDecoration: 'none' }}>
+                  Read More
+                  <svg width="14" height="10" viewBox="0 0 14 10" fill="none" stroke="#FFD700" strokeWidth="1.2" strokeLinecap="round"><path d="M1 5h12M7 1l6 4-6 4"/></svg>
+                </Link>
               </div>
             </motion.article>
           ))}
