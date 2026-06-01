@@ -583,7 +583,7 @@ const Services = () => {
                                   <span className="font-cinzel text-[0.7rem] tracking-[0.2em] uppercase block mb-1 font-bold" style={{ color: '#FFD700' }}>{category.category}</span>
                                   <h3 className="font-playfair text-base font-semibold" style={{ color: '#F8F5F0' }}>{service.name}</h3>
                                   {(category.category === 'Bridal Services' || isHairExtensionCategory(category.category)) && (
-                                    <span className="inline-block text-[0.55rem] font-cinzel tracking-[0.1em] uppercase px-1.5 py-0.5 rounded-sm mt-1.5" style={{ background: 'rgba(255, 215, 0, 0.1)', color: '#FFD700', border: '1px solid rgba(255, 215, 0, 0.2)' }}>
+                                    <span className="inline-block whitespace-nowrap text-[0.55rem] font-cinzel tracking-[0.1em] uppercase px-1.5 py-0.5 rounded-sm mt-1.5" style={{ background: 'rgba(255, 215, 0, 0.1)', color: '#FFD700', border: '1px solid rgba(255, 215, 0, 0.2)' }}>
                                       WhatsApp Inquiry Only
                                     </span>
                                   )}
