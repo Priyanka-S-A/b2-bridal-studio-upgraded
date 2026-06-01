@@ -7,9 +7,9 @@
 /* ─── Design Tokens ─────────────────────────────────────── */
 @theme {
   /* Gold palette — Premium Metallic Upgrade */
-  --color-gold-premium: #D4AF37;
+  --color-gold-premium: #FFD700;
   --color-gold-300: #FFED8A;
-  --color-gold-400: #D4AF37;
+  --color-gold-400: #FFD700;
   --color-gold-500: #FFCA28;
   --color-gold-600: #E5A100;
   --color-gold-700: #C47F17;
@@ -30,7 +30,7 @@
 }
 
 :root {
-  --gold-premium: #D4AF37;
+  --gold-premium: #FFD700;
 }
 
 /* ─── Global Reset & Base ───────────────────────────────── */
@@ -249,7 +249,7 @@ body {
   font-weight: 600;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  border: 1px solid rgba(212, 175, 55, 0.7);
+  border: 1px solid rgba(255, 215, 0, 0.55);
   cursor: pointer;
   position: relative;
   overflow: hidden;
@@ -258,10 +258,10 @@ body {
 }
 
 .btn-outline-gold:hover {
-  background: rgba(212, 175, 55, 0.14);
+  background: rgba(255, 215, 0, 0.12);
   border-color: var(--gold-premium);
-  box-shadow: 0 0 15px rgba(212, 175, 55, 0.3), 0 0 30px rgba(212, 175, 55, 0.08);
-  color: #FFED8A;
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.3), 0 0 30px rgba(255, 215, 0, 0.08);
+  color: #FFE566;
 }
 
 /* Premium CTA Button — filled gold with animated glow */
