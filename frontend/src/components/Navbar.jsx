@@ -136,8 +136,8 @@ const Navbar = () => {
                 />
               </div>
               <div className="shrink-0 whitespace-nowrap">
-                <div className="font-cinzel text-[0.8rem] tracking-[0.25em] uppercase font-extrabold whitespace-nowrap" style={{ color: '#D4AF37' }}>B2 Bridal</div>
-                <div className="font-cormorant text-[0.7rem] tracking-[0.2em] uppercase font-bold whitespace-nowrap" style={{ color: '#FFFFFF', lineHeight: 1 }}>Studio</div>
+                <div className="font-cinzel text-[0.8rem] tracking-[0.25em] uppercase font-extrabold whitespace-nowrap" style={{ color: '#FFD700' }}>B2 Bridal</div>
+                <div className="font-cormorant text-[0.85rem] tracking-[0.2em] uppercase font-extrabold whitespace-nowrap" style={{ color: '#FFFFFF', lineHeight: 1.1, textShadow: '0 0 8px rgba(255,255,255,0.35)' }}>Studio</div>
               </div>
             </Link>
 
@@ -235,9 +235,9 @@ const Navbar = () => {
               <button
                 onClick={openCart}
                 className="relative w-10 h-10 flex items-center justify-center transition-colors duration-200 cursor-pointer"
-                style={{ color: '#F8F5F0' }}
-                onMouseEnter={e => e.currentTarget.style.color = '#D4AF37'}
-                onMouseLeave={e => e.currentTarget.style.color = '#F8F5F0'}
+                style={{ color: '#FFD700' }}
+                onMouseEnter={e => e.currentTarget.style.color = '#FFE566'}
+                onMouseLeave={e => e.currentTarget.style.color = '#FFD700'}
               >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                   <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" strokeLinecap="round" strokeLinejoin="round"/>
@@ -247,7 +247,7 @@ const Navbar = () => {
                 {itemCount > 0 && (
                   <span
                     className="absolute -top-0.5 -right-0.5 w-4 h-4 flex items-center justify-center rounded-full text-[0.55rem] font-bold"
-                    style={{ background: '#D4AF37', color: '#fff' }}
+                    style={{ background: '#FFD700', color: '#000' }}
                   >
                     {itemCount > 9 ? '9+' : itemCount}
                   </span>
@@ -297,9 +297,9 @@ const Navbar = () => {
                   <Link
                     to="/auth"
                     className="font-cinzel text-[0.7rem] tracking-[0.15em] uppercase px-4 py-2 transition-all duration-300 font-bold"
-                    style={{ color: '#F8F5F0', border: '1px solid rgba(255,255,255,0.2)' }}
-                    onMouseEnter={e => { e.currentTarget.style.color = '#D4AF37'; e.currentTarget.style.borderColor = '#D4AF37'; }}
-                    onMouseLeave={e => { e.currentTarget.style.color = '#F8F5F0'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'; }}
+                    style={{ color: '#FFD700', border: '1px solid rgba(255, 215, 0, 0.4)' }}
+                    onMouseEnter={e => { e.currentTarget.style.color = '#FFE566'; e.currentTarget.style.borderColor = '#FFE566'; }}
+                    onMouseLeave={e => { e.currentTarget.style.color = '#FFD700'; e.currentTarget.style.borderColor = 'rgba(255, 215, 0, 0.4)'; }}
                   >
                     Login
                   </Link>
@@ -312,7 +312,7 @@ const Navbar = () => {
               <button
                 onClick={openCart}
                 className="relative w-10 h-10 flex items-center justify-center cursor-pointer"
-                style={{ color: '#D4AF37' }}
+                style={{ color: '#FFD700' }}
               >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                   <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" strokeLinecap="round" strokeLinejoin="round"/>
@@ -320,7 +320,7 @@ const Navbar = () => {
                   <path d="M16 10a4 4 0 01-8 0"/>
                 </svg>
                 {itemCount > 0 && (
-                  <span className="absolute top-0 right-0 w-4 h-4 flex items-center justify-center rounded-full text-[0.55rem] font-bold" style={{ background: '#D4AF37', color: '#fff' }}>
+                  <span className="absolute top-0 right-0 w-4 h-4 flex items-center justify-center rounded-full text-[0.55rem] font-bold" style={{ background: '#FFD700', color: '#000' }}>
                     {itemCount > 9 ? '9+' : itemCount}
                   </span>
                 )}
