@@ -16,7 +16,20 @@ const statusColors = {
 const Profile = () => {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
-  const user = JSON.parse(localStorage.getItem('user') || 'null');
+  const getValidUser = () => {
+    const stored = localStorage.getItem('user');
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        if (parsed && (parsed.email || parsed.name)) {
+          return parsed;
+        }
+      } catch (e) {}
+    }
+    return null;
+  };
+
+  const user = getValidUser();
 
   useEffect(() => {
     if (!user?.email) { setLoading(false); return; }

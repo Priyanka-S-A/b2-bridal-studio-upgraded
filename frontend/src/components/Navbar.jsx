@@ -33,7 +33,16 @@ const Navbar = () => {
   useEffect(() => {
     const loadUser = () => {
       const stored = localStorage.getItem('user');
-      setUser(stored ? JSON.parse(stored) : null);
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          if (parsed && (parsed.email || parsed.name)) {
+            setUser(parsed);
+            return;
+          }
+        } catch (e) {}
+      }
+      setUser(null);
     };
     loadUser();
     window.addEventListener('storage', loadUser);
