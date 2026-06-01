@@ -155,10 +155,12 @@ const BlogDetail = () => {
           {/* Back */}
           <Link
             to="/blogs"
-            className="btn-outline-gold mb-8 inline-flex items-center gap-2 group"
-            style={{ padding: '0.6rem 1.5rem', letterSpacing: '0.15em', fontSize: '0.7rem', textDecoration: 'none' }}
+            className="inline-flex items-center gap-2 mb-8 font-cinzel text-xs tracking-[0.2em] uppercase font-bold transition-all duration-300 group"
+            style={{ color: '#FFD700', textShadow: '0 0 8px rgba(255,215,0,0.3)', textDecoration: 'none' }}
+            onMouseEnter={e => e.currentTarget.style.color = '#FFE566'}
+            onMouseLeave={e => e.currentTarget.style.color = '#FFD700'}
           >
-            <svg width="12" height="8" viewBox="0 0 14 10" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="transition-transform duration-300 group-hover:-translate-x-1" style={{ marginRight: '4px' }}><path d="M13 5H1M7 9L1 5l6-4"/></svg>
+            <svg width="14" height="10" viewBox="0 0 14 10" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" className="transition-transform duration-300 group-hover:-translate-x-1" style={{ marginRight: '4px' }}><path d="M13 5H1M7 9L1 5l6-4"/></svg>
             Back to Journal
           </Link>
 
