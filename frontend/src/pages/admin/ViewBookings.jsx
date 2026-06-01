@@ -2,6 +2,35 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Calendar, User, ShoppingBag, Receipt } from 'lucide-react';
 const API = import.meta.env.VITE_API_URL;
+
+const formatBookingScheduled = (dateStr, timeStr) => {
+  if (!dateStr) return '';
+  try {
+    let combinedStr = dateStr;
+    if (!dateStr.includes('T') && timeStr) {
+      const normalizedTime = timeStr.includes(':') ? timeStr : `${timeStr}:00`;
+      combinedStr = `${dateStr}T${normalizedTime}`;
+    }
+    const d = new Date(combinedStr);
+    if (isNaN(d.getTime())) {
+      return `${dateStr} at ${timeStr || ''}`;
+    }
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    
+    let hours = d.getHours();
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+    const minutes = String(d.getMinutes()).padStart(2, '0');
+    
+    return `${day}-${month}-${year} at ${hours}:${minutes} ${ampm}`;
+  } catch {
+    return `${dateStr} at ${timeStr || ''}`;
+  }
+};
+
 const ViewBookings = () => {
   const [bills, setBills] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -66,7 +95,7 @@ const ViewBookings = () => {
                     </div>
                     {bill.customerDetails?.date && (
                       <div className="text-xs text-gray-500 mt-1 pl-6">
-                        Scheduled: {bill.customerDetails.date} at {bill.customerDetails.time}
+                        Scheduled: {formatBookingScheduled(bill.customerDetails.date, bill.customerDetails.time)}
                       </div>
                     )}
                   </td>
@@ -76,13 +105,15 @@ const ViewBookings = () => {
                       {bill.customerDetails?.name || 'Walk-in / Unknown'}
                     </div>
                     {bill.customerDetails?.phone && (
-                      <div className="text-xs text-gray-500 pl-6 font-cormorant">{bill.customerDetails.phone}</div>
+                      <div className="pl-6" style={{ fontSize: '14px', color: '#000000', fontWeight: 500, fontFamily: 'Arial, Helvetica, sans-serif', lineHeight: 1.5 }}>{bill.customerDetails.phone}</div>
                     )}
                   </td>
                   <td className="p-4 text-sm text-gray-600">
-                    <ul className="list-disc pl-4 space-y-1 font-cormorant">
+                    <ul className="list-disc pl-4 space-y-2">
                       {bill.items.map((item, i) => (
-                        <li key={i}>{item.name} <span className="text-gray-400">(₹{item.price})</span></li>
+                        <li key={i} style={{ fontSize: '14px', color: '#000000', fontWeight: 500, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                          {item.name} <span style={{ fontSize: '13px', color: '#000000', fontWeight: 500, fontFamily: 'Arial, Helvetica, sans-serif', marginLeft: '4px' }}>(₹{item.price})</span>
+                        </li>
                       ))}
                     </ul>
                   </td>
