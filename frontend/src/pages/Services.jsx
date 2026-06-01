@@ -479,7 +479,7 @@ const Services = () => {
     }
 
     if (!user) {
-      triggerAuthToast('Please login with your account details to book or enquire.');
+      triggerAuthToast('Please login to book or enquire.');
       return;
     }
 

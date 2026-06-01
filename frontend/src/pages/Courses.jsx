@@ -125,7 +125,7 @@ const Courses = () => {
     }
 
     if (!user) {
-      triggerAuthToast('Please login with your account details to enroll.');
+      triggerAuthToast('Please login to enroll.');
       return;
     }
 

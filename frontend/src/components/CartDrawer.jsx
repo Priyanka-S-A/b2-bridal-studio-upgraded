@@ -196,7 +196,7 @@ const CartDrawer = () => {
                     }
 
                     if (!user) {
-                      triggerAuthToast('Please login with your account details to enquire.');
+                      triggerAuthToast('Please login to enquire.');
                       return;
                     }
                     
