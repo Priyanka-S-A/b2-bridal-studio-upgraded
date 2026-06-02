@@ -249,23 +249,23 @@ body {
   font-weight: 700;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  border: 2px solid var(--gold-premium);
+  border: 1.35px solid var(--gold-premium);
   cursor: pointer;
   position: relative;
   overflow: hidden;
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   text-decoration: none;
-  box-shadow: 0 0 10px rgba(255, 215, 0, 0.15);
-  text-shadow: 0 0 4px rgba(255, 215, 0, 0.3);
+  box-shadow: 0 0 8px rgba(212, 175, 55, 0.15);
+  text-shadow: 0 0 3px rgba(212, 175, 55, 0.25);
 }
 
 .btn-outline-gold:hover {
-  background: rgba(255, 215, 0, 0.18);
-  border-color: #FFED8A;
-  box-shadow: 0 0 20px rgba(255, 215, 0, 0.55), 0 0 40px rgba(255, 215, 0, 0.2);
-  color: #FFFFFF;
-  text-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
-  transform: translateY(-3px);
+  background: rgba(255, 215, 0, 0.06);
+  border-color: var(--gold-premium);
+  box-shadow: 0 0 16px rgba(212, 175, 55, 0.52), 0 0 32px rgba(212, 175, 55, 0.22);
+  color: #FFED8A;
+  text-shadow: 0 0 8px rgba(255, 215, 0, 0.55);
+  transform: translateY(-2px);
 }
 
 .btn-outline-gold:active {
