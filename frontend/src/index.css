@@ -249,7 +249,7 @@ body {
   font-weight: 700;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  border: 1.35px solid var(--gold-premium);
+  border: 1.3px solid var(--gold-premium);
   cursor: pointer;
   position: relative;
   overflow: hidden;
