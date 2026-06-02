@@ -32,6 +32,7 @@ const CustomerLogins = () => {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
+  const [dobOption, setDobOption] = useState('none');
 
   const fetchCustomers = async () => {
     try {
@@ -73,8 +74,36 @@ const CustomerLogins = () => {
     const phoneMatch = c.phone?.includes(search);
     const matchesSearch = nameMatch || emailMatch || phoneMatch;
 
-    if (statusFilter === 'All') return matchesSearch;
-    return matchesSearch && c.accountStatus === statusFilter;
+    if (!matchesSearch) return false;
+    if (statusFilter !== 'All' && c.accountStatus !== statusFilter) return false;
+
+    if (dobOption === 'thisMonth') {
+      if (!c.dob) return false;
+      const dobMonth = new Date(c.dob).getMonth();
+      const currentMonth = new Date().getMonth();
+      return dobMonth === currentMonth;
+    }
+    
+    if (dobOption === 'today') {
+      if (!c.dob) return false;
+      const dobDate = new Date(c.dob);
+      const today = new Date();
+      return dobDate.getMonth() === today.getMonth() && dobDate.getDate() === today.getDate();
+    }
+
+    return true;
+  }).sort((a, b) => {
+    if (dobOption === 'asc' || dobOption === 'desc') {
+      if (!a.dob && !b.dob) return 0;
+      if (!a.dob) return 1;
+      if (!b.dob) return -1;
+      
+      const dateA = new Date(a.dob).getTime();
+      const dateB = new Date(b.dob).getTime();
+
+      return dobOption === 'asc' ? dateA - dateB : dateB - dateA;
+    }
+    return 0;
   });
 
   if (loading) return (
@@ -111,6 +140,17 @@ const CustomerLogins = () => {
             <option value="All">All Statuses</option>
             <option value="Active">Active Only</option>
             <option value="Suspended">Suspended Only</option>
+          </select>
+          <select
+            value={dobOption}
+            onChange={e => setDobOption(e.target.value)}
+            className="p-2 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-[#D4AF37]"
+          >
+            <option value="none">DOB Filter / Sort</option>
+            <option value="thisMonth">Birthdays This Month</option>
+            <option value="today">Birthdays Today</option>
+            <option value="asc">Sort: Oldest to Youngest</option>
+            <option value="desc">Sort: Youngest to Oldest</option>
           </select>
         </div>
       </div>

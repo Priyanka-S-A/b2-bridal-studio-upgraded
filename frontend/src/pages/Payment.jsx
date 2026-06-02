@@ -155,13 +155,13 @@ const Payment = () => {
               >
                 Tap to Pay via UPI
               </a>
-              <span className="font-cormorant italic text-[0.7rem] block text-center" style={{ color: 'rgba(248,245,240,0.45)' }}>
+              <span className="font-cormorant italic font-bold text-xs block text-center text-white">
                 Opens Google Pay, PhonePe, or Paytm on mobile devices
               </span>
             </div>
 
             <div className="p-4 rounded-sm" style={{ background: 'rgba(255,195,0,0.05)', border: '1px solid rgba(255,195,0,0.1)' }}>
-              <p className="font-cormorant italic text-sm" style={{ color: 'rgba(248,245,240,0.5)' }}>
+              <p className="font-cormorant italic font-bold text-base text-white text-center">
                 After making the payment, click "Confirm Booking" to submit your booking details and payment proof.
               </p>
             </div>
@@ -210,13 +210,13 @@ const Payment = () => {
                       placeholder="Coupon Code"
                       value={couponCode}
                       onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-                      className="flex-1 px-3 py-2 bg-black/50 border outline-none text-sm font-cinzel text-white uppercase"
-                      style={{ borderColor: 'rgba(255,195,0,0.3)' }}
+                      className="flex-1 px-3 py-2 bg-black/50 border outline-none text-sm font-cinzel text-white uppercase placeholder-white"
+                      style={{ borderColor: 'rgba(255,195,0,0.4)' }}
                     />
                     <button
                       onClick={handleApplyCoupon}
-                      className="px-4 py-2 font-cinzel text-xs tracking-wider"
-                      style={{ background: 'rgba(255,195,0,0.1)', color: '#FFD700', border: '1px solid rgba(255,195,0,0.3)' }}
+                      className="px-4 py-2 font-cinzel text-xs font-bold tracking-wider hover:bg-yellow-500/20 transition-colors"
+                      style={{ background: 'rgba(255,195,0,0.15)', color: '#FFD700', border: '1px solid rgba(255,195,0,0.4)' }}
                     >
                       Apply
                     </button>
