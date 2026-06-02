@@ -246,22 +246,30 @@ body {
   color: var(--gold-premium);
   font-family: 'Cinzel', serif;
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  border: 1px solid rgba(255, 215, 0, 0.55);
+  border: 2px solid var(--gold-premium);
   cursor: pointer;
   position: relative;
   overflow: hidden;
-  transition: all 0.4s ease;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   text-decoration: none;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.15);
+  text-shadow: 0 0 4px rgba(255, 215, 0, 0.3);
 }
 
 .btn-outline-gold:hover {
-  background: rgba(255, 215, 0, 0.12);
-  border-color: var(--gold-premium);
-  box-shadow: 0 0 15px rgba(255, 215, 0, 0.3), 0 0 30px rgba(255, 215, 0, 0.08);
-  color: #FFE566;
+  background: rgba(255, 215, 0, 0.18);
+  border-color: #FFED8A;
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.55), 0 0 40px rgba(255, 215, 0, 0.2);
+  color: #FFFFFF;
+  text-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
+  transform: translateY(-3px);
+}
+
+.btn-outline-gold:active {
+  transform: translateY(-1px);
 }
 
 /* Premium CTA Button — filled gold with animated glow */
