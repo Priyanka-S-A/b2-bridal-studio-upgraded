@@ -129,7 +129,8 @@ const Courses = () => {
       return;
     }
 
-    const message = `*Course Enrollment*%0A%0A*Customer:* ${user.name}%0APhone: ${user.phone}%0AEmail: ${user.email}%0A%0A*Category:* ${categoryData.title}%0A*Course:* ${course.title}%0A*Duration:* ${course.duration}%0A*Branch:* ${selectedBranch === 'branch1' ? 'Chennai' : 'Madurai'}%0A%0APlease send QR code for fee payment.`;
+    const rawMessage = `*Course Enrollment*\n\n*Customer:* ${user.name}\nPhone: ${user.phone}\nEmail: ${user.email || ''}\n\n*Category:* ${categoryData.title}\n*Course:* ${course.title}\n*Duration:* ${course.duration}\n*Branch:* ${selectedBranch === 'branch1' ? 'Chennai' : 'Madurai'}\n\nPlease send QR code for fee payment.`;
+    const message = encodeURIComponent(rawMessage);
     window.open(`https://wa.me/919361527951?text=${message}`, '_blank');
   };
 
