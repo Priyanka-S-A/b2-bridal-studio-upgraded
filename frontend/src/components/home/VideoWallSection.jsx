@@ -140,13 +140,10 @@ const VideoWallSection = () => {
                     </p>
                 </motion.div>
 
-                {/* Grid / Carousel */}
-                <div 
-                    className="flex md:grid overflow-x-auto md:overflow-visible snap-x snap-mandatory md:snap-none md:grid-cols-3 gap-3 md:gap-5 pb-6 md:pb-0 px-4 md:px-0 [&::-webkit-scrollbar]:hidden items-center justify-center max-w-[900px] mx-auto"
-                    style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-                >
+                {/* Grid */}
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-5 px-4 md:px-0 items-center justify-center max-w-[900px] mx-auto">
                     {videoWallVideos.map(video => (
-                        <div key={video.id} className="snap-center shrink-0 w-[75vw] max-w-[280px] md:w-full">
+                        <div key={video.id} className="w-full">
                             <VideoCard video={video} onClick={setSelectedVideo} />
                         </div>
                     ))}

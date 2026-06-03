@@ -108,15 +108,14 @@ const WhyChooseUs = () => {
         </motion.div>
 
         {/* Feature grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8">
+        <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 md:gap-8">
           {features.map((feature, i) => (
             <motion.div
               key={i}
               initial={{ opacity: 0, y: 40 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.7, delay: i * 0.12, ease: [0.16, 1, 0.3, 1] }}
-              className="flex flex-col text-center items-center group"
-              style={{ padding: '2.5rem 2rem' }}
+              className="flex flex-col text-center items-center group p-2 md:py-10 md:px-8"
             >
               {/* Icon ring */}
               <div
