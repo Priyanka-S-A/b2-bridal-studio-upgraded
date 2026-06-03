@@ -119,7 +119,7 @@ const Payment = () => {
             <div className="mb-6">
               <span className="font-cinzel text-[0.6rem] tracking-[0.2em] uppercase block mb-2 font-bold" style={{ color: '#FFD700' }}>UPI ID</span>
               <div className="flex items-center justify-center gap-3 mb-4">
-                <span className="font-inter text-base font-medium" style={{ color: '#FFD700' }}>{UPI_ID}</span>
+                <span className="font-inter text-base font-medium text-white">{UPI_ID}</span>
                 <button
                   onClick={() => { navigator.clipboard.writeText(UPI_ID); }}
                   className="px-3 py-1 font-cinzel text-[0.6rem] tracking-[0.15em] uppercase transition-all cursor-pointer font-bold animate-glow-pulse"
@@ -132,7 +132,7 @@ const Payment = () => {
               {/* GPay Number */}
               <span className="font-cinzel text-[0.6rem] tracking-[0.2em] uppercase block mb-2 font-bold" style={{ color: '#FFD700' }}>GPay Number</span>
               <div className="flex items-center justify-center gap-3 mb-4">
-                <span className="font-inter text-base font-medium" style={{ color: '#FFD700' }}>9840551365</span>
+                <span className="font-inter text-base font-medium text-white">9840551365</span>
                 <button
                   onClick={() => { navigator.clipboard.writeText('9840551365'); }}
                   className="px-3 py-1 font-cinzel text-[0.6rem] tracking-[0.15em] uppercase transition-all cursor-pointer font-bold animate-glow-pulse"
