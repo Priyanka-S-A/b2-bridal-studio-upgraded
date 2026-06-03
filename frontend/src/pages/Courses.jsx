@@ -81,12 +81,29 @@ const Courses = () => {
   const { category } = useParams();
   const [selectedBranch, setSelectedBranch] = useState('branch1');
   const [dbCourses, setDbCourses] = useState([]);
+  const [toast, setToast] = useState({ show: false, message: '' });
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: '-5%' });
+
+  const triggerAuthToast = (message) => {
+    setToast({ show: true, message });
+    setTimeout(() => {
+      window.location.href = '/auth';
+    }, 2500);
+  };
 
   useEffect(() => {
     axios.get(`${API}/api/courses`).then(res => setDbCourses(res.data)).catch(() => { });
   }, []);
+
+  useEffect(() => {
+    if (toast.show) {
+      const timer = setTimeout(() => {
+        setToast(prev => ({ ...prev, show: false }));
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [toast]);
 
   const categoryData = category ? {
     title: CATEGORIES[category]?.title || category,
@@ -96,9 +113,22 @@ const Courses = () => {
   } : null;
 
   const handleEnroll = (course) => {
-    const userData = localStorage.getItem('user');
-    if (!userData) { alert('Please login first'); window.location.href = '/login'; return; }
-    const user = JSON.parse(userData);
+    const stored = localStorage.getItem('user');
+    let user = null;
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        if (parsed && parsed.name && (parsed.email || parsed.phone)) {
+          user = parsed;
+        }
+      } catch (e) {}
+    }
+
+    if (!user) {
+      triggerAuthToast('Please login to enroll.');
+      return;
+    }
+
     const message = `*Course Enrollment*%0A%0A*Customer:* ${user.name}%0APhone: ${user.phone}%0AEmail: ${user.email}%0A%0A*Category:* ${categoryData.title}%0A*Course:* ${course.title}%0A*Duration:* ${course.duration}%0A*Branch:* ${selectedBranch === 'branch1' ? 'Chennai' : 'Madurai'}%0A%0APlease send QR code for fee payment.`;
     window.open(`https://wa.me/919361527951?text=${message}`, '_blank');
   };
@@ -190,18 +220,64 @@ const Courses = () => {
 
       {/* Branch Selector */}
       <div className="max-w-[1300px] mx-auto px-6 lg:px-12 pt-10 pb-4">
-        <div className="glass-dark p-4 flex flex-wrap items-center justify-end gap-4" style={{ border: '1px solid rgba(255,195,0,0.1)' }}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFD700" strokeWidth="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" /><circle cx="12" cy="10" r="3" /></svg>
-          <span className="font-cormorant text-base" style={{ color: 'rgba(248,245,240,0.92)' }}>Select Branch:</span>
-          <select
-            value={selectedBranch}
-            onChange={e => setSelectedBranch(e.target.value)}
-            className="px-4 py-2.5 font-cormorant rounded-sm outline-none"
-            style={{ background: 'rgba(255,195,0,0.08)', border: '1px solid rgba(255,195,0,0.2)', color: '#F8F5F0', fontSize: '1.05rem' }}
-          >
-            <option value="branch1" style={{ background: '#111' }}>Chennai — Moolakaadai</option>
-            <option value="branch2" style={{ background: '#111' }}>Madurai — Kochadai</option>
-          </select>
+        <div 
+          className="glass-dark p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all duration-300" 
+          style={{ 
+            border: '1px solid rgba(255,195,0,0.15)',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.2)'
+          }}
+        >
+          {/* Label + Icon */}
+          <div className="flex items-center gap-3">
+            <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center" style={{ background: 'rgba(255,215,0,0.06)', border: '1px solid rgba(255,215,0,0.15)' }}>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#FFD700" strokeWidth="1.8">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
+                <circle cx="12" cy="10" r="3" />
+              </svg>
+            </div>
+            <div className="flex flex-col">
+              <span className="font-cinzel text-[0.65rem] tracking-[0.25em] uppercase font-bold" style={{ color: '#FFD700' }}>
+                Select Studio Branch
+              </span>
+              <span className="font-cormorant text-[0.8rem] italic mt-0.5" style={{ color: 'rgba(248,245,240,0.6)' }}>
+                Choose a location to view custom offerings
+              </span>
+            </div>
+          </div>
+
+          {/* Select Element */}
+          <div className="w-full sm:w-auto relative">
+            <select
+              value={selectedBranch}
+              onChange={e => setSelectedBranch(e.target.value)}
+              className="w-full sm:w-64 px-4 py-3 font-cormorant rounded-sm outline-none cursor-pointer transition-all duration-300 text-base appearance-none"
+              style={{ 
+                background: 'rgba(255,195,0,0.06)', 
+                border: '1px solid rgba(255,195,0,0.25)', 
+                color: '#F8F5F0', 
+                paddingRight: '2.5rem',
+                fontSize: '1rem',
+                letterSpacing: '0.02em'
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.borderColor = 'rgba(255,195,0,0.5)';
+                e.currentTarget.style.background = 'rgba(255,195,0,0.1)';
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.borderColor = 'rgba(255,195,0,0.25)';
+                e.currentTarget.style.background = 'rgba(255,195,0,0.06)';
+              }}
+            >
+              <option value="branch1" style={{ background: '#0e0e0f', color: '#F8F5F0' }}>Chennai — Moolakaadai</option>
+              <option value="branch2" style={{ background: '#0e0e0f', color: '#F8F5F0' }}>Madurai — Kochadai</option>
+            </select>
+            {/* Custom Arrow Accent */}
+            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none flex items-center justify-center">
+              <svg width="10" height="6" viewBox="0 0 10 6" fill="none" stroke="#FFD700" strokeWidth="1.5">
+                <path d="M1 1l4 4 4-4" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -260,6 +336,71 @@ const Courses = () => {
           ))}
         </div>
       </div>
+      <AnimatePresence>
+        {toast.show && (
+          <>
+            {/* Mobile Toast */}
+            <motion.div
+              key="mobile-toast"
+              initial={{ opacity: 0, y: 50, x: '-50%' }}
+              animate={{ opacity: 1, y: 0, x: '-50%' }}
+              exit={{ opacity: 0, y: 20, x: '-50%' }}
+              transition={{ duration: 0.3, ease: 'easeOut' }}
+              className="fixed bottom-6 left-1/2 z-[9999] lg:hidden w-[90%] max-w-md"
+            >
+              <div className="glass-dark border-gold-glow px-4 py-3 rounded-md flex items-center justify-between shadow-2xl relative overflow-hidden" style={{ background: 'rgba(10, 10, 10, 0.95)' }}>
+                <div className="flex items-center gap-3">
+                  <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center" style={{ background: 'rgba(248,113,113,0.1)', border: '1px solid rgba(248,113,113,0.3)' }}>
+                    <span style={{ color: '#f87171', fontSize: '16px' }}>⚠</span>
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-playfair text-[0.85rem] font-semibold leading-snug" style={{ color: '#F8F5F0' }}>
+                      {toast.message}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setToast(prev => ({ ...prev, show: false }))}
+                  className="ml-3 transition-colors text-xs font-sans px-2 py-1 rounded"
+                  style={{ color: 'rgba(248, 245, 240, 0.5)' }}
+                >
+                  ✕
+                </button>
+              </div>
+            </motion.div>
+
+            {/* Desktop Toast */}
+            <motion.div
+              key="desktop-toast"
+              initial={{ opacity: 0, x: 100 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 50 }}
+              transition={{ duration: 0.3, ease: 'easeOut' }}
+              className="fixed top-24 right-6 z-[9999] hidden lg:block w-full max-w-sm"
+            >
+              <div className="glass-dark border-gold-glow px-4 py-3 rounded-md flex items-center justify-between shadow-2xl relative overflow-hidden" style={{ background: 'rgba(10, 10, 10, 0.95)' }}>
+                <div className="flex items-center gap-3">
+                  <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center" style={{ background: 'rgba(248,113,113,0.1)', border: '1px solid rgba(248,113,113,0.3)' }}>
+                    <span style={{ color: '#f87171', fontSize: '16px' }}>⚠</span>
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-playfair text-[0.85rem] font-semibold leading-snug" style={{ color: '#F8F5F0' }}>
+                      {toast.message}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setToast(prev => ({ ...prev, show: false }))}
+                  className="ml-3 transition-colors text-xs font-sans px-2 py-1 rounded"
+                  style={{ color: 'rgba(248, 245, 240, 0.5)' }}
+                >
+                  ✕
+                </button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

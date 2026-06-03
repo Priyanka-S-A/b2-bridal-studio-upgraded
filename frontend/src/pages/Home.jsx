@@ -9,7 +9,7 @@ import WhyChooseUs from '../components/home/WhyChooseUs';
 import Achievements from '../components/home/Achievements';
 import GalleryShowcase from '../components/home/GalleryShowcase';
 import Testimonials from '../components/home/Testimonials';
-import VideoTestimonialsSection from '../components/home/VideoTestimonialsSection';
+import VideoWallSection from '../components/home/VideoWallSection';
 
 import ContactSection from '../components/home/ContactSection';
 
@@ -51,7 +51,7 @@ const Home = () => {
         <Achievements />
         <GalleryShowcase />
         <Testimonials />
-        <VideoTestimonialsSection />
+        <VideoWallSection />
 
         <ContactSection />
       </main>

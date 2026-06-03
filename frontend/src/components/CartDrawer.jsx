@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '../context/CartContext';
 import { Link } from 'react-router-dom';
@@ -6,7 +6,24 @@ import { Link } from 'react-router-dom';
 const API = import.meta.env.VITE_API_URL;
 
 const CartDrawer = () => {
-  const { items, itemCount, subtotal, total, isOpen, closeCart, removeFromCart, updateQuantity } = useCart();
+  const { items, itemCount, subtotal, total, isOpen, closeCart, removeFromCart, updateQuantity, updatePeopleCount } = useCart();
+  const [toast, setToast] = useState({ show: false, message: '' });
+
+  const triggerAuthToast = (message) => {
+    setToast({ show: true, message });
+    setTimeout(() => {
+      window.location.href = '/auth';
+    }, 2500);
+  };
+
+  React.useEffect(() => {
+    if (toast.show) {
+      const timer = setTimeout(() => {
+        setToast(prev => ({ ...prev, show: false }));
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [toast]);
 
   return (
     <AnimatePresence>
@@ -111,24 +128,27 @@ const CartDrawer = () => {
                         </p>
 
                         {/* Quantity controls */}
-                        <div className="flex items-center gap-2 mt-2">
-                          <button
-                            onClick={() => updateQuantity(item._id || item.id, item.quantity - 1)}
-                            className="w-6 h-6 flex items-center justify-center text-xs"
-                            style={{ border: '1px solid rgba(255,195,0,0.2)', color: 'rgba(248,245,240,0.6)' }}
-                          >
-                            −
-                          </button>
-                          <span className="font-cinzel text-xs w-6 text-center" style={{ color: '#F8F5F0' }}>
-                            {item.quantity}
-                          </span>
-                          <button
-                            onClick={() => updateQuantity(item._id || item.id, item.quantity + 1)}
-                            className="w-6 h-6 flex items-center justify-center text-xs"
-                            style={{ border: '1px solid rgba(255,195,0,0.2)', color: 'rgba(248,245,240,0.6)' }}
-                          >
-                            +
-                          </button>
+                        <div className="flex items-center justify-between mt-2">
+                          <span className="font-cinzel text-[0.65rem] tracking-[0.1em] uppercase font-bold" style={{ color: 'rgba(248,245,240,0.6)' }}>Quantity:</span>
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => updatePeopleCount(item._id || item.id, (item.peopleCount || item.quantity) - 1)}
+                              className="w-6 h-6 flex items-center justify-center text-xs transition-all rounded-sm cursor-pointer hover:bg-yellow-500/20"
+                              style={{ border: '1px solid rgba(255,195,0,0.2)', color: 'rgba(248,245,240,0.6)', background: 'transparent' }}
+                            >
+                              −
+                            </button>
+                            <span className="font-cinzel text-xs w-6 text-center text-white">
+                              {item.peopleCount || item.quantity}
+                            </span>
+                            <button
+                              onClick={() => updatePeopleCount(item._id || item.id, (item.peopleCount || item.quantity) + 1)}
+                              className="w-6 h-6 flex items-center justify-center text-xs transition-all rounded-sm cursor-pointer hover:bg-yellow-500/20"
+                              style={{ border: '1px solid rgba(255,195,0,0.2)', color: 'rgba(248,245,240,0.6)', background: 'transparent' }}
+                            >
+                              +
+                            </button>
+                          </div>
                         </div>
                       </div>
 
@@ -155,10 +175,7 @@ const CartDrawer = () => {
             {items.length > 0 && (
               <div className="px-6 py-5" style={{ borderTop: '1px solid rgba(255,195,0,0.12)' }}>
                 <div className="flex flex-col gap-2 mb-4">
-                  <div className="flex justify-between font-cormorant text-sm" style={{ color: 'rgba(248,245,240,0.5)' }}>
-                    <span>Subtotal</span>
-                    <span>₹{subtotal.toFixed(2)}</span>
-                  </div>
+
                   <div className="flex justify-between font-cinzel text-sm tracking-wider pt-2" style={{ color: '#F8F5F0', borderTop: '1px solid rgba(255,195,0,0.1)' }}>
                     <span>Total</span>
                     <span style={{ color: '#FFD700' }}>₹{total.toFixed(2)}</span>
@@ -167,10 +184,19 @@ const CartDrawer = () => {
 
                 <button
                   onClick={() => {
-                    const user = JSON.parse(localStorage.getItem('user') || 'null');
+                    const stored = localStorage.getItem('user');
+                    let user = null;
+                    if (stored) {
+                      try {
+                        const parsed = JSON.parse(stored);
+                        if (parsed && parsed.name && (parsed.email || parsed.phone)) {
+                          user = parsed;
+                        }
+                      } catch (e) {}
+                    }
+
                     if (!user) {
-                      alert('Please login to continue');
-                      window.location.href = '/login';
+                      triggerAuthToast('Please login to enquire.');
                       return;
                     }
                     
@@ -194,6 +220,37 @@ const CartDrawer = () => {
                 </button>
               </div>
             )}
+            <AnimatePresence>
+              {toast.show && (
+                <motion.div
+                  key="cart-drawer-toast"
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 20 }}
+                  className="absolute bottom-24 left-6 right-6 z-[999] animate-glow-pulse"
+                >
+                  <div className="glass-dark border-gold-glow px-4 py-3 rounded-md flex items-center justify-between shadow-2xl relative overflow-hidden" style={{ background: 'rgba(10, 10, 10, 0.95)' }}>
+                    <div className="flex items-center gap-3">
+                      <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center" style={{ background: 'rgba(248,113,113,0.1)', border: '1px solid rgba(248,113,113,0.3)' }}>
+                        <span style={{ color: '#f87171', fontSize: '16px' }}>⚠</span>
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-playfair text-[0.85rem] font-semibold leading-snug" style={{ color: '#F8F5F0' }}>
+                          {toast.message}
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => setToast(prev => ({ ...prev, show: false }))}
+                      className="ml-3 transition-colors text-xs font-sans px-2 py-1 rounded"
+                      style={{ color: 'rgba(248, 245, 240, 0.5)' }}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </motion.div>
         </>
       )}

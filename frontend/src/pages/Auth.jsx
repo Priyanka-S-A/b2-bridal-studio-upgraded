@@ -210,7 +210,7 @@ const Auth = () => {
   return (
     <div className="min-h-screen flex items-center justify-center relative pt-28 pb-12 px-4" style={{ background: '#000' }}>
       {/* Background radial glow */}
-      <div className="absolute pointer-events-none" style={{ top: '30%', left: '50%', transform: 'translate(-50%, -50%)', width: '600px', height: '600px', background: 'radial-gradient(circle, rgba(212,175,55,0.08), transparent 70%)' }} />
+      <div className="absolute pointer-events-none" style={{ top: '30%', left: '50%', transform: 'translate(-50%, -50%)', width: '600px', height: '600px', background: 'radial-gradient(circle, rgba(255,215,0,0.08), transparent 70%)' }} />
 
       <motion.div
         variants={staggerContainer}
@@ -220,11 +220,11 @@ const Auth = () => {
       >
         {/* Logo and Premium Branding */}
         <motion.div variants={fadeUp} className="text-center mb-8">
-          <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 bg-black" style={{ border: '1px solid rgba(212,175,55,0.4)', boxShadow: '0 0 25px rgba(212,175,55,0.18)' }}>
+          <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 bg-black" style={{ border: '1px solid rgba(255,215,0,0.4)', boxShadow: '0 0 25px rgba(255,215,0,0.18)' }}>
             <img
               src="/b2-logo-transparent.svg"
               alt="B2 Logo"
-              style={{ width: '42px', height: '42px', objectFit: 'contain', filter: 'drop-shadow(0 0 4px rgba(212,175,55,0.4))' }}
+              style={{ width: '42px', height: '42px', objectFit: 'contain', filter: 'drop-shadow(0 0 4px rgba(255,215,0,0.4))' }}
             />
           </div>
           <h1 className="font-cinzel text-lg tracking-[0.25em] uppercase font-bold" style={{ color: '#FFD700' }}>B2 BRIDAL STUDIO</h1>
@@ -358,7 +358,7 @@ const Auth = () => {
                 <div>
                   <label className="block font-cinzel text-[0.7rem] tracking-[0.25em] uppercase mb-1 font-bold flex items-center justify-between" style={{ color: '#FFD700', textShadow: '0 0 8px rgba(255, 215, 0, 0.15)' }}>
                     Date of Birth
-                    <span className="font-cormorant italic text-[0.75rem] normal-case tracking-normal font-semibold text-gold-300">
+                    <span className="font-cormorant italic text-[0.75rem] normal-case tracking-normal font-semibold" style={{ color: '#FFD700' }}>
                       (optional)
                     </span>
                   </label>
@@ -414,7 +414,7 @@ const Auth = () => {
                   <p className="font-cormorant italic mt-1" style={{ color: '#ffffff', fontSize: '13px' }}>
                     Enter the 6-digit OTP sent to
                   </p>
-                  <p className="font-inter text-xs text-gold-300 mt-0.5 select-all font-semibold">
+                  <p className="font-inter text-xs mt-0.5 select-all font-semibold" style={{ color: '#FFD700' }}>
                     {form.email}
                   </p>
                 </div>
@@ -434,8 +434,8 @@ const Auth = () => {
                       onKeyDown={e => handleOtpKeyDown(index, e)}
                       className="w-12 h-14 bg-white/5 border text-center text-xl font-bold font-inter focus:outline-none transition-all duration-300 text-white rounded-sm"
                       style={{
-                        borderColor: digit ? '#D4AF37' : 'rgba(212, 175, 55, 0.25)',
-                        boxShadow: digit ? '0 0 10px rgba(212, 175, 55, 0.2)' : 'none'
+                        borderColor: digit ? '#FFD700' : 'rgba(255, 215, 0, 0.25)',
+                        boxShadow: digit ? '0 0 10px rgba(255, 215, 0, 0.2)' : 'none'
                       }}
                     />
                   ))}

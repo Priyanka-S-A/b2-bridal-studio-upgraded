@@ -7,15 +7,30 @@ const API = import.meta.env.VITE_API_URL;
 
 
 const Products = () => {
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState(() => {
+    const cached = localStorage.getItem('b2_products_cache');
+    return cached ? JSON.parse(cached) : [];
+  });
+  const [loading, setLoading] = useState(() => {
+    return !localStorage.getItem('b2_products_cache');
+  });
   const [quantities, setQuantities] = useState({});
   const [toast, setToast] = useState(null);
   const { addToCart, removeFromCart, items, openCart } = useCart();
 
   useEffect(() => {
+    if (!products.length) setLoading(true);
     axios.get(`${API}/api/products`)
-      .then(res => setProducts(res.data || []))
-      .catch(() => setProducts([]));
+      .then(res => {
+        const data = res.data || [];
+        setProducts(data);
+        localStorage.setItem('b2_products_cache', JSON.stringify(data));
+        setLoading(false);
+      })
+      .catch(() => {
+        if (!products.length) setProducts([]);
+        setLoading(false);
+      });
   }, []);
 
   const isInCart = (id) => items.some(i => (i._id || i.id) === id);
@@ -60,7 +75,9 @@ const Products = () => {
 
       {/* Product Grid or Empty State */}
       <div className="max-w-[1300px] mx-auto px-6 lg:px-12 py-16 pb-24">
-        {products.length === 0 ? (
+        {loading ? (
+          <div className="flex justify-center py-20"><div className="w-8 h-8 rounded-full animate-spin" style={{ border: '2px solid rgba(255,195,0,0.2)', borderTopColor: '#FFD700' }} /></div>
+        ) : products.length === 0 ? (
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}

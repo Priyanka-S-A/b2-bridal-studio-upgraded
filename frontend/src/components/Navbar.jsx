@@ -33,7 +33,16 @@ const Navbar = () => {
   useEffect(() => {
     const loadUser = () => {
       const stored = localStorage.getItem('user');
-      setUser(stored ? JSON.parse(stored) : null);
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          if (parsed && (parsed.email || parsed.name)) {
+            setUser(parsed);
+            return;
+          }
+        } catch (e) {}
+      }
+      setUser(null);
     };
     loadUser();
     window.addEventListener('storage', loadUser);
@@ -296,10 +305,21 @@ const Navbar = () => {
                 <>
                   <Link
                     to="/auth"
-                    className="font-cinzel text-[0.7rem] tracking-[0.15em] uppercase px-4 py-2 transition-all duration-300 font-bold"
-                    style={{ color: '#FFD700', border: '1px solid rgba(255, 215, 0, 0.4)' }}
-                    onMouseEnter={e => { e.currentTarget.style.color = '#FFE566'; e.currentTarget.style.borderColor = '#FFE566'; }}
-                    onMouseLeave={e => { e.currentTarget.style.color = '#FFD700'; e.currentTarget.style.borderColor = 'rgba(255, 215, 0, 0.4)'; }}
+                    className="font-cinzel text-[0.7rem] tracking-[0.15em] uppercase px-5 py-2.5 transition-all duration-300 font-extrabold flex items-center justify-center rounded-sm"
+                    style={{
+                      background: 'linear-gradient(135deg, #FFED8A, #FFD700, #FFCA28, #E5A100)',
+                      border: 'none',
+                      color: '#000',
+                      boxShadow: '0 2px 10px rgba(255,195,0,0.25)'
+                    }}
+                    onMouseEnter={e => {
+                      e.currentTarget.style.boxShadow = '0 0 25px rgba(255,215,0,0.5), 0 4px 16px rgba(255,195,0,0.25)';
+                      e.currentTarget.style.transform = 'translateY(-2px)';
+                    }}
+                    onMouseLeave={e => {
+                      e.currentTarget.style.boxShadow = '0 2px 10px rgba(255,195,0,0.25)';
+                      e.currentTarget.style.transform = 'translateY(0)';
+                    }}
                   >
                     Login
                   </Link>
@@ -422,7 +442,27 @@ const Navbar = () => {
               </div>
             ) : (
               <div className="mt-8 flex flex-col gap-3 pb-8">
-                <Link to="/auth" className="btn-outline-gold text-center text-xs py-3" onClick={() => setMenuOpen(false)}>Login</Link>
+                <Link
+                  to="/auth"
+                  onClick={() => setMenuOpen(false)}
+                  className="text-center text-xs py-3 font-cinzel tracking-[0.15em] uppercase font-extrabold transition-all duration-300 rounded-sm"
+                  style={{
+                    background: 'linear-gradient(135deg, #FFED8A, #FFD700, #FFCA28, #E5A100)',
+                    border: 'none',
+                    color: '#000',
+                    boxShadow: '0 2px 10px rgba(255,195,0,0.25)'
+                  }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.boxShadow = '0 0 25px rgba(255,215,0,0.5), 0 4px 16px rgba(255,195,0,0.25)';
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.boxShadow = '0 2px 10px rgba(255,195,0,0.25)';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                  }}
+                >
+                  Login
+                </Link>
               </div>
             )}
         </div>

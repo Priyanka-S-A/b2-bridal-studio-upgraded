@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { motion } from 'framer-motion';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { useCart } from '../context/CartContext';
 import { fadeUp, staggerContainer } from '../animations/variants';
 
 const UPI_ID = 'b2bridalstudio@sbi';
@@ -11,20 +10,20 @@ const API = import.meta.env.VITE_API_URL;
 const Payment = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { items: cartItems, subtotal: cartSubtotal, total: cartTotal } = useCart();
 
-  // Support both Cart flow and Direct Service flow
+  // Support only Direct Service flow
   const serviceData = location.state?.serviceData;
-  const items = cartItems.length > 0 ? cartItems : (serviceData?.items || []);
-  const subtotal = cartItems.length > 0 ? cartSubtotal : (serviceData?.subtotal || 0);
+  const items = serviceData?.items || [];
+  const subtotal = serviceData?.subtotal || 0;
   const gst = 0;
-  const total = cartItems.length > 0 ? cartTotal : (serviceData?.total || 0);
-  const isServiceFlow = cartItems.length === 0 && !!serviceData;
+  const total = serviceData?.total || 0;
+  const isServiceFlow = !!serviceData;
 
   const gstIncluded = items.reduce((sum, i) => {
     const gstPercent = i.gstPercentage || 0;
     if (gstPercent > 0) {
-      const finalPrice = i.price * (i.quantity || 1);
+      const count = i.peopleCount || i.quantity || 1;
+      const finalPrice = i.price * count;
       const base = finalPrice / (1 + gstPercent / 100);
       return sum + (finalPrice - base);
     }
@@ -120,7 +119,7 @@ const Payment = () => {
             <div className="mb-6">
               <span className="font-cinzel text-[0.6rem] tracking-[0.2em] uppercase block mb-2 font-bold" style={{ color: '#FFD700' }}>UPI ID</span>
               <div className="flex items-center justify-center gap-3 mb-4">
-                <span className="font-inter text-base font-medium" style={{ color: '#FFD700' }}>{UPI_ID}</span>
+                <span className="font-inter text-base font-medium text-white">{UPI_ID}</span>
                 <button
                   onClick={() => { navigator.clipboard.writeText(UPI_ID); }}
                   className="px-3 py-1 font-cinzel text-[0.6rem] tracking-[0.15em] uppercase transition-all cursor-pointer font-bold animate-glow-pulse"
@@ -133,7 +132,7 @@ const Payment = () => {
               {/* GPay Number */}
               <span className="font-cinzel text-[0.6rem] tracking-[0.2em] uppercase block mb-2 font-bold" style={{ color: '#FFD700' }}>GPay Number</span>
               <div className="flex items-center justify-center gap-3 mb-4">
-                <span className="font-inter text-base font-medium" style={{ color: '#FFD700' }}>9840551365</span>
+                <span className="font-inter text-base font-medium text-white">9840551365</span>
                 <button
                   onClick={() => { navigator.clipboard.writeText('9840551365'); }}
                   className="px-3 py-1 font-cinzel text-[0.6rem] tracking-[0.15em] uppercase transition-all cursor-pointer font-bold animate-glow-pulse"
@@ -157,13 +156,13 @@ const Payment = () => {
               >
                 Tap to Pay via UPI
               </a>
-              <span className="font-cormorant italic text-[0.7rem] block text-center" style={{ color: 'rgba(248,245,240,0.45)' }}>
+              <span className="font-cormorant italic font-bold text-xs block text-center text-white">
                 Opens Google Pay, PhonePe, or Paytm on mobile devices
               </span>
             </div>
 
             <div className="p-4 rounded-sm" style={{ background: 'rgba(255,195,0,0.05)', border: '1px solid rgba(255,195,0,0.1)' }}>
-              <p className="font-cormorant italic text-sm" style={{ color: 'rgba(248,245,240,0.5)' }}>
+              <p className="font-cormorant italic font-bold text-base text-white text-center">
                 After making the payment, click "Confirm Booking" to submit your booking details and payment proof.
               </p>
             </div>
@@ -177,26 +176,29 @@ const Payment = () => {
             className="glass-dark p-4 sm:p-8 rounded-sm flex flex-col"
             style={{ border: '1px solid rgba(255,195,0,0.15)' }}
           >
-            <span className="font-cinzel text-[0.65rem] tracking-[0.3em] uppercase block mb-6 font-bold" style={{ color: '#FFD700' }}>Order Summary</span>
+            <span className="font-cinzel text-sm tracking-[0.25em] uppercase block mb-6 font-bold" style={{ color: '#FFD700' }}>Order Summary</span>
 
             <div className="flex-1 overflow-y-auto mb-6" style={{ maxHeight: '300px' }}>
-              {items.map(item => (
-                <div key={item._id || item.id} className="flex justify-between items-center py-3" style={{ borderBottom: '1px solid rgba(255,195,0,0.06)' }}>
-                  <div>
-                    <span className="font-cormorant text-sm block" style={{ color: '#F8F5F0' }}>{item.name}</span>
-                    <span className="font-cinzel text-[0.6rem] tracking-[0.1em] font-bold" style={{ color: '#FFD700' }}>Qty: {item.quantity}</span>
+              {items.map(item => {
+                const count = item.peopleCount || item.quantity || 1;
+                return (
+                  <div key={item._id || item.id} className="flex justify-between items-center py-3" style={{ borderBottom: '1px solid rgba(255,195,0,0.06)' }}>
+                    <div>
+                      <span className="font-cormorant text-base font-medium block" style={{ color: '#FFFFFF' }}>{item.name}</span>
+                      <span className="font-cinzel text-xs tracking-[0.15em] font-bold" style={{ color: '#FFD700' }}>
+                        Service For: {count} {count === 1 ? 'Person' : 'People'}
+                      </span>
+                    </div>
+                    <span className="font-cinzel text-base font-bold" style={{ color: '#FFD700' }}>₹{(item.price * count).toLocaleString()}</span>
                   </div>
-                  <span className="font-cinzel text-sm" style={{ color: '#FFD700' }}>₹{(item.price * item.quantity).toLocaleString()}</span>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             <div className="pt-4 flex flex-col gap-2" style={{ borderTop: '1px solid rgba(255,195,0,0.1)' }}>
-              <div className="flex justify-between font-cormorant text-sm" style={{ color: 'rgba(248,245,240,0.5)' }}>
-                <span>Subtotal</span><span>₹{subtotal.toFixed(2)}</span>
-              </div>
+
               {gstIncluded > 0 && (
-                <div className="flex justify-between font-cormorant text-sm" style={{ color: 'rgba(248,245,240,0.5)' }}>
+                <div className="flex justify-between font-cormorant text-base font-medium" style={{ color: 'rgba(248,245,240,0.85)' }}>
                   <span>GST (Included)</span>
                   <span>₹{(appliedCoupon ? gstIncluded * (appliedCoupon.finalAmount / total) : gstIncluded).toFixed(2)}</span>
                 </div>
@@ -212,13 +214,13 @@ const Payment = () => {
                       placeholder="Coupon Code"
                       value={couponCode}
                       onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-                      className="flex-1 px-3 py-2 bg-black/50 border outline-none text-sm font-cinzel text-white uppercase"
-                      style={{ borderColor: 'rgba(255,195,0,0.3)' }}
+                      className="flex-1 px-3 py-2 bg-black/50 border outline-none text-sm font-cinzel text-white uppercase placeholder-white"
+                      style={{ borderColor: 'rgba(255,195,0,0.4)' }}
                     />
                     <button
                       onClick={handleApplyCoupon}
-                      className="px-4 py-2 font-cinzel text-xs tracking-wider"
-                      style={{ background: 'rgba(255,195,0,0.1)', color: '#FFD700', border: '1px solid rgba(255,195,0,0.3)' }}
+                      className="px-4 py-2 font-cinzel text-xs font-bold tracking-wider hover:bg-yellow-500/20 transition-colors"
+                      style={{ background: 'rgba(255,195,0,0.15)', color: '#FFD700', border: '1px solid rgba(255,195,0,0.4)' }}
                     >
                       Apply
                     </button>
@@ -229,13 +231,13 @@ const Payment = () => {
               )}
 
               {appliedCoupon && (
-                <div className="flex justify-between font-cormorant text-sm text-green-500">
+                <div className="flex justify-between font-cormorant text-base font-medium text-green-400">
                   <span>Discount ({appliedCoupon.discountPercentage}%)</span>
                   <span>-₹{appliedCoupon.discountAmount.toFixed(2)}</span>
                 </div>
               )}
 
-              <div className="flex justify-between font-cinzel text-base pt-2" style={{ borderTop: '1px solid rgba(255,195,0,0.08)', color: '#F8F5F0' }}>
+              <div className="flex justify-between font-cinzel text-lg font-bold pt-3" style={{ borderTop: '1px solid rgba(255,195,0,0.2)', color: '#FFFFFF' }}>
                 <span>Total</span>
                 <span style={{ color: '#FFD700' }}>
                   ₹{(appliedCoupon ? appliedCoupon.finalAmount : total).toFixed(2)}

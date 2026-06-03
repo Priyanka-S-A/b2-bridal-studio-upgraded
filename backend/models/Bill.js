@@ -6,6 +6,7 @@ const billSchema = new mongoose.Schema({
     name: String, 
     price: Number, 
     quantity: { type: Number, default: 1 },
+    peopleCount: { type: Number, default: 1 },
     itemType: { type: String } // 'service' | 'product'
   }],
   subtotal: { type: Number, default: 0 },

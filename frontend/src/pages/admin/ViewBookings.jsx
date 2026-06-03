@@ -110,11 +110,19 @@ const ViewBookings = () => {
                   </td>
                   <td className="p-4 text-sm text-gray-600">
                     <ul className="list-disc pl-4 space-y-2">
-                      {bill.items.map((item, i) => (
-                        <li key={i} style={{ fontSize: '14px', color: '#000000', fontWeight: 500, fontFamily: 'Arial, Helvetica, sans-serif' }}>
-                          {item.name} <span style={{ fontSize: '13px', color: '#000000', fontWeight: 500, fontFamily: 'Arial, Helvetica, sans-serif', marginLeft: '4px' }}>(₹{item.price})</span>
-                        </li>
-                      ))}
+                      {bill.items.map((item, i) => {
+                        const count = item.peopleCount || item.quantity || 1;
+                        const isService = item.itemType === 'service' || bill.type === 'service';
+                        return (
+                          <li key={i} style={{ fontSize: '14px', color: '#000000', fontWeight: 500, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                            <div className="font-semibold">{item.name}</div>
+                            <div className="text-xs text-gray-500 font-medium mt-0.5">
+                              {isService ? 'Service For: ' : 'Qty: '}{count} {isService ? (count === 1 ? 'Person' : 'People') : ''}
+                              <span className="ml-1 text-gray-400 font-normal">(₹{item.price} each)</span>
+                            </div>
+                          </li>
+                        );
+                      })}
                     </ul>
                   </td>
                   <td className="p-4">

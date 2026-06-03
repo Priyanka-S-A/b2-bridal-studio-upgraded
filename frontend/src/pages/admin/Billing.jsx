@@ -183,7 +183,14 @@ export default function Billing() {
     setGenerating(true);
     try {
       const payload = {
-        items: billItems.map(i => ({ name: i.name, price: i.price, quantity: i.quantity, itemType: i.itemType, gstPercentage: i.gstPercentage || 0 })),
+        items: billItems.map(i => ({ 
+          name: i.name, 
+          price: i.price, 
+          quantity: i.quantity, 
+          peopleCount: i.itemType === 'service' ? i.quantity : 1,
+          itemType: i.itemType, 
+          gstPercentage: i.gstPercentage || 0 
+        })),
         subtotal: subtotalBase,
         gst: gstAmount,
         total: finalTotal,
@@ -215,7 +222,7 @@ export default function Billing() {
       const revenueCreated = data.revenueCreated !== false;
 
       setSuccessBill({ bill, revenueCreated });
-      generatePDF(bill);
+      await generatePDF(bill);
       setBillItems([]);
       setCustomer('Walk-in');
     } catch (e) {
@@ -226,92 +233,139 @@ export default function Billing() {
   };
 
   /* ─── PDF generation ───────────────────────────────────────── */
-  const generatePDF = (bill) => {
+  const generatePDF = async (bill) => {
     const doc = new jsPDF();
 
-    // Black header
-    doc.setFillColor(0, 0, 0);
-    doc.rect(0, 0, 210, 42, 'F');
-    doc.setTextColor(201, 162, 39);
-    doc.setFontSize(22);
-    doc.setFont('helvetica', 'bold');
-    doc.text('B2 Bridal Studio', 105, 18, { align: 'center' });
-    doc.setFontSize(9);
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(180, 160, 120);
-    doc.text('Premium Beauty & Artistry', 105, 27, { align: 'center' });
-    doc.setTextColor(140, 130, 110);
-    doc.text('Offline Bill', 105, 35, { align: 'center' });
+    // Header background
+    doc.setFillColor(10, 10, 10);
+    doc.rect(0, 0, 210, 45, 'F');
+
+    // Add Logo
+    try {
+      const logoImg = await new Promise((resolve) => {
+        const img = new Image();
+        img.src = '/b2-icon.svg';
+        img.width = 150;
+        img.height = 150;
+        img.onload = () => {
+          try {
+            const canvas = document.createElement('canvas');
+            canvas.width = 150;
+            canvas.height = 150;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, 150, 150);
+            resolve(canvas.toDataURL('image/png'));
+          } catch (e) {
+            console.error("Canvas rasterize error:", e);
+            resolve(null);
+          }
+        };
+        img.onerror = () => resolve(null);
+      });
+      if (logoImg) {
+        doc.addImage(logoImg, 'PNG', 97.5, 4, 15, 15);
+      }
+    } catch (e) {
+      console.error("Logo load error:", e);
+    }
+
+    // Header Text
+    doc.setFont('times', 'bold');
+    doc.setTextColor(255, 215, 0); // Bright Gold!
+    doc.setFontSize(20);
+    doc.text('B2 Bridal Studio', 105, 28, { align: 'center' });
+    
+    doc.setFont('times', 'italic');
+    doc.setTextColor(230, 220, 200); // Premium cream color
+    doc.setFontSize(10);
+    doc.text('Premium Beauty & Artistry', 105, 35, { align: 'center' });
 
     // Bill meta
-    doc.setTextColor(60, 60, 60);
-    doc.setFontSize(10);
+    doc.setFont('times', 'normal');
+    doc.setTextColor(50, 50, 50);
+    doc.setFontSize(11);
     const billNo = bill._id.slice(-8).toUpperCase();
     const billDate = new Date(bill.date || bill.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
-    doc.text(`Bill #${billNo}`, 15, 54);
+    
+    doc.text(`Bill No: #${billNo}`, 15, 55);
     doc.text(`Date: ${billDate}`, 15, 62);
-    doc.text(`Source: ${bill.source}`, 15, 70);
-    doc.text(`Payment: ${bill.paymentMethod}`, 15, 78);
-    doc.text(`Customer: ${bill.customer || 'Walk-in'}`, 120, 54);
+    if (bill.source) doc.text(`Source: ${bill.source}`, 15, 69);
+    if (bill.paymentMethod) doc.text(`Payment Mode: ${bill.paymentMethod}`, 15, 76);
+
+    doc.text(`Customer: ${bill.customer || 'Walk-in'}`, 120, 55);
 
     // Items table
-    const tableData = bill.items.map((item, i) => [
-      i + 1,
-      item.name,
-      item.quantity || 1,
-      `Rs.${item.price.toFixed(2)}`,
-      `Rs.${(item.price * (item.quantity || 1)).toFixed(2)}`,
-    ]);
+    const tableData = bill.items.map((item, i) => {
+      const count = item.peopleCount || item.quantity || 1;
+      const isService = item.itemType === 'service';
+      return [
+        i + 1,
+        item.name,
+        isService ? `${count} ${count === 1 ? 'Person' : 'People'}` : count,
+        `Rs. ${item.price}`,
+        `Rs. ${(item.price * count)}`
+      ];
+    });
 
     autoTable(doc, {
-      startY: 80,
-      head: [['#', 'Item', 'Qty', 'Price', 'Amount']],
+      startY: 85,
+      head: [['#', 'Item', 'Service For / Qty', 'Price', 'Amount']],
       body: tableData,
       theme: 'grid',
-      headStyles: { fillColor: [20, 20, 20], textColor: [201, 162, 39], fontStyle: 'bold', fontSize: 9 },
-      bodyStyles: { fontSize: 9, textColor: [50, 50, 50] },
-      alternateRowStyles: { fillColor: [250, 248, 244] },
+      headStyles: { 
+        fillColor: [15, 15, 15], 
+        textColor: [255, 215, 0], // Bright Gold!
+        font: 'times', 
+        fontStyle: 'bold', 
+        fontSize: 10 
+      },
+      bodyStyles: { 
+        font: 'times', 
+        fontSize: 10, 
+        textColor: [40, 40, 40] 
+      },
+      alternateRowStyles: { fillColor: [250, 250, 250] },
       margin: { left: 15, right: 15 },
     });
 
-    const finalY = doc.lastAutoTable.finalY + 8;
-    doc.setFontSize(10);
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(100, 100, 100);
-    let cursorY = finalY + 6;
+    const finalY = doc.lastAutoTable.finalY + 12;
+    let cursorY = finalY;
+    doc.setFont('times', 'normal');
+    doc.setFontSize(11);
 
     // Service Total (Original pre-discount total)
     const displayOriginalAmount = bill.originalAmount || bill.total + (bill.discountAmount || 0);
-    doc.text(`Service Total: Rs.${displayOriginalAmount.toFixed(2)}`, 193, cursorY, { align: 'right' });
-    cursorY += 6;
+    doc.setTextColor(100, 100, 100);
+    doc.text(`Service Total: Rs. ${displayOriginalAmount.toFixed(2)}`, 195, cursorY, { align: 'right' });
+    cursorY += 8;
 
     // Coupon or manual discount line-items
     if (bill.discountAmount && bill.discountAmount > 0) {
       doc.setTextColor(34, 139, 34); // Forest green
       if (bill.discountType === 'coupon' || bill.couponCode) {
-        doc.text(`Coupon Applied (${bill.couponCode}): -Rs.${bill.discountAmount.toFixed(2)}`, 193, cursorY, { align: 'right' });
+        doc.text(`Coupon Applied (${bill.couponCode}): -Rs. ${bill.discountAmount.toFixed(2)}`, 195, cursorY, { align: 'right' });
       } else if (bill.discountType === 'manual') {
-        doc.text(`Manual Discount: -Rs.${bill.discountAmount.toFixed(2)}`, 193, cursorY, { align: 'right' });
+        doc.text(`Manual Discount: -Rs. ${bill.discountAmount.toFixed(2)}`, 195, cursorY, { align: 'right' });
       }
-      cursorY += 6;
+      cursorY += 8;
     }
 
     if (bill.gst && bill.gst > 0) {
       doc.setTextColor(100, 100, 100);
-      doc.text(`GST Included: Rs.${bill.gst.toFixed(2)}`, 193, cursorY, { align: 'right' });
-      cursorY += 6;
+      doc.text(`GST Included: Rs. ${bill.gst.toFixed(2)}`, 195, cursorY, { align: 'right' });
+      cursorY += 8;
     }
     
-    cursorY += 2;
-    doc.setFontSize(13);
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(20, 20, 20);
-    doc.text(`Final Amount Paid: Rs.${bill.total.toFixed(2)}`, 193, cursorY, { align: 'right' });
+    cursorY += 4;
+    doc.setFont('times', 'bold');
+    doc.setFontSize(14);
+    doc.setTextColor(255, 215, 0); // Bright Gold!
+    doc.text(`Final Amount Paid: Rs. ${bill.total.toFixed(2)}`, 195, cursorY, { align: 'right' });
 
     // Footer
-    doc.setFontSize(8);
-    doc.setFont('helvetica', 'italic');
-    doc.setTextColor(160, 160, 160);
+    doc.setFont('times', 'italic');
+    doc.setFontSize(9);
+    doc.setTextColor(140, 140, 140);
     doc.text('Thank you for choosing B2 Bridal Studio', 105, 282, { align: 'center' });
 
     doc.save(`B2-Bill-${billNo}.pdf`);
@@ -570,7 +624,9 @@ export default function Billing() {
             {/* Quantity */}
             <div className="flex items-center gap-3">
               <div className="flex-1">
-                <label className="block text-xs font-cinzel font-semibold uppercase tracking-wide text-gray-700 mb-1.5">Quantity</label>
+                <label className="block text-xs font-cinzel font-semibold uppercase tracking-wide text-gray-700 mb-1.5">
+                  {category === 'services' ? 'Service For (People)' : 'Quantity'}
+                </label>
                 <input
                   id="billing-qty"
                   type="number"
@@ -669,7 +725,7 @@ export default function Billing() {
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-semibold text-gray-900 truncate">{item.name}</p>
                       <p className="text-xs text-gray-600 mt-0.5">
-                        ₹{item.price} × {item.quantity}
+                        ₹{item.price} × {item.itemType === 'service' ? `Service For: ${item.quantity} ${item.quantity === 1 ? 'Person' : 'People'}` : `Qty: ${item.quantity}`}
                         <span className="ml-2 px-1.5 py-0.5 rounded bg-gray-100 text-gray-700 capitalize text-[0.65rem] font-medium">{item.itemType}</span>
                       </p>
                     </div>

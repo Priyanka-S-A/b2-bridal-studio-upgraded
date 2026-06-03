@@ -35,11 +35,11 @@ export const CartProvider = ({ children }) => {
       if (existing) {
         return prev.map(i =>
           (i._id || i.id) === key
-            ? { ...i, quantity: i.quantity + quantityToAdd }
+            ? { ...i, quantity: i.quantity + quantityToAdd, peopleCount: (i.peopleCount || i.quantity) + quantityToAdd }
             : i
         );
       }
-      return [...prev, { ...product, quantity: quantityToAdd }];
+      return [...prev, { ...product, quantity: quantityToAdd, peopleCount: quantityToAdd }];
     });
   }, []);
 
@@ -47,17 +47,21 @@ export const CartProvider = ({ children }) => {
     setItems(prev => prev.filter(i => (i._id || i.id) !== productId));
   }, []);
 
-  const updateQuantity = useCallback((productId, quantity) => {
-    if (quantity < 1) {
+  const updatePeopleCount = useCallback((productId, peopleCount) => {
+    if (peopleCount < 1) {
       setItems(prev => prev.filter(i => (i._id || i.id) !== productId));
       return;
     }
     setItems(prev =>
       prev.map(i =>
-        (i._id || i.id) === productId ? { ...i, quantity } : i
+        (i._id || i.id) === productId ? { ...i, quantity: peopleCount, peopleCount } : i
       )
     );
   }, []);
+
+  const updateQuantity = useCallback((productId, quantity) => {
+    updatePeopleCount(productId, quantity);
+  }, [updatePeopleCount]);
 
   const clearCart = useCallback(() => setItems([]), []);
 
@@ -65,8 +69,8 @@ export const CartProvider = ({ children }) => {
   const closeCart = useCallback(() => setIsOpen(false), []);
   const toggleCart = useCallback(() => setIsOpen(p => !p), []);
 
-  const itemCount = items.reduce((sum, i) => sum + i.quantity, 0);
-  const subtotal = items.reduce((sum, i) => sum + (i.price || 0) * i.quantity, 0);
+  const itemCount = items.reduce((sum, i) => sum + (i.peopleCount || i.quantity || 0), 0);
+  const subtotal = items.reduce((sum, i) => sum + (i.price || 0) * (i.peopleCount || i.quantity || 0), 0);
   const total = subtotal;
 
   return (
@@ -74,7 +78,7 @@ export const CartProvider = ({ children }) => {
       value={{
         items, itemCount, subtotal, total,
         isOpen, openCart, closeCart, toggleCart,
-        addToCart, removeFromCart, updateQuantity, clearCart,
+        addToCart, removeFromCart, updateQuantity, updatePeopleCount, clearCart,
       }}
     >
       {children}
