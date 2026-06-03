@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 const API = import.meta.env.VITE_API_URL;
 
 const CartDrawer = () => {
-  const { items, itemCount, subtotal, total, isOpen, closeCart, removeFromCart, updateQuantity } = useCart();
+  const { items, itemCount, subtotal, total, isOpen, closeCart, removeFromCart, updateQuantity, updatePeopleCount } = useCart();
   const [toast, setToast] = useState({ show: false, message: '' });
 
   const triggerAuthToast = (message) => {
@@ -128,24 +128,27 @@ const CartDrawer = () => {
                         </p>
 
                         {/* Quantity controls */}
-                        <div className="flex items-center gap-2 mt-2">
-                          <button
-                            onClick={() => updateQuantity(item._id || item.id, item.quantity - 1)}
-                            className="w-6 h-6 flex items-center justify-center text-xs"
-                            style={{ border: '1px solid rgba(255,195,0,0.2)', color: 'rgba(248,245,240,0.6)' }}
-                          >
-                            −
-                          </button>
-                          <span className="font-cinzel text-xs w-6 text-center" style={{ color: '#F8F5F0' }}>
-                            {item.quantity}
-                          </span>
-                          <button
-                            onClick={() => updateQuantity(item._id || item.id, item.quantity + 1)}
-                            className="w-6 h-6 flex items-center justify-center text-xs"
-                            style={{ border: '1px solid rgba(255,195,0,0.2)', color: 'rgba(248,245,240,0.6)' }}
-                          >
-                            +
-                          </button>
+                        <div className="flex items-center justify-between mt-2">
+                          <span className="font-cinzel text-[0.65rem] tracking-[0.1em] uppercase font-bold" style={{ color: 'rgba(248,245,240,0.6)' }}>Quantity:</span>
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => updatePeopleCount(item._id || item.id, (item.peopleCount || item.quantity) - 1)}
+                              className="w-6 h-6 flex items-center justify-center text-xs transition-all rounded-sm cursor-pointer hover:bg-yellow-500/20"
+                              style={{ border: '1px solid rgba(255,195,0,0.2)', color: 'rgba(248,245,240,0.6)', background: 'transparent' }}
+                            >
+                              −
+                            </button>
+                            <span className="font-cinzel text-xs w-6 text-center text-white">
+                              {item.peopleCount || item.quantity}
+                            </span>
+                            <button
+                              onClick={() => updatePeopleCount(item._id || item.id, (item.peopleCount || item.quantity) + 1)}
+                              className="w-6 h-6 flex items-center justify-center text-xs transition-all rounded-sm cursor-pointer hover:bg-yellow-500/20"
+                              style={{ border: '1px solid rgba(255,195,0,0.2)', color: 'rgba(248,245,240,0.6)', background: 'transparent' }}
+                            >
+                              +
+                            </button>
+                          </div>
                         </div>
                       </div>
 
@@ -172,10 +175,7 @@ const CartDrawer = () => {
             {items.length > 0 && (
               <div className="px-6 py-5" style={{ borderTop: '1px solid rgba(255,195,0,0.12)' }}>
                 <div className="flex flex-col gap-2 mb-4">
-                  <div className="flex justify-between font-cormorant text-sm" style={{ color: 'rgba(248,245,240,0.5)' }}>
-                    <span>Subtotal</span>
-                    <span>₹{subtotal.toFixed(2)}</span>
-                  </div>
+
                   <div className="flex justify-between font-cinzel text-sm tracking-wider pt-2" style={{ color: '#F8F5F0', borderTop: '1px solid rgba(255,195,0,0.1)' }}>
                     <span>Total</span>
                     <span style={{ color: '#FFD700' }}>₹{total.toFixed(2)}</span>

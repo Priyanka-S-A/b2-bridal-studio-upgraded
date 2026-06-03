@@ -20,7 +20,8 @@ const ConfirmBooking = () => {
   const gstTotal = items.reduce((sum, i) => {
     const gstPercent = i.gstPercentage || 0;
     if (gstPercent > 0) {
-      const finalPrice = i.price * (i.quantity || 1);
+      const count = i.peopleCount || i.quantity || 1;
+      const finalPrice = i.price * count;
       const base = finalPrice / (1 + gstPercent / 100);
       return sum + (finalPrice - base);
     }
@@ -83,7 +84,8 @@ const ConfirmBooking = () => {
       formData.append('items', JSON.stringify(items.map(i => ({
         name: i.name,
         price: i.price,
-        quantity: i.quantity,
+        quantity: i.peopleCount || i.quantity || 1,
+        peopleCount: i.peopleCount || i.quantity || 1,
         gstPercentage: i.gstPercentage || 0
       }))));
       formData.append('paymentProof', paymentProof);
@@ -314,12 +316,20 @@ const ConfirmBooking = () => {
             <h3 className="font-cinzel text-sm tracking-[0.25em] uppercase mb-5 pb-3 font-bold" style={{ color: '#FFD700', borderBottom: '1px solid rgba(255,195,0,0.1)' }}>Cart Summary</h3>
 
             <div className="flex flex-col gap-3 mb-5">
-              {items.map(item => (
-                <div key={item._id || item.id} className="flex justify-between text-sm">
-                  <span className="font-cormorant text-base font-medium" style={{ color: 'rgba(248,245,240,0.95)' }}>{item.quantity}x {item.name}</span>
-                  <span className="font-cinzel text-sm font-bold" style={{ color: '#FFD700' }}>₹{(item.price * item.quantity).toLocaleString()}</span>
-                </div>
-              ))}
+              {items.map(item => {
+                const count = item.peopleCount || item.quantity || 1;
+                return (
+                  <div key={item._id || item.id} className="flex justify-between items-center py-2" style={{ borderBottom: '1px solid rgba(255,195,0,0.06)' }}>
+                    <div className="flex flex-col gap-0.5">
+                      <span className="font-cormorant text-base font-medium" style={{ color: 'rgba(248,245,240,0.95)' }}>{item.name}</span>
+                      <span className="font-cinzel text-[0.7rem] tracking-[0.05em] uppercase font-bold" style={{ color: '#FFD700' }}>
+                        Service For: {count} {count === 1 ? 'Person' : 'People'}
+                      </span>
+                    </div>
+                    <span className="font-cinzel text-sm font-bold" style={{ color: '#FFD700' }}>₹{(item.price * count).toLocaleString()}</span>
+                  </div>
+                );
+              })}
             </div>
 
             <div className="mt-6 flex flex-col gap-2" style={{ borderTop: '1px solid rgba(255,195,0,0.1)', paddingTop: '16px' }}>

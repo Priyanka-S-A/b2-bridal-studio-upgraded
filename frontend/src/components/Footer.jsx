@@ -27,17 +27,19 @@ const SocialLink = ({ href, label, children }) => (
     className="w-9 h-9 flex items-center justify-center transition-all duration-300"
     style={{
       border: '1px solid rgba(255,195,0,0.2)',
-      color: 'rgba(248,245,240,0.5)',
+      color: '#FFFFFF',
     }}
     onMouseEnter={e => {
       e.currentTarget.style.background = 'rgba(255,195,0,0.12)';
-      e.currentTarget.style.borderColor = 'rgba(255,195,0,0.5)';
+      e.currentTarget.style.borderColor = '#FFD700';
       e.currentTarget.style.color = '#FFD700';
+      e.currentTarget.style.boxShadow = '0 0 12px rgba(255, 215, 0, 0.6)';
     }}
     onMouseLeave={e => {
       e.currentTarget.style.background = 'transparent';
       e.currentTarget.style.borderColor = 'rgba(255,195,0,0.2)';
-      e.currentTarget.style.color = 'rgba(248,245,240,0.5)';
+      e.currentTarget.style.color = '#FFFFFF';
+      e.currentTarget.style.boxShadow = 'none';
     }}
   >
     {children}

@@ -358,7 +358,7 @@ const Auth = () => {
                 <div>
                   <label className="block font-cinzel text-[0.7rem] tracking-[0.25em] uppercase mb-1 font-bold flex items-center justify-between" style={{ color: '#FFD700', textShadow: '0 0 8px rgba(255, 215, 0, 0.15)' }}>
                     Date of Birth
-                    <span className="font-cormorant italic text-[0.75rem] normal-case tracking-normal font-semibold text-gold-300">
+                    <span className="font-cormorant italic text-[0.75rem] normal-case tracking-normal font-semibold" style={{ color: '#FFD700' }}>
                       (optional)
                     </span>
                   </label>
@@ -414,7 +414,7 @@ const Auth = () => {
                   <p className="font-cormorant italic mt-1" style={{ color: '#ffffff', fontSize: '13px' }}>
                     Enter the 6-digit OTP sent to
                   </p>
-                  <p className="font-inter text-xs text-gold-300 mt-0.5 select-all font-semibold">
+                  <p className="font-inter text-xs mt-0.5 select-all font-semibold" style={{ color: '#FFD700' }}>
                     {form.email}
                   </p>
                 </div>

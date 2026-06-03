@@ -22,7 +22,8 @@ const Payment = () => {
   const gstIncluded = items.reduce((sum, i) => {
     const gstPercent = i.gstPercentage || 0;
     if (gstPercent > 0) {
-      const finalPrice = i.price * (i.quantity || 1);
+      const count = i.peopleCount || i.quantity || 1;
+      const finalPrice = i.price * count;
       const base = finalPrice / (1 + gstPercent / 100);
       return sum + (finalPrice - base);
     }
@@ -178,21 +179,24 @@ const Payment = () => {
             <span className="font-cinzel text-sm tracking-[0.25em] uppercase block mb-6 font-bold" style={{ color: '#FFD700' }}>Order Summary</span>
 
             <div className="flex-1 overflow-y-auto mb-6" style={{ maxHeight: '300px' }}>
-              {items.map(item => (
-                <div key={item._id || item.id} className="flex justify-between items-center py-3" style={{ borderBottom: '1px solid rgba(255,195,0,0.06)' }}>
-                  <div>
-                    <span className="font-cormorant text-base font-medium block" style={{ color: '#FFFFFF' }}>{item.name}</span>
-                    <span className="font-cinzel text-xs tracking-[0.1em] font-bold" style={{ color: '#FFD700' }}>Qty: {item.quantity}</span>
+              {items.map(item => {
+                const count = item.peopleCount || item.quantity || 1;
+                return (
+                  <div key={item._id || item.id} className="flex justify-between items-center py-3" style={{ borderBottom: '1px solid rgba(255,195,0,0.06)' }}>
+                    <div>
+                      <span className="font-cormorant text-base font-medium block" style={{ color: '#FFFFFF' }}>{item.name}</span>
+                      <span className="font-cinzel text-xs tracking-[0.15em] font-bold" style={{ color: '#FFD700' }}>
+                        Service For: {count} {count === 1 ? 'Person' : 'People'}
+                      </span>
+                    </div>
+                    <span className="font-cinzel text-base font-bold" style={{ color: '#FFD700' }}>₹{(item.price * count).toLocaleString()}</span>
                   </div>
-                  <span className="font-cinzel text-base font-bold" style={{ color: '#FFD700' }}>₹{(item.price * item.quantity).toLocaleString()}</span>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             <div className="pt-4 flex flex-col gap-2" style={{ borderTop: '1px solid rgba(255,195,0,0.1)' }}>
-              <div className="flex justify-between font-cormorant text-base font-medium" style={{ color: 'rgba(248,245,240,0.85)' }}>
-                <span>Subtotal</span><span>₹{subtotal.toFixed(2)}</span>
-              </div>
+
               {gstIncluded > 0 && (
                 <div className="flex justify-between font-cormorant text-base font-medium" style={{ color: 'rgba(248,245,240,0.85)' }}>
                   <span>GST (Included)</span>

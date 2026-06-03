@@ -127,12 +127,20 @@ const Profile = () => {
 
                       {/* Items */}
                       <div className="mb-4">
-                        {booking.items.map((item, j) => (
-                          <div key={j} className="flex justify-between py-1.5 text-lg font-bold" style={{ borderBottom: j < booking.items.length - 1 ? '1px solid rgba(255,195,0,0.08)' : 'none' }}>
-                            <span className="font-cormorant font-extrabold" style={{ color: '#FFFFFF' }}>{item.quantity || 1}x {item.name}</span>
-                            <span className="font-cinzel text-base font-extrabold" style={{ color: '#FFD700' }}>₹{item.price}</span>
-                          </div>
-                        ))}
+                        {booking.items.map((item, j) => {
+                          const count = item.peopleCount || item.quantity || 1;
+                          return (
+                            <div key={j} className="flex justify-between items-start py-2 text-lg font-bold" style={{ borderBottom: j < booking.items.length - 1 ? '1px solid rgba(255,195,0,0.08)' : 'none' }}>
+                              <div className="flex flex-col gap-0.5">
+                                <span className="font-cormorant font-extrabold text-white">{item.name}</span>
+                                <span className="font-cinzel text-[0.7rem] tracking-[0.05em] uppercase font-bold" style={{ color: '#FFD700' }}>
+                                  Booked For: {count} {count === 1 ? 'Person' : 'People'}
+                                </span>
+                              </div>
+                              <span className="font-cinzel text-base font-extrabold" style={{ color: '#FFD700' }}>₹{(item.price * count).toLocaleString()}</span>
+                            </div>
+                          );
+                        })}
                       </div>
 
                       {/* Footer */}

@@ -42,7 +42,7 @@ router.post('/generate-from-booking/:id', verifyToken, verifyRole(['staff', 'own
     let calculatedGst = 0;
     
     (booking.items || []).forEach(item => {
-      const qty = item.quantity || 1;
+      const qty = item.peopleCount || item.quantity || 1;
       const finalPrice = item.price * qty;
       const gstPercent = item.gstPercentage || 0;
       if (gstPercent > 0) {
@@ -155,7 +155,7 @@ router.post('/offline', verifyToken, verifyRole(['staff', 'owner']), async (req,
     let calculatedGst = 0;
     
     (items || []).forEach(item => {
-      const qty = item.quantity || 1;
+      const qty = item.peopleCount || item.quantity || 1;
       const finalPrice = item.price * qty;
       const gstPercent = item.gstPercentage || 0;
       if (item.itemType === 'service' && gstPercent > 0) {

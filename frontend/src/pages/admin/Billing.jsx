@@ -183,7 +183,14 @@ export default function Billing() {
     setGenerating(true);
     try {
       const payload = {
-        items: billItems.map(i => ({ name: i.name, price: i.price, quantity: i.quantity, itemType: i.itemType, gstPercentage: i.gstPercentage || 0 })),
+        items: billItems.map(i => ({ 
+          name: i.name, 
+          price: i.price, 
+          quantity: i.quantity, 
+          peopleCount: i.itemType === 'service' ? i.quantity : 1,
+          itemType: i.itemType, 
+          gstPercentage: i.gstPercentage || 0 
+        })),
         subtotal: subtotalBase,
         gst: gstAmount,
         total: finalTotal,
@@ -288,17 +295,21 @@ export default function Billing() {
     doc.text(`Customer: ${bill.customer || 'Walk-in'}`, 120, 55);
 
     // Items table
-    const tableData = bill.items.map((item, i) => [
-      i + 1,
-      item.name,
-      item.quantity || 1,
-      `Rs. ${item.price}`,
-      `Rs. ${(item.price * (item.quantity || 1))}`
-    ]);
+    const tableData = bill.items.map((item, i) => {
+      const count = item.peopleCount || item.quantity || 1;
+      const isService = item.itemType === 'service';
+      return [
+        i + 1,
+        item.name,
+        isService ? `${count} ${count === 1 ? 'Person' : 'People'}` : count,
+        `Rs. ${item.price}`,
+        `Rs. ${(item.price * count)}`
+      ];
+    });
 
     autoTable(doc, {
       startY: 85,
-      head: [['#', 'Item', 'Qty', 'Price', 'Amount']],
+      head: [['#', 'Item', 'Service For / Qty', 'Price', 'Amount']],
       body: tableData,
       theme: 'grid',
       headStyles: { 
@@ -613,7 +624,9 @@ export default function Billing() {
             {/* Quantity */}
             <div className="flex items-center gap-3">
               <div className="flex-1">
-                <label className="block text-xs font-cinzel font-semibold uppercase tracking-wide text-gray-700 mb-1.5">Quantity</label>
+                <label className="block text-xs font-cinzel font-semibold uppercase tracking-wide text-gray-700 mb-1.5">
+                  {category === 'services' ? 'Service For (People)' : 'Quantity'}
+                </label>
                 <input
                   id="billing-qty"
                   type="number"
@@ -712,7 +725,7 @@ export default function Billing() {
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-semibold text-gray-900 truncate">{item.name}</p>
                       <p className="text-xs text-gray-600 mt-0.5">
-                        ₹{item.price} × {item.quantity}
+                        ₹{item.price} × {item.itemType === 'service' ? `Service For: ${item.quantity} ${item.quantity === 1 ? 'Person' : 'People'}` : `Qty: ${item.quantity}`}
                         <span className="ml-2 px-1.5 py-0.5 rounded bg-gray-100 text-gray-700 capitalize text-[0.65rem] font-medium">{item.itemType}</span>
                       </p>
                     </div>

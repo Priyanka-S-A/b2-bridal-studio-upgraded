@@ -252,6 +252,7 @@ const Services = () => {
   const [expandedCategory, setExpandedCategory] = useState(null);
   const [selectedOptions, setSelectedOptions] = useState({});
   const [toast, setToast] = useState({ show: false, message: '', serviceName: '' });
+  const [pendingCounts, setPendingCounts] = useState({});
 
   const triggerAuthToast = (message) => {
     setToast({ show: true, message, serviceName: '', isWarning: true });
@@ -357,7 +358,7 @@ const Services = () => {
     });
 
 
-  const addToCart = (serviceItem) => {
+  const addToCart = (serviceItem, initialCount = 1) => {
     if (cart.find(item => item._id === serviceItem._id)) return;
 
     // Hair Extension services are inquiry-only — never add to cart
@@ -376,7 +377,7 @@ const Services = () => {
       return;
     }
 
-    setCart([...cart, serviceItem]);
+    setCart([...cart, { ...serviceItem, peopleCount: initialCount }]);
     setToast({ show: true, message: `"${serviceItem.name}" added successfully. Scroll down to view your cart.`, serviceName: serviceItem.name });
   };
 
@@ -406,7 +407,19 @@ const Services = () => {
     setCart(cart.filter(item => item._id !== serviceId));
   };
 
-  const subtotal = cart.reduce((acc, curr) => acc + curr.price, 0);
+  const updatePeopleCount = (serviceId, count) => {
+    if (count < 1) {
+      removeFromCart(serviceId);
+      return;
+    }
+    if (count > 10) {
+      setToast({ show: true, message: 'Maximum booking limit is 10 people per service.', serviceName: '', isWarning: true });
+      return;
+    }
+    setCart(prev => prev.map(item => item._id === serviceId ? { ...item, peopleCount: count } : item));
+  };
+
+  const subtotal = cart.reduce((acc, curr) => acc + curr.price * (curr.peopleCount || 1), 0);
   const gstTotal = 0;
   const total = subtotal;
   const hasBridalService = cart.some(item => item.category === 'Bridal Services');
@@ -498,7 +511,7 @@ const Services = () => {
 
     // Filter bridal services in the cart
     const bridalItems = cart.filter(item => item.category === 'Bridal Services');
-    const bridalNames = bridalItems.map(item => item.name).join(', ');
+    const bridalNames = bridalItems.map(item => `${item.name} (Service For: ${item.peopleCount || 1} ${item.peopleCount === 1 ? 'Person' : 'People'})`).join(', ');
 
     // Prefilled message formatting
     const formattedDate = new Date(bookingDate).toLocaleDateString('en-US', {
@@ -560,8 +573,12 @@ const Services = () => {
     }
     setSlotChecking(false);
 
-    const serviceData = {
-      items: cart.map(item => ({ ...item, quantity: 1 })),
+     const serviceData = {
+      items: cart.map(item => ({ 
+        ...item, 
+        quantity: item.peopleCount || 1,
+        peopleCount: item.peopleCount || 1
+      })),
       subtotal,
       gstTotal,
       total,
@@ -630,6 +647,31 @@ const Services = () => {
                           ? { _id: activeOption._id, name: `${service.name} - ${activeOption.name}`, price: activeOption.price, category: category.category, gstPercentage: serviceGst }
                           : { _id: service._id, name: service.name, price: service.price, category: category.category, gstPercentage: serviceGst };
                         const isAdded = cart.find(item => item._id === cartItem._id);
+                        const serviceCount = isAdded ? (isAdded.peopleCount || 1) : (pendingCounts[cartItem._id] || 1);
+
+                        const handleDecrement = () => {
+                          if (isAdded) {
+                            updatePeopleCount(cartItem._id, serviceCount - 1);
+                          } else {
+                            const current = pendingCounts[cartItem._id] || 1;
+                            if (current > 1) {
+                              setPendingCounts(prev => ({ ...prev, [cartItem._id]: current - 1 }));
+                            }
+                          }
+                        };
+
+                        const handleIncrement = () => {
+                          if (isAdded) {
+                            updatePeopleCount(cartItem._id, serviceCount + 1);
+                          } else {
+                            const current = pendingCounts[cartItem._id] || 1;
+                            if (current < 10) {
+                              setPendingCounts(prev => ({ ...prev, [cartItem._id]: current + 1 }));
+                            } else {
+                              setToast({ show: true, message: 'Maximum booking limit is 10 people per service.', serviceName: '', isWarning: true });
+                            }
+                          }
+                        };
                         return (
                           <div key={service._id} className="glass-dark p-5 rounded-sm flex flex-col justify-between">
                             <div>
@@ -686,19 +728,46 @@ const Services = () => {
                               >
                                 <MessageCircle size={14} /> Book via WhatsApp
                               </button>
-                            ) : isAdded ? (
-                              <div className="flex gap-2 mt-2">
-                                <span className="flex-1 py-2.5 font-cinzel text-[0.6rem] tracking-[0.15em] uppercase flex items-center justify-center gap-1.5 rounded-sm" style={{ background: 'rgba(255,195,0,0.12)', color: '#FFD700', fontWeight: 700, border: '1px solid rgba(255,195,0,0.25)' }}>
-                                  <Check size={13} /> Added
-                                </span>
-                                <button onClick={() => removeFromCart(cartItem._id)} className="px-3 py-2.5 font-cinzel text-[0.6rem] tracking-[0.1em] uppercase flex items-center justify-center gap-1.5 rounded-sm transition-all" style={{ background: 'transparent', color: '#f87171', fontWeight: 700, border: '1px solid rgba(248,113,113,0.3)' }} onMouseEnter={e => { e.currentTarget.style.background = 'rgba(248,113,113,0.1)'; e.currentTarget.style.borderColor = 'rgba(248,113,113,0.5)'; }} onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'rgba(248,113,113,0.3)'; }}>
-                                  <Trash2 size={13} /> Remove
-                                </button>
-                              </div>
                             ) : (
-                              <button onClick={() => addToCart(cartItem)} className="w-full py-2.5 font-cinzel text-[0.6rem] tracking-[0.15em] uppercase flex items-center justify-center gap-2 mt-2 transition-all rounded-sm" style={{ border: 'none', background: 'linear-gradient(135deg, #FFED8A, #FFD700, #FFCA28, #E5A100)', color: '#000', fontWeight: 700, boxShadow: '0 2px 10px rgba(255,195,0,0.25)' }}>
-                                <ShoppingCart size={14} /> Add
-                              </button>
+                              <div className="flex flex-col gap-2 mt-2">
+                                <div className="flex items-center justify-between px-3 py-2 rounded-sm" style={{ background: 'rgba(255,195,0,0.05)', border: '1px solid rgba(255,195,0,0.15)' }}>
+                                  <span className="font-cinzel text-[0.65rem] tracking-[0.1em] uppercase font-bold" style={{ color: '#FFD700' }}>Service For:</span>
+                                  <div className="flex items-center gap-2">
+                                    <button 
+                                      onClick={handleDecrement}
+                                      className="w-6 h-6 flex items-center justify-center text-sm font-bold transition-all rounded-sm cursor-pointer hover:bg-yellow-500/20"
+                                      style={{ border: '1px solid rgba(255,195,0,0.3)', color: '#FFD700', background: 'transparent' }}
+                                    >
+                                      -
+                                    </button>
+                                    <span className="font-cinzel text-xs font-bold w-6 text-center" style={{ color: '#F8F5F0' }}>
+                                      {serviceCount}
+                                    </span>
+                                    <button 
+                                      onClick={handleIncrement}
+                                      className="w-6 h-6 flex items-center justify-center text-sm font-bold transition-all rounded-sm cursor-pointer hover:bg-yellow-500/20"
+                                      style={{ border: '1px solid rgba(255,195,0,0.3)', color: '#FFD700', background: 'transparent' }}
+                                    >
+                                      +
+                                    </button>
+                                  </div>
+                                </div>
+
+                                {isAdded ? (
+                                  <div className="flex gap-2 w-full">
+                                    <span className="flex-grow py-2 font-cinzel text-[0.6rem] tracking-[0.15em] uppercase flex items-center justify-center gap-1.5 rounded-sm" style={{ background: 'rgba(255,195,0,0.12)', color: '#FFD700', fontWeight: 700, border: '1px solid rgba(255,195,0,0.25)' }}>
+                                      <Check size={13} /> Added
+                                    </span>
+                                    <button onClick={() => removeFromCart(cartItem._id)} className="px-3 py-2 font-cinzel text-[0.6rem] tracking-[0.1em] uppercase flex items-center justify-center gap-1.5 rounded-sm transition-all" style={{ background: 'transparent', color: '#f87171', fontWeight: 700, border: '1px solid rgba(248,113,113,0.3)' }} onMouseEnter={e => { e.currentTarget.style.background = 'rgba(248,113,113,0.1)'; e.currentTarget.style.borderColor = 'rgba(248,113,113,0.5)'; }} onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'rgba(248,113,113,0.3)'; }}>
+                                      <Trash2 size={13} /> Remove
+                                    </button>
+                                  </div>
+                                ) : (
+                                  <button onClick={() => addToCart(cartItem, serviceCount)} className="w-full py-2.5 font-cinzel text-[0.6rem] tracking-[0.15em] uppercase flex items-center justify-center gap-2 transition-all rounded-sm" style={{ border: 'none', background: 'linear-gradient(135deg, #FFED8A, #FFD700, #FFCA28, #E5A100)', color: '#000', fontWeight: 700, boxShadow: '0 2px 10px rgba(255,195,0,0.25)' }}>
+                                    <ShoppingCart size={14} /> Add
+                                  </button>
+                                )}
+                              </div>
                             )}
                           </div>
                         );
@@ -819,14 +888,38 @@ const Services = () => {
               <p className="font-cormorant italic text-sm text-center py-4" style={{ color: 'rgba(248,245,240,0.68)' }}>No services selected.</p>
             ) : (
               <ul className="flex flex-col gap-3 mb-4">{cart.map(item => (
-                <li key={item._id} className="flex justify-between items-center group text-sm">
-                  <div className="flex-1 min-w-0">
-                    <span className="block font-cormorant mb-1 truncate" style={{ color: '#F8F5F0', fontSize: '1.125rem', fontWeight: 500, letterSpacing: '0.01em' }}>
-                      {item.name}
-                    </span>
-                    <span className="font-cinzel text-xs font-bold" style={{ color: '#FFD700' }}>₹{item.price}</span>
+                <li key={item._id} className="flex flex-col gap-2 pb-3" style={{ borderBottom: '1px solid rgba(255,195,0,0.08)' }}>
+                  <div className="flex justify-between items-start text-sm">
+                    <div className="flex-1 min-w-0">
+                      <span className="block font-cormorant mb-1 truncate text-white" style={{ fontSize: '1.125rem', fontWeight: 500, letterSpacing: '0.01em' }}>
+                        {item.name}
+                      </span>
+                      <span className="font-cinzel text-xs font-bold" style={{ color: '#FFD700' }}>₹{item.price} each</span>
+                    </div>
+                    <button onClick={() => removeFromCart(item._id)} className="p-1.5 rounded-sm transition-all cursor-pointer" style={{ color: '#f87171', background: 'rgba(248,113,113,0.08)', border: '1px solid rgba(248,113,113,0.15)' }} onMouseEnter={e => { e.currentTarget.style.background = 'rgba(248,113,113,0.15)'; e.currentTarget.style.borderColor = 'rgba(248,113,113,0.3)'; }} onMouseLeave={e => { e.currentTarget.style.background = 'rgba(248,113,113,0.08)'; e.currentTarget.style.borderColor = 'rgba(248,113,113,0.15)'; }}><Trash2 size={14} /></button>
                   </div>
-                  <button onClick={() => removeFromCart(item._id)} className="p-1.5 rounded-sm transition-all" style={{ color: '#f87171', background: 'rgba(248,113,113,0.08)', border: '1px solid rgba(248,113,113,0.15)' }} onMouseEnter={e => { e.currentTarget.style.background = 'rgba(248,113,113,0.15)'; e.currentTarget.style.borderColor = 'rgba(248,113,113,0.3)'; }} onMouseLeave={e => { e.currentTarget.style.background = 'rgba(248,113,113,0.08)'; e.currentTarget.style.borderColor = 'rgba(248,113,113,0.15)'; }}><Trash2 size={14} /></button>
+                  <div className="flex items-center justify-between">
+                    <span className="font-cinzel text-[0.65rem] tracking-[0.1em] uppercase font-bold" style={{ color: 'rgba(248,245,240,0.6)' }}>Service For:</span>
+                    <div className="flex items-center gap-2">
+                      <button 
+                        onClick={() => updatePeopleCount(item._id, (item.peopleCount || 1) - 1)}
+                        className="w-6 h-6 flex items-center justify-center text-xs transition-all rounded-sm cursor-pointer hover:bg-yellow-500/20"
+                        style={{ border: '1px solid rgba(255,195,0,0.2)', color: 'rgba(248,245,240,0.6)', background: 'transparent' }}
+                      >
+                        −
+                      </button>
+                      <span className="font-cinzel text-xs w-6 text-center text-white">
+                        {item.peopleCount || 1}
+                      </span>
+                      <button 
+                        onClick={() => updatePeopleCount(item._id, (item.peopleCount || 1) + 1)}
+                        className="w-6 h-6 flex items-center justify-center text-xs transition-all rounded-sm cursor-pointer hover:bg-yellow-500/20"
+                        style={{ border: '1px solid rgba(255,195,0,0.2)', color: 'rgba(248,245,240,0.6)', background: 'transparent' }}
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
                 </li>
               ))}</ul>
             )}

@@ -111,17 +111,21 @@ const BillView = () => {
     }
 
     // Table
-    const tableData = bill.items.map((item, i) => [
-      i + 1,
-      item.name,
-      item.quantity || 1,
-      `Rs. ${item.price}`,
-      `Rs. ${(item.price * (item.quantity || 1))}`
-    ]);
+    const tableData = bill.items.map((item, i) => {
+      const count = item.peopleCount || item.quantity || 1;
+      const isService = item.itemType === 'service' || bill.type === 'service';
+      return [
+        i + 1,
+        item.name,
+        isService ? `${count} ${count === 1 ? 'Person' : 'People'}` : count,
+        `Rs. ${item.price}`,
+        `Rs. ${(item.price * count)}`
+      ];
+    });
 
     autoTable(doc, {
       startY: 85,
-      head: [['#', 'Item', 'Qty', 'Price', 'Amount']],
+      head: [['#', 'Item', 'Service For / Qty', 'Price', 'Amount']],
       body: tableData,
       theme: 'grid',
       headStyles: { 
@@ -273,15 +277,21 @@ const BillView = () => {
             {/* Items */}
             <div className="px-6 py-4" style={{ borderBottom: '1px solid rgba(255,215,0,0.04)' }}>
               <span className="font-cinzel text-[0.7rem] tracking-[0.2em] uppercase block mb-3 font-bold" style={{ color: '#FFD700', textShadow: '0 0 4px rgba(255,215,0,0.15)' }}>Items</span>
-              {bill.items.map((item, i) => (
-                <div key={i} className="flex justify-between py-2.5" style={{ borderBottom: i < bill.items.length - 1 ? '1px solid rgba(255,215,0,0.04)' : 'none' }}>
-                  <div>
-                    <span className="font-cormorant text-[1.1rem] font-medium" style={{ color: '#F8F5F0' }}>{item.name}</span>
-                    <span className="font-cinzel text-xs ml-2" style={{ color: 'rgba(248,245,240,0.4)' }}>× {item.quantity || 1}</span>
+              {bill.items.map((item, i) => {
+                const count = item.peopleCount || item.quantity || 1;
+                const isService = item.itemType === 'service' || bill.type === 'service';
+                return (
+                  <div key={i} className="flex justify-between py-2.5" style={{ borderBottom: i < bill.items.length - 1 ? '1px solid rgba(255,215,0,0.04)' : 'none' }}>
+                    <div>
+                      <span className="font-cormorant text-[1.1rem] font-medium" style={{ color: '#F8F5F0' }}>{item.name}</span>
+                      <span className="font-cinzel text-xs ml-2" style={{ color: 'rgba(248,245,240,0.4)' }}>
+                        × {isService ? `Service For: ${count} ${count === 1 ? 'Person' : 'People'}` : count}
+                      </span>
+                    </div>
+                    <span className="font-cinzel text-[0.95rem] font-bold" style={{ color: '#FFD700', textShadow: '0 0 4px rgba(255,215,0,0.15)' }}>₹{(item.price * count).toLocaleString()}</span>
                   </div>
-                  <span className="font-cinzel text-[0.95rem] font-bold" style={{ color: '#FFD700', textShadow: '0 0 4px rgba(255,215,0,0.15)' }}>₹{(item.price * (item.quantity || 1)).toLocaleString()}</span>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             {/* Totals */}
