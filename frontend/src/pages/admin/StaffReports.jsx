@@ -565,7 +565,6 @@ const StaffReports = () => {
                   <td className="p-4 pl-6 font-mono font-bold text-sm text-amber-700">{m.staffId}</td>
                   <td className="p-4">
                     <div className="font-bold text-gray-900 font-playfair">{m.name}</div>
-                    <div className="text-[0.62rem] text-gray-400 font-cormorant">{m.email}</div>
                   </td>
                   <td className="p-4">
                     {filterType === 'daily' ? (
