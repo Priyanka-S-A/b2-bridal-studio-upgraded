@@ -108,6 +108,12 @@ const CustomerLogins = () => {
     }
 
     return true;
+  }).sort((a, b) => {
+    // Sort by lastLoginDate descending; entries with no date go to the bottom
+    if (!a.lastLoginDate && !b.lastLoginDate) return 0;
+    if (!a.lastLoginDate) return 1;
+    if (!b.lastLoginDate) return -1;
+    return new Date(b.lastLoginDate) - new Date(a.lastLoginDate);
   });
 
   if (loading) return (
