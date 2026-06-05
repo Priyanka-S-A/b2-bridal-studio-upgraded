@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { ShoppingCart, Plus, Trash2, FileText, CheckCircle, Printer, Download, X } from 'lucide-react';
+import { ShoppingCart, Plus, Trash2, FileText, CheckCircle, Printer, Download, X, Send } from 'lucide-react';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
@@ -29,7 +29,9 @@ export default function Billing() {
   const [billItems, setBillItems] = useState([]);
   const [source, setSource] = useState('offline');
   const [paymentMethod, setPaymentMethod] = useState('cash');
-  const [customer, setCustomer] = useState('Walk-in');
+  const [customer, setCustomer] = useState('');
+  const [phone, setPhone] = useState('');
+  const [dob, setDob] = useState('');
 
   /* ui state */
   const [generating, setGenerating] = useState(false);
@@ -179,6 +181,16 @@ export default function Billing() {
   /* ─── generate bill ────────────────────────────────────────── */
   const handleGenerateBill = async () => {
     if (billItems.length === 0) { setError('Add at least one item before generating a bill.'); return; }
+    if (!customer.trim()) { setError('Customer name is required.'); return; }
+    if (!phone.trim()) { setError('Phone number is required.'); return; }
+    
+    // Clean and validate 10-digit number
+    const cleanedPhone = phone.trim().replace(/\D/g, '');
+    if (cleanedPhone.length !== 10) {
+      setError('Please enter a valid 10-digit phone number.');
+      return;
+    }
+
     setError('');
     setGenerating(true);
     try {
@@ -196,7 +208,9 @@ export default function Billing() {
         total: finalTotal,
         source,
         paymentMethod,
-        customer: customer.trim() || 'Walk-in',
+        customer: customer.trim(),
+        phone: cleanedPhone,
+        dob: dob || undefined,
         originalAmount,
         discountType,
         couponCode: discountType === 'coupon' && appliedCoupon ? appliedCoupon.code : undefined,
@@ -222,14 +236,26 @@ export default function Billing() {
       const revenueCreated = data.revenueCreated !== false;
 
       setSuccessBill({ bill, revenueCreated });
-      await generatePDF(bill);
       setBillItems([]);
-      setCustomer('Walk-in');
+      setCustomer('');
+      setPhone('');
+      setDob('');
     } catch (e) {
       setError(e.message);
     } finally {
       setGenerating(false);
     }
+  };
+
+  const sendWhatsApp = (bill) => {
+    const billPhone = bill.customerDetails?.phone || '';
+    let phoneStr = String(billPhone).replace(/\D/g, '');
+    if (phoneStr.length === 10) {
+      phoneStr = '91' + phoneStr;
+    }
+    const billUrl = `${window.location.origin}/bill/${bill._id}`;
+    const message = encodeURIComponent(`Your bill is ready:\n${billUrl}`);
+    window.open(`https://wa.me/${phoneStr}?text=${message}`, '_blank');
   };
 
   /* ─── PDF generation ───────────────────────────────────────── */
@@ -292,7 +318,21 @@ export default function Billing() {
     if (bill.source) doc.text(`Source: ${bill.source}`, 15, 69);
     if (bill.paymentMethod) doc.text(`Payment Mode: ${bill.paymentMethod}`, 15, 76);
 
-    doc.text(`Customer: ${bill.customer || 'Walk-in'}`, 120, 55);
+    // Right column (Customer details)
+    if (bill.customerDetails?.name) {
+      doc.text(`Customer: ${bill.customerDetails.name}`, 120, 55);
+      if (bill.customerDetails.phone) doc.text(`Phone: ${bill.customerDetails.phone}`, 120, 62);
+      if (bill.customerDetails.dob) {
+        try {
+          const formattedDob = new Date(bill.customerDetails.dob).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+          doc.text(`DOB: ${formattedDob}`, 120, 69);
+        } catch (e) {
+          doc.text(`DOB: ${bill.customerDetails.dob}`, 120, 69);
+        }
+      }
+    } else {
+      doc.text(`Customer: ${bill.customer || 'Walk-in'}`, 120, 55);
+    }
 
     // Items table
     const tableData = bill.items.map((item, i) => {
@@ -388,45 +428,7 @@ export default function Billing() {
         <p className="text-sm text-gray-600 mt-1">B2 Bridal Studio — Generate walk-in bills instantly</p>
       </div>
 
-      {/* Success/Warning banner */}
-      {successBill && (
-        <div className={`mb-6 border rounded-xl p-4 flex items-start gap-3 ${successBill.revenueCreated ? 'bg-green-50 border-green-200' : 'bg-yellow-50 border-yellow-200'}`}>
-          <CheckCircle className={`${successBill.revenueCreated ? 'text-green-500' : 'text-yellow-500'} mt-0.5 shrink-0`} size={20} />
-          <div className="flex-1">
-            <p className={`font-semibold ${successBill.revenueCreated ? 'text-green-800' : 'text-yellow-800'}`}>
-              {successBill.revenueCreated ? 'Bill generated successfully!' : 'Bill generated, but revenue update failed'}
-            </p>
-            <p className={`text-sm mt-0.5 ${successBill.revenueCreated ? 'text-green-600' : 'text-yellow-700'}`}>
-              Bill #{successBill.bill._id.slice(-8).toUpperCase()} — {successBill.revenueCreated ? 'Revenue updated.' : 'Revenue entry was not created due to an error.'}
-            </p>
-            <div className="flex gap-3 mt-3 flex-wrap">
-              <a
-                href={`/bill/${successBill.bill._id}`}
-                target="_blank"
-                rel="noreferrer"
-                className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-cinzel font-bold uppercase tracking-wide bg-[#111] text-white transition-all hover:shadow-md"
-              >
-                <FileText size={14} /> View Bill
-              </a>
-              <button
-                onClick={() => generatePDF(successBill.bill)}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-cinzel font-bold uppercase tracking-wide border border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors"
-              >
-                <Download size={14} /> Download PDF
-              </button>
-              <button
-                onClick={() => handlePrint(successBill.bill)}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-cinzel font-bold uppercase tracking-wide border border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors"
-              >
-                <Printer size={14} /> Print
-              </button>
-              <button onClick={() => setSuccessBill(null)} className="ml-auto text-gray-400 hover:text-gray-700 transition-colors">
-                <X size={18} />
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+
 
       {/* Error banner */}
       {error && (
@@ -446,13 +448,42 @@ export default function Billing() {
             <h3 className="font-cinzel font-bold text-gray-900 text-sm uppercase tracking-wide pb-3" style={{ borderBottom: '1px solid rgba(0,0,0,0.06)' }}>Bill Details</h3>
 
             <div>
-              <label className="block text-xs font-cinzel font-semibold uppercase tracking-wide text-gray-700 mb-1.5">Customer Name</label>
+              <label className="block text-xs font-cinzel font-semibold uppercase tracking-wide text-gray-700 mb-1.5">
+                Customer Name <span className="text-red-500">*</span>
+              </label>
               <input
                 id="billing-customer"
                 type="text"
                 value={customer}
                 onChange={e => setCustomer(e.target.value)}
-                placeholder="Walk-in"
+                placeholder="Enter customer name"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-200 focus:border-amber-400 font-cormorant text-lg transition-colors"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-cinzel font-semibold uppercase tracking-wide text-gray-700 mb-1.5">
+                Phone Number <span className="text-red-500">*</span>
+              </label>
+              <input
+                id="billing-phone"
+                type="tel"
+                value={phone}
+                onChange={e => setPhone(e.target.value)}
+                placeholder="e.g. 9876543210"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-200 focus:border-amber-400 font-cormorant text-lg transition-colors"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-cinzel font-semibold uppercase tracking-wide text-gray-700 mb-1.5">
+                Date of Birth (Optional)
+              </label>
+              <input
+                id="billing-dob"
+                type="date"
+                value={dob}
+                onChange={e => setDob(e.target.value)}
                 className="w-full border border-gray-200 rounded-lg px-3 py-2.5 bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-200 focus:border-amber-400 font-cormorant text-lg transition-colors"
               />
             </div>
@@ -774,7 +805,10 @@ export default function Billing() {
 
             <div className="flex items-center justify-between text-xs text-gray-600 mb-4">
               <span>Source: <strong className="text-gray-900 capitalize">{source}</strong> | Payment: <strong className="text-gray-900 capitalize">{paymentMethod}</strong></span>
-              <span>Customer: <strong className="text-gray-900">{customer || 'Walk-in'}</strong></span>
+              <div className="text-right">
+                <div>Customer: <strong className="text-gray-900">{customer || '—'}</strong></div>
+                {phone && <div className="text-[10px] text-gray-500">Phone: {phone}</div>}
+              </div>
             </div>
             <button
               id="billing-generate-btn"
@@ -795,6 +829,57 @@ export default function Billing() {
                 </>
               )}
             </button>
+
+            {successBill && (
+              <div className="mt-4 p-4 border border-green-200 bg-green-50/60 rounded-xl space-y-3 shadow-sm" style={{ animation: 'slideDown 0.3s ease-out' }}>
+                <div className="flex items-start gap-2.5">
+                  <CheckCircle className="text-green-600 mt-0.5 shrink-0" size={18} />
+                  <div className="flex-1">
+                    <p className="text-xs font-semibold text-green-900">
+                      Bill generated successfully!
+                    </p>
+                    <p className="text-[10px] text-green-700 mt-0.5">
+                      Bill #{successBill.bill._id.slice(-8).toUpperCase()} — {successBill.revenueCreated ? 'Revenue updated.' : 'Revenue entry failed.'}
+                    </p>
+                  </div>
+                  <button onClick={() => setSuccessBill(null)} className="text-gray-400 hover:text-gray-600 transition-colors">
+                    <X size={16} />
+                  </button>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-2 pt-1">
+                  <a
+                    href={`/bill/${successBill.bill._id}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-cinzel font-bold uppercase tracking-wide bg-[#111] text-[#FFD700] hover:bg-black transition-all hover:shadow-md"
+                  >
+                    <FileText size={14} /> View Bill
+                  </a>
+                  <button
+                    onClick={() => sendWhatsApp(successBill.bill)}
+                    className="flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-cinzel font-bold uppercase tracking-wide bg-green-500 text-white hover:bg-green-600 transition-colors hover:shadow-md"
+                  >
+                    <Send size={14} /> Send Bill
+                  </button>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    onClick={() => generatePDF(successBill.bill)}
+                    className="flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-cinzel font-bold uppercase tracking-wide border border-gray-200 text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+                  >
+                    <Download size={14} /> PDF
+                  </button>
+                  <button
+                    onClick={() => handlePrint(successBill.bill)}
+                    className="flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-cinzel font-bold uppercase tracking-wide border border-gray-200 text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+                  >
+                    <Printer size={14} /> Print
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

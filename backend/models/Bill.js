@@ -25,7 +25,8 @@ const billSchema = new mongoose.Schema({
     name: String,
     phone: String,
     date: String,
-    time: String
+    time: String,
+    dob: String
   },
   // Booking pipeline reference
   bookingId: { type: mongoose.Schema.Types.ObjectId, ref: 'Booking' },

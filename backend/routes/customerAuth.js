@@ -507,8 +507,147 @@ router.post('/verify-otp', async (req, res) => {
   }
 });
 
-// 📥 GET ALL CUSTOMERS (Secure - Owner only)
+// 📥 GET B2 CUSTOMER DETAILS (Secure - Owner only)
 const { verifyToken, verifyRole } = require('../middleware/auth');
+router.get('/b2-details', verifyToken, verifyRole(['owner']), async (req, res) => {
+  try {
+    const Booking = require('../models/Booking');
+    const Bill = require('../models/Bill');
+
+    const customers = await Customer.find();
+    const bookings = await Booking.find();
+    const bills = await Bill.find();
+
+    const customerMap = new Map();
+
+    const getCleanPhone = (phone) => {
+      if (!phone) return '';
+      const cleaned = phone.toString().replace(/\D/g, '');
+      return cleaned.slice(-10);
+    };
+
+    const getCleanEmail = (email) => {
+      if (!email) return '';
+      return email.toString().trim().toLowerCase();
+    };
+
+    const addOrUpdate = (key, data) => {
+      if (!key) return;
+      if (customerMap.has(key)) {
+        const existing = customerMap.get(key);
+        if (data.name && (!existing.name || existing.name === 'Walk-in' || existing.name === 'Unknown')) {
+          existing.name = data.name;
+        }
+        if (data.phone && !existing.phone) {
+          existing.phone = data.phone;
+        }
+        if (data.email && !existing.email) {
+          existing.email = data.email;
+        }
+        if (data.dob && !existing.dob) {
+          existing.dob = data.dob;
+        }
+        if (data.source) {
+          existing.sources.add(data.source);
+        }
+      } else {
+        customerMap.set(key, {
+          name: data.name || 'Unknown',
+          phone: data.phone || '',
+          email: data.email || '',
+          dob: data.dob || null,
+          sources: new Set(data.source ? [data.source] : [])
+        });
+      }
+    };
+
+    // Pre-populate lookup maps from registered customers
+    const regLookupByPhone = new Map();
+    const regLookupByEmail = new Map();
+    customers.forEach(c => {
+      const cleanPhone = getCleanPhone(c.phone);
+      const cleanEmail = getCleanEmail(c.email);
+      if (cleanPhone) regLookupByPhone.set(cleanPhone, c);
+      if (cleanEmail) regLookupByEmail.set(cleanEmail, c);
+    });
+
+    // 1. Process bookings (real bookings)
+    bookings.forEach(b => {
+      if (b.status === 'Rejected') return;
+
+      const cleanPhone = getCleanPhone(b.phone);
+      const cleanEmail = getCleanEmail(b.userId);
+
+      let regCust = null;
+      if (cleanPhone) regCust = regLookupByPhone.get(cleanPhone);
+      if (!regCust && cleanEmail) regCust = regLookupByEmail.get(cleanEmail);
+
+      const dob = regCust ? regCust.dob : null;
+      const email = cleanEmail || (regCust ? regCust.email : '');
+      const key = cleanPhone || cleanEmail || b.phone || b.userId;
+
+      addOrUpdate(key, {
+        name: b.name || (regCust ? regCust.name : ''),
+        phone: b.phone || (regCust ? regCust.phone : ''),
+        email: email,
+        dob: dob,
+        source: 'online'
+      });
+    });
+
+    // 2. Process bills
+    bills.forEach(bill => {
+      const customerName = bill.customerDetails?.name || bill.customer || '';
+      const phone = bill.customerDetails?.phone || '';
+      const cleanPhone = getCleanPhone(phone);
+      const cleanEmail = getCleanEmail(bill.userId);
+
+      let regCust = null;
+      if (cleanPhone) regCust = regLookupByPhone.get(cleanPhone);
+      if (!regCust && cleanEmail) regCust = regLookupByEmail.get(cleanEmail);
+
+      const dob = bill.customerDetails?.dob || (regCust ? regCust.dob : null);
+      const email = cleanEmail || (regCust ? regCust.email : '');
+      const source = bill.source || 'offline';
+
+      const key = cleanPhone || cleanEmail || phone || bill.userId || customerName;
+      addOrUpdate(key, {
+        name: customerName || (regCust ? regCust.name : ''),
+        phone: phone || (regCust ? regCust.phone : ''),
+        email: email,
+        dob: dob,
+        source: source
+      });
+    });
+
+    const result = Array.from(customerMap.values()).map(c => {
+      const sourceArr = Array.from(c.sources);
+      let sourceStr = 'offline';
+      if (sourceArr.includes('online') && sourceArr.includes('offline')) {
+        sourceStr = 'online/offline';
+      } else if (sourceArr.includes('online')) {
+        sourceStr = 'online';
+      } else if (sourceArr.includes('offline')) {
+        sourceStr = 'offline';
+      }
+
+      return {
+        name: c.name,
+        phone: c.phone || 'N/A',
+        email: c.email || 'N/A',
+        dob: c.dob,
+        source: sourceStr
+      };
+    });
+
+    result.sort((a, b) => a.name.localeCompare(b.name));
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// 📥 GET ALL CUSTOMERS (Secure - Owner only)
 router.get('/list', verifyToken, verifyRole(['owner']), async (req, res) => {
   try {
     const customers = await Customer.find().sort({ createdAt: -1 });

@@ -107,6 +107,13 @@ const BillView = () => {
         const { date, time } = getScheduledDetails(bill.customerDetails.date);
         doc.text(`Scheduled Date: ${date}`, 120, 69);
         doc.text(`Scheduled Time: ${time}`, 120, 76);
+      } else if (bill.customerDetails.dob) {
+        try {
+          const formattedDob = new Date(bill.customerDetails.dob).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+          doc.text(`DOB: ${formattedDob}`, 120, 69);
+        } catch (e) {
+          doc.text(`DOB: ${bill.customerDetails.dob}`, 120, 69);
+        }
       }
     }
 
@@ -260,6 +267,11 @@ const BillView = () => {
                   <span className="font-cinzel text-[0.7rem] tracking-[0.2em] uppercase block mb-1.5 font-bold" style={{ color: '#FFD700', textShadow: '0 0 4px rgba(255,215,0,0.15)' }}>Customer</span>
                   <span className="font-inter text-[0.95rem] font-bold block" style={{ color: '#F8F5F0' }}>{bill.customerDetails.name}</span>
                   {bill.customerDetails.phone && <span className="font-inter text-xs block mt-0.5 font-semibold" style={{ color: 'rgba(248,245,240,0.5)' }}>{bill.customerDetails.phone}</span>}
+                  {bill.customerDetails.dob && (
+                    <span className="font-inter text-xs block mt-1 font-semibold" style={{ color: 'rgba(248,245,240,0.5)' }}>
+                      DOB: {new Date(bill.customerDetails.dob).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                    </span>
+                  )}
                 </div>
                 {bill.source === 'online' && bill.customerDetails?.date && (() => {
                   const { date, time } = getScheduledDetails(bill.customerDetails.date);

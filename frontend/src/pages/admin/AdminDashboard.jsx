@@ -23,6 +23,7 @@ import SlotManagement from './SlotManagement.jsx';
 import StaffWork from './StaffWork.jsx';
 import ExpenseTracker from './ExpenseTracker.jsx';
 import StaffReports from './StaffReports.jsx';
+import B2CustomerDetails from './B2CustomerDetails.jsx';
 
 const API = import.meta.env.VITE_API_URL;
 
@@ -252,6 +253,7 @@ const OwnerPortal = () => {
     { id: 'revenue', label: 'Revenue Dashboard', icon: TrendingUp },
     { id: 'staff', label: 'Staff Management', icon: Users },
     { id: 'reports', label: 'Performance Reports', icon: Award },
+    { id: 'customer-details', label: 'B2 Customer Details', icon: Users },
     { id: 'customers', label: 'Customer Logins', icon: ShieldCheck }
   ];
 
@@ -284,6 +286,7 @@ const OwnerPortal = () => {
         {ownerTab === 'revenue' && <Revenue />}
         {ownerTab === 'staff' && <ManageStaff />}
         {ownerTab === 'reports' && <StaffReports />}
+        {ownerTab === 'customer-details' && <B2CustomerDetails />}
         {ownerTab === 'customers' && <CustomerLogins />}
       </div>
 
