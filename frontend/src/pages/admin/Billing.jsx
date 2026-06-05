@@ -137,14 +137,16 @@ export default function Billing() {
     const found = catalogueItems.find(i => i.id === selectedItem);
     if (!found) return;
 
+    const finalQty = Math.max(1, Number(qty) || 1);
+
     setBillItems(prev => {
       const existing = prev.findIndex(i => i.id === found.id);
       if (existing !== -1) {
         const updated = [...prev];
-        updated[existing] = { ...updated[existing], quantity: updated[existing].quantity + qty };
+        updated[existing] = { ...updated[existing], quantity: updated[existing].quantity + finalQty };
         return updated;
       }
-      return [...prev, { ...found, quantity: qty }];
+      return [...prev, { ...found, quantity: finalQty }];
     });
     setSelectedItem('');
     setQty(1);
@@ -785,7 +787,21 @@ export default function Billing() {
                   type="number"
                   min={1}
                   value={qty}
-                  onChange={e => setQty(Math.max(1, Number(e.target.value)))}
+                  onChange={e => {
+                    const val = e.target.value;
+                    if (val === '') {
+                      setQty('');
+                    } else {
+                      const num = Number(val);
+                      setQty(isNaN(num) ? 1 : num);
+                    }
+                  }}
+                  onBlur={() => {
+                    if (qty === '' || qty < 1) {
+                      setQty(1);
+                    }
+                  }}
+                  onFocus={e => e.target.select()}
                   className="w-full border border-gray-200 rounded-lg px-3 py-2.5 bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-200 focus:border-amber-400 font-cormorant text-lg transition-colors"
                 />
               </div>
