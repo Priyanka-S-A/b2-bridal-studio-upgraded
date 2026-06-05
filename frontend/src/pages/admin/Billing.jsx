@@ -759,7 +759,7 @@ export default function Billing() {
                                       }`}
                                     >
                                       <span className="truncate">{item.name}</span>
-                                      <span className="font-bold text-gray-900 text-base shrink-0 ml-2">₹{item.price}</span>
+                                      <span className="font-serif font-bold text-gray-900 text-base shrink-0 ml-2">₹{item.price}</span>
                                     </button>
                                   ))}
                                 </div>
