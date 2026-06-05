@@ -394,7 +394,12 @@ const AdminDashboard = () => {
         >
           {!isCollapsed && (
             <div className="flex items-center gap-3">
-              <img src="/b2-admin-logo.svg" alt="B2" style={{ width: 36, height: 36, objectFit: 'contain', filter: 'drop-shadow(0 0 6px rgba(212,175,55,0.3))' }} />
+              <img 
+                src="/b2-admin-logo.svg" 
+                alt="B2" 
+                onError={(e) => { e.target.style.display = 'none'; }}
+                style={{ width: 36, height: 36, objectFit: 'contain', filter: 'drop-shadow(0 0 6px rgba(212,175,55,0.3))' }} 
+              />
               <div>
                 <h1 className="text-sm font-bold tracking-wide uppercase font-cinzel" style={{ color: '#1a1a1a' }}>Admin Panel</h1>
                 <p className="font-cormorant italic tracking-wide" style={{ color: '#000000', fontSize: '17px', fontWeight: 500, marginTop: '-2px' }}>B2 Bridal Studio</p>
@@ -458,7 +463,12 @@ const AdminDashboard = () => {
           style={{ background: '#FFFFFF', borderBottom: '1px solid rgba(0,0,0,0.06)', boxShadow: '0 1px 8px rgba(0,0,0,0.03)' }}
         >
           <div className="flex items-center gap-2">
-            <img src="/b2-admin-logo.png" alt="B2" style={{ width: 30, height: 30, objectFit: 'contain', filter: 'drop-shadow(0 0 4px rgba(212,175,55,0.3))' }} />
+            <img 
+              src="/b2-admin-logo.svg" 
+              alt="B2" 
+              onError={(e) => { e.target.style.display = 'none'; }}
+              style={{ width: 30, height: 30, objectFit: 'contain', filter: 'drop-shadow(0 0 4px rgba(212,175,55,0.3))' }} 
+            />
             <h1 className="text-sm font-bold tracking-wide uppercase font-cinzel" style={{ color: '#1a1a1a' }}>Admin</h1>
           </div>
           <div className="flex items-center gap-2">
