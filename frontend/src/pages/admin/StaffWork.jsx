@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import axios from 'axios';
-import { Briefcase, Plus, Trash2, Calendar, Search, Filter, RotateCcw, X, Check, Download } from 'lucide-react';
+import { Briefcase, Plus, Trash2, Calendar, Search, Filter, RotateCcw, X, Check, FileSpreadsheet } from 'lucide-react';
 
 const API = import.meta.env.VITE_API_URL;
 
@@ -542,19 +542,7 @@ const StaffWork = () => {
 
         </div>
 
-        <div className="mt-4 flex justify-end gap-3">
-          <button
-            onClick={handleExportExcel}
-            disabled={filteredWorks.length === 0}
-            className={`flex items-center gap-1.5 px-5 py-2 rounded-lg font-cinzel text-xs font-bold uppercase tracking-wider transition-all border ${
-              filteredWorks.length > 0
-                ? 'bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100 cursor-pointer'
-                : 'bg-gray-50 text-gray-400 border-gray-200 cursor-not-allowed opacity-50'
-            }`}
-          >
-            <Download size={14} className={filteredWorks.length > 0 ? 'text-emerald-600' : 'text-gray-400'} />
-            Export to Excel
-          </button>
+        <div className="mt-4 flex flex-wrap justify-end gap-3">
           <button
             onClick={handleClearFilters}
             className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 font-cinzel text-xs font-bold uppercase tracking-wider transition-colors"
@@ -566,6 +554,13 @@ const StaffWork = () => {
             className="flex items-center gap-1.5 px-5 py-2 rounded-lg font-cinzel text-xs font-bold uppercase tracking-wide transition-all shadow-sm hover:shadow-md bg-[#111] text-white"
           >
             <Search size={14} /> Apply Filter
+          </button>
+          <button
+            onClick={handleExportExcel}
+            disabled={filteredWorks.length === 0}
+            className="flex items-center gap-1.5 px-5 py-2 rounded-lg font-cinzel text-xs font-bold uppercase tracking-wide transition-all shadow-sm hover:shadow-md bg-green-700 text-white disabled:opacity-50"
+          >
+            <FileSpreadsheet size={14} /> Excel Download
           </button>
         </div>
       </div>

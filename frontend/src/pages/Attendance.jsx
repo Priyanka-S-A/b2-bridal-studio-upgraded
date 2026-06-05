@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { CalendarCheck, Plus, Save, AlertCircle, Lock, Download, Search, RotateCcw } from 'lucide-react';
+import { CalendarCheck, Plus, Save, AlertCircle, Lock, Download, Search, RotateCcw, FileSpreadsheet } from 'lucide-react';
 
 const API = import.meta.env.VITE_API_URL;
 
@@ -291,14 +291,9 @@ const Attendance = () => {
           <button
             onClick={handleExportExcel}
             disabled={filteredRecords.length === 0}
-            className={`flex items-center gap-2 px-5 py-2 rounded-lg font-cinzel text-xs font-bold uppercase tracking-widest transition-all border ${
-              filteredRecords.length > 0
-                ? 'bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100 cursor-pointer'
-                : 'bg-gray-50 text-gray-400 border-gray-200 cursor-not-allowed opacity-50'
-            }`}
+            className="flex items-center gap-1.5 px-5 py-2 rounded-lg font-cinzel text-xs font-bold uppercase tracking-wide transition-all shadow-sm hover:shadow-md bg-green-700 text-white disabled:opacity-50"
           >
-            <Download size={14} className={filteredRecords.length > 0 ? 'text-emerald-600' : 'text-gray-400'} />
-            Excel Export
+            <FileSpreadsheet size={14} /> Excel Download
           </button>
         </div>
 

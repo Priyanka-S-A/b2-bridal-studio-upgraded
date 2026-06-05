@@ -7,6 +7,7 @@ const QUICK_LINKS = [
   { label: 'Gallery', to: '/gallery' },
   { label: 'Certificates', to: '/certificates' },
   { label: 'About Us', to: '/about' },
+  { label: 'Blogs', to: '/blogs' },
   { label: 'Contact', to: '/contact' },
 ];
 

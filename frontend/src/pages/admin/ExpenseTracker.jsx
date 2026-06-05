@@ -409,7 +409,7 @@ const ExpenseTracker = () => {
           <p className="text-[0.7rem] text-red-500 font-cinzel uppercase tracking-wide">
             {!filterFromDate && "* 'From Date' is mandatory for filtering."}
           </p>
-          <div className="flex gap-3">
+          <div className="flex flex-wrap gap-3">
             <button
               onClick={handleClearFilters}
               className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 font-cinzel text-xs font-bold uppercase tracking-wider transition-colors"

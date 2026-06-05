@@ -508,7 +508,7 @@ const ManageServices = () => {
                       className="w-full px-5 py-4 flex justify-between items-center bg-white hover:bg-gray-50 transition-colors border-b border-gray-50"
                     >
                       <div className="flex items-center gap-3">
-                        <span className="font-cinzel font-bold tracking-wide text-gray-900 text-sm uppercase">
+                        <span className="font-cinzel font-bold tracking-wide text-gray-900 text-sm uppercase text-left">
                           {cat.category}
                         </span>
                         <span className="px-2.5 py-0.5 rounded-full text-[0.65rem] font-bold uppercase bg-gray-100 text-gray-600 border border-gray-200">

@@ -4,7 +4,7 @@ import {
   TrendingUp, Calendar, Users, Award, 
   Clock, CheckCircle, Search, RotateCcw, 
   Download, ChevronRight, Star, 
-  ShieldCheck, ArrowUpRight
+  ShieldCheck, ArrowUpRight, FileSpreadsheet
 } from 'lucide-react';
 
 const API = import.meta.env.VITE_API_URL;
@@ -378,9 +378,9 @@ const StaffReports = () => {
         <div className="flex gap-2">
           <button
             onClick={handleExportCSV}
-            className="flex items-center gap-1.5 px-4 py-2 border border-gray-200 rounded-lg font-cinzel text-xs font-bold uppercase tracking-wider text-gray-700 bg-white hover:bg-gray-50 transition-all shadow-sm"
+            className="flex items-center gap-1.5 px-5 py-2 rounded-lg font-cinzel text-xs font-bold uppercase tracking-wide transition-all shadow-sm hover:shadow-md bg-green-700 text-white disabled:opacity-50"
           >
-            <Download size={14} className="text-gray-400" /> Export CSV
+            <FileSpreadsheet size={14} /> Excel Download
           </button>
 
         </div>
@@ -395,10 +395,10 @@ const StaffReports = () => {
 
       {/* ── 🔍 ADVANCED FILTERS PANEL ── */}
       <div className="bg-white rounded-xl shadow-[0_2px_15px_rgba(0,0,0,0.04)] p-6 mb-8 border border-gray-100 print:hidden">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-6 items-end">
           
           {/* Quick Date filter selection */}
-          <div className="flex flex-col gap-1.5">
+          <div className="flex flex-col gap-1.5 md:col-span-2">
             <label className="text-xs font-cinzel font-semibold uppercase tracking-wide text-gray-700">Date Range Filter</label>
             <div className="flex bg-gray-50 p-1 rounded-lg border border-gray-200">
               {['all', 'daily', 'weekly', 'monthly', 'custom'].map(t => (
@@ -416,7 +416,7 @@ const StaffReports = () => {
           </div>
 
           {/* Custom From Date */}
-          <div className="flex flex-col gap-1.5">
+          <div className="flex flex-col gap-1.5 md:col-span-1">
             <label className="text-xs font-cinzel font-semibold uppercase tracking-wide text-gray-700">Custom From Date</label>
             <input
               type="date"
@@ -427,7 +427,7 @@ const StaffReports = () => {
           </div>
 
           {/* Custom To Date */}
-          <div className="flex flex-col gap-1.5">
+          <div className="flex flex-col gap-1.5 md:col-span-1">
             <label className="text-xs font-cinzel font-semibold uppercase tracking-wide text-gray-700">Custom To Date</label>
             <input
               type="date"
@@ -438,8 +438,8 @@ const StaffReports = () => {
           </div>
 
           {/* Staff filter */}
-          <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-cinzel font-semibold uppercase tracking-wide text-gray-700">Selected Staff member</label>
+          <div className="flex flex-col gap-1.5 md:col-span-1">
+            <label className="text-xs font-cinzel font-semibold uppercase tracking-wide text-gray-700">Selected Staff</label>
             <select
               value={selectedStaffId}
               onChange={e => setSelectedStaffId(e.target.value)}
