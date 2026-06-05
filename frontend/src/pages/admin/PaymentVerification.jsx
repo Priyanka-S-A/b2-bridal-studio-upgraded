@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import { Tag, CreditCard, X } from 'lucide-react';
+import { Tag, CreditCard, X, Search } from 'lucide-react';
 
 const API = import.meta.env.VITE_API_URL;
 
@@ -32,7 +32,16 @@ const PaymentVerification = () => {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('All');
   const [proofModal, setProofModal] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [expandedBookings, setExpandedBookings] = useState({});
   const intervalRef = useRef(null);
+
+  const toggleExpand = (id) => {
+    setExpandedBookings(prev => ({
+      ...prev,
+      [id]: !prev[id]
+    }));
+  };
 
   const fetchBookings = async () => {
     try {
@@ -88,13 +97,30 @@ const PaymentVerification = () => {
   };
 
   const sendWhatsApp = (booking) => {
-    const phone = '91' + booking.phone;
+    let phoneStr = String(booking.phone || '').replace(/\D/g, '');
+    if (phoneStr.length === 10) {
+      phoneStr = '91' + phoneStr;
+    }
     const billUrl = `${window.location.origin}/bill/${booking.billId}`;
     const message = encodeURIComponent(`Your bill is ready:\n${billUrl}`);
-    window.open(`https://wa.me/${phone}?text=${message}`, '_blank');
+    window.open(`https://wa.me/${phoneStr}?text=${message}`, '_blank');
   };
 
-  const filtered = filter === 'All' ? bookings : bookings.filter(b => b.status === filter);
+  const filtered = bookings.filter(b => {
+    // 1. Status Filter
+    if (filter !== 'All' && b.status !== filter) return false;
+    
+    // 2. Search Query Filter
+    const query = searchQuery.toLowerCase().trim();
+    if (!query) return true;
+    
+    const name = (b.name || '').toLowerCase();
+    const phone = (b.phone || '').toLowerCase();
+    const transactionId = (b.transactionId || '').toLowerCase();
+    const upiId = (b.upiId || '').toLowerCase();
+    
+    return name.includes(query) || phone.includes(query) || transactionId.includes(query) || upiId.includes(query);
+  });
 
   if (loading) return (
     <div className="flex justify-center py-20">
@@ -104,28 +130,44 @@ const PaymentVerification = () => {
 
   return (
     <div className="bg-[#FDFDFD] min-h-screen p-4 md:p-8 font-sans text-gray-900">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6">
-        <div>
-          <h1 className="text-2xl font-bold font-cinzel uppercase tracking-wide text-gray-900 flex items-center gap-3">
-            <CreditCard size={24} className="text-[#D4AF37]" />
-            Payment Verification
-          </h1>
-          <p className="text-sm text-gray-600 mt-1">Review and manage incoming payments.</p>
+      <div className="flex flex-col gap-4 mb-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+          <div>
+            <h1 className="text-2xl font-bold font-cinzel uppercase tracking-wide text-gray-900 flex items-center gap-3">
+              <CreditCard size={24} className="text-[#D4AF37]" />
+              Payment Verification
+            </h1>
+            <p className="text-sm text-gray-600 mt-1">Review and manage incoming payments.</p>
+          </div>
+          <div className="flex gap-2 flex-wrap">
+            {['All', 'Pending', 'Approved', 'Completed', 'Rejected'].map(f => (
+              <button
+                key={f}
+                onClick={() => setFilter(f)}
+                className={`px-4 py-2 text-xs font-cinzel font-bold uppercase tracking-wide rounded-lg transition-all ${
+                  filter === f 
+                    ? 'bg-[#111] text-amber-400 shadow-md' 
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                {f} {f !== 'All' ? `(${bookings.filter(b => b.status === f).length})` : `(${bookings.length})`}
+              </button>
+            ))}
+          </div>
         </div>
-        <div className="flex gap-2 flex-wrap">
-          {['All', 'Pending', 'Approved', 'Completed', 'Rejected'].map(f => (
-            <button
-              key={f}
-              onClick={() => setFilter(f)}
-              className={`px-4 py-2 text-xs font-cinzel font-bold uppercase tracking-wide rounded-lg transition-all ${
-                filter === f 
-                  ? 'bg-[#111] text-amber-400 shadow-md' 
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
-            >
-              {f} {f !== 'All' ? `(${bookings.filter(b => b.status === f).length})` : `(${bookings.length})`}
-            </button>
-          ))}
+        
+        {/* Search Bar */}
+        <div className="relative w-full max-w-md">
+          <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+            <Search className="text-gray-400" size={18} />
+          </span>
+          <input
+            type="text"
+            placeholder="Search by name, phone or transaction ID..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent transition-all shadow-sm"
+          />
         </div>
       </div>
 
@@ -167,19 +209,37 @@ const PaymentVerification = () => {
                     <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs font-medium">{b.branch}</span>
                   </td>
                   <td className="p-4 text-sm text-gray-600">
-                    <ul className="list-disc pl-4 space-y-2">
-                      {b.items.map((item, i) => {
-                        const count = item.peopleCount || item.quantity || 1;
-                        return (
-                          <li key={i} style={{ fontSize: '14px', color: '#000000', fontWeight: 500, fontFamily: 'Arial, Helvetica, sans-serif' }}>
-                            <div className="font-semibold">{item.name}</div>
-                            <div className="text-xs text-gray-500 font-medium mt-0.5">
-                              Service For: {count} {count === 1 ? 'Person' : 'People'} <span className="ml-1 text-gray-400 font-normal">(₹{item.price} each)</span>
-                            </div>
-                          </li>
-                        );
-                      })}
-                    </ul>
+                    {(() => {
+                      const isExpanded = expandedBookings[b._id];
+                      const displayItems = (b.items.length >= 3 && !isExpanded) ? b.items.slice(0, 2) : b.items;
+                      const hasMore = b.items.length >= 3;
+                      
+                      return (
+                        <>
+                          <ul className="list-disc pl-4 space-y-2">
+                            {displayItems.map((item, i) => {
+                              const count = item.peopleCount || item.quantity || 1;
+                              return (
+                                <li key={i} style={{ fontSize: '14px', color: '#000000', fontWeight: 500, fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                                  <div className="font-semibold">{item.name}</div>
+                                  <div className="text-xs text-gray-500 font-medium mt-0.5">
+                                    Service For: {count} {count === 1 ? 'Person' : 'People'} <span className="ml-1 text-gray-400 font-normal">(₹{item.price} each)</span>
+                                  </div>
+                                </li>
+                              );
+                            })}
+                          </ul>
+                          {hasMore && (
+                            <button
+                              onClick={() => toggleExpand(b._id)}
+                              className="mt-2 text-xs font-bold text-amber-600 hover:text-amber-800 flex items-center gap-1 transition-colors pl-1 focus:outline-none"
+                            >
+                              {isExpanded ? 'View Less ▲' : `View More (${b.items.length - 2} more) ▼`}
+                            </button>
+                          )}
+                        </>
+                      );
+                    })()}
                   </td>
                   <td className="p-4">
                     <div className="text-xs font-mono text-gray-600">{b.transactionId}</div>

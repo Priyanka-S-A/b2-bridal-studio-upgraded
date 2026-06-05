@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
 import {
   TrendingUp, Wifi, WifiOff, ExternalLink, Trash2,
-  CalendarRange, X, Search, RotateCcw, Wallet
+  CalendarRange, X, Search, RotateCcw, Wallet, FileSpreadsheet
 } from 'lucide-react';
 
 const API = import.meta.env.VITE_API_URL;
@@ -489,6 +489,52 @@ const Revenue = () => {
     setAppliedTo('');
   };
 
+  const handleExportExcel = () => {
+    if (filtered.length === 0) {
+      alert('No records to export.');
+      return;
+    }
+
+    const headers = ['Date', 'Customer', 'Branch', 'Source', 'Payment Mode', 'Total (Rs.)', 'Bill ID'];
+    const rows = filtered.map(entry => {
+      const dateFormatted = new Date(entry.date).toLocaleDateString('en-IN', {
+        day: '2-digit', month: '2-digit', year: 'numeric'
+      });
+      return [
+        dateFormatted,
+        entry.customer || 'Walk-in',
+        entry.branch || '',
+        entry.source || 'offline',
+        entry.mode || entry.paymentMethod || '—',
+        entry.total || 0,
+        entry.billId?._id || entry.billId || ''
+      ];
+    });
+
+    const escapeCSV = (val) => {
+      if (val === null || val === undefined) return '';
+      const str = String(val);
+      if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+        return `"${str.replace(/"/g, '""')}"`;
+      }
+      return str;
+    };
+
+    const csvContent = [
+      headers.map(escapeCSV).join(','),
+      ...rows.map(row => row.map(escapeCSV).join(','))
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `revenue_report_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -642,26 +688,36 @@ const Revenue = () => {
       )}
 
       {/* ══════════════════════════════════════════
-          SOURCE FILTER TABS (unchanged)
+          SOURCE FILTER TABS (WITH EXCEL DOWNLOAD)
       ══════════════════════════════════════════ */}
-      <div className="flex gap-2 mb-4">
-        {[
-          { key: 'all', label: 'All' },
-          { key: 'online', label: 'Online' },
-          { key: 'offline', label: 'Offline' },
-        ].map(f => (
-          <button
-            key={f.key}
-            onClick={() => setFilter(f.key)}
-            className={`px-4 py-1.5 rounded-full text-xs font-cinzel font-bold uppercase tracking-wide transition-all ${
-              filter === f.key
-                ? 'bg-[#111] text-amber-400 shadow-md'
-                : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
-            }`}
-          >
-            {f.label}
-          </button>
-        ))}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
+        <div className="flex gap-2">
+          {[
+            { key: 'all', label: 'All' },
+            { key: 'online', label: 'Online' },
+            { key: 'offline', label: 'Offline' },
+          ].map(f => (
+            <button
+              key={f.key}
+              onClick={() => setFilter(f.key)}
+              className={`px-4 py-1.5 rounded-full text-xs font-cinzel font-bold uppercase tracking-wide transition-all ${
+                filter === f.key
+                  ? 'bg-[#111] text-amber-400 shadow-md'
+                  : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+              }`}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Excel Download button */}
+        <button
+          onClick={handleExportExcel}
+          className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-xs font-cinzel font-bold uppercase tracking-wider rounded-lg transition-all shadow-sm focus:outline-none cursor-pointer"
+        >
+          <FileSpreadsheet size={14} /> Excel Download
+        </button>
       </div>
 
       {/* ══════════════════════════════════════════

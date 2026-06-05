@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Calendar, User, ShoppingBag, Receipt } from 'lucide-react';
+import { Calendar, User, ShoppingBag, Receipt, Search } from 'lucide-react';
 const API = import.meta.env.VITE_API_URL;
 
 const formatBookingScheduled = (dateStr, timeStr) => {
@@ -35,6 +35,7 @@ const ViewBookings = () => {
   const [bills, setBills] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     const fetchBills = async () => {
@@ -53,6 +54,14 @@ const ViewBookings = () => {
     fetchBills();
   }, []);
 
+  const filteredBills = bills.filter((bill) => {
+    const name = (bill.customerDetails?.name || bill.customer || 'Walk-in / Unknown').toLowerCase();
+    const phone = (bill.customerDetails?.phone || '').toLowerCase();
+    const invoiceNo = (bill._id || '').toLowerCase();
+    const query = searchQuery.toLowerCase().trim().replace('#', '');
+    return name.includes(query) || phone.includes(query) || invoiceNo.includes(query);
+  });
+
   if (loading) return (
     <div className="flex justify-center py-20">
       <div className="w-8 h-8 rounded-full animate-spin border-2 border-gray-200 border-t-[#FFD700]"></div>
@@ -61,12 +70,28 @@ const ViewBookings = () => {
 
   return (
     <div className="bg-[#FDFDFD] min-h-screen p-4 md:p-8 font-sans text-gray-900">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold font-cinzel uppercase tracking-wide text-gray-900 flex items-center gap-3">
-          <Receipt size={24} className="text-[#D4AF37]" />
-          Bookings & Bills
-        </h1>
-        <p className="text-sm text-gray-600 mt-1">View all generated bills and booking records.</p>
+      <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold font-cinzel uppercase tracking-wide text-gray-900 flex items-center gap-3">
+            <Receipt size={24} className="text-[#D4AF37]" />
+            Bookings & Bills
+          </h1>
+          <p className="text-sm text-gray-600 mt-1">View all generated bills and booking records.</p>
+        </div>
+        
+        {/* Search Bar */}
+        <div className="relative w-full md:w-80">
+          <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+            <Search className="text-gray-400" size={18} />
+          </span>
+          <input
+            type="text"
+            placeholder="Search by name, phone or invoice..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent transition-all shadow-sm"
+          />
+        </div>
       </div>
 
       {error && <div className="text-red-500 mb-4 px-4 py-3 bg-red-50 border border-red-200 rounded-lg font-cormorant">{error}</div>}
@@ -76,7 +101,8 @@ const ViewBookings = () => {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-gray-50 border-b border-gray-100">
-                <th className="p-4 pl-6 text-xs font-cinzel font-bold uppercase tracking-wider text-gray-700">Date</th>
+                <th className="p-4 pl-6 text-xs font-cinzel font-bold uppercase tracking-wider text-gray-700">Invoice No</th>
+                <th className="p-4 text-xs font-cinzel font-bold uppercase tracking-wider text-gray-700">Date</th>
                 <th className="p-4 text-xs font-cinzel font-bold uppercase tracking-wider text-gray-700">Customer</th>
                 <th className="p-4 text-xs font-cinzel font-bold uppercase tracking-wider text-gray-700">Items/Services</th>
                 <th className="p-4 text-xs font-cinzel font-bold uppercase tracking-wider text-gray-700">Type</th>
@@ -84,11 +110,21 @@ const ViewBookings = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {bills.length === 0 ? (
-                <tr><td colSpan="5" className="p-10 text-center text-gray-500 font-cormorant italic text-lg">No bookings found.</td></tr>
-              ) : bills.map((bill) => (
+              {filteredBills.length === 0 ? (
+                <tr><td colSpan="6" className="p-10 text-center text-gray-500 font-cormorant italic text-lg">No bookings found.</td></tr>
+              ) : filteredBills.map((bill) => (
                 <tr key={bill._id} className="hover:bg-[#FFFCF5] transition-colors">
                   <td className="p-4 pl-6">
+                    <a
+                      href={`/bill/${bill._id}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-amber-600 hover:text-amber-800 hover:underline font-mono font-semibold text-sm transition-colors"
+                    >
+                      #{bill._id.slice(-8).toUpperCase()}
+                    </a>
+                  </td>
+                  <td className="p-4">
                     <div className="flex items-center gap-2 font-medium text-gray-900">
                       <Calendar size={16} className="text-amber-600" />
                       {new Date(bill.date).toLocaleDateString()}
@@ -127,12 +163,15 @@ const ViewBookings = () => {
                   </td>
                   <td className="p-4">
                     <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
-                      bill.type === 'service' ? 'bg-blue-50 text-blue-700 border border-blue-200' :
-                      bill.type === 'product' ? 'bg-green-50 text-green-700 border border-green-200' :
-                      'bg-purple-50 text-purple-700 border border-purple-200'
+                      bill.source === 'online'
+                        ? 'bg-amber-50 text-amber-700 border border-amber-200'
+                        : 'bg-gray-100 text-gray-700 border border-gray-200'
                     }`}>
-                      {bill.type}
+                      {bill.source === 'online' ? 'Online' : 'Offline'}
                     </span>
+                    <div className="text-xs text-gray-500 mt-1 capitalize pl-1">
+                      {bill.type || 'mixed'}
+                    </div>
                   </td>
                   <td className="p-4 pr-6 text-right">
                     <div className="font-bold text-gray-900 text-lg font-cinzel">

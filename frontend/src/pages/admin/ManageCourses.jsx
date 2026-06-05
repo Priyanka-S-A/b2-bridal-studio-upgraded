@@ -40,7 +40,7 @@ const ManageCourses = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Search Logic (Auto-select category and scroll)
+  // Search Logic (Auto-select category)
   useEffect(() => {
     if (searchTerm) {
       const matchedCourse = courses.find(course => 
@@ -49,12 +49,6 @@ const ManageCourses = () => {
       if (matchedCourse) {
         setSelectedCategory(matchedCourse.category);
         setHighlightedCourseId(matchedCourse._id);
-        
-        setTimeout(() => {
-          if (scrollRef.current[matchedCourse._id]) {
-            scrollRef.current[matchedCourse._id].scrollIntoView({ behavior: 'smooth', block: 'center' });
-          }
-        }, 100);
       } else {
         setHighlightedCourseId(null);
       }
@@ -68,8 +62,11 @@ const ManageCourses = () => {
   const activeCategoriesFromData = courses.map(c => c.category).filter(Boolean);
   const uniqueCategories = Array.from(new Set([...ALL_CATEGORIES, ...activeCategoriesFromData]));
 
-  // Filtered Courses for selected category
-  const displayCourses = courses.filter(c => c.category === selectedCategory);
+  // Filtered Courses for selected category and search term
+  const displayCourses = courses.filter(c => 
+    c.category === selectedCategory && 
+    c.title.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   // 🔥 ADD COURSE
   const handleAdd = async () => {
