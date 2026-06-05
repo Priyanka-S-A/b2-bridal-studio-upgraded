@@ -634,9 +634,8 @@ router.get('/b2-details', verifyToken, verifyRole(['owner']), async (req, res) =
 
       const dob = regCust ? regCust.dob : null;
       const email = cleanEmail || (regCust ? regCust.email : '');
-      // For online bookings: use email as the primary key to prevent duplicates
-      // when the same customer books with a different phone number.
-      const key = cleanEmail || cleanPhone || b.userId || b.phone;
+      // Consolidate on email if a valid one is present; fallback to phone or userId
+      const key = (email && email.includes('@')) ? email : (cleanPhone || b.userId || b.phone);
 
       let lastBillTime = getSafeTime(b.createdAt);
 
@@ -665,7 +664,8 @@ router.get('/b2-details', verifyToken, verifyRole(['owner']), async (req, res) =
       const email = cleanEmail || (regCust ? regCust.email : '');
       const source = bill.source || 'offline';
 
-      const key = cleanPhone || cleanEmail || phone || bill.userId || customerName;
+      // Consolidate on email if a valid one is present; fallback to phone or name
+      const key = (email && email.includes('@')) ? email : (cleanPhone || phone || bill.userId || customerName);
 
       let lastBillTime = getSafeTime(bill.createdAt) || getSafeTime(bill.date);
 
@@ -676,7 +676,7 @@ router.get('/b2-details', verifyToken, verifyRole(['owner']), async (req, res) =
         dob: dob,
         source: source,
         lastBillTime: lastBillTime
-      });
+      }, true); // Allow phone update to latest phone on billing activity too
     });
 
     const result = Array.from(customerMap.values()).map(c => {
