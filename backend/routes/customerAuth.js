@@ -8,6 +8,20 @@ const { OAuth2Client } = require('google-auth-library');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret';
 
+// ─── Email helpers ───────────────────────────────────────────────────────────
+// Always store and look up emails as lowercase to prevent duplicate records
+// caused by case differences (e.g. "ABC@gmail.com" vs "abc@gmail.com").
+const normalizeEmail = (email) => (email || '').trim().toLowerCase();
+
+// Case-insensitive email query — needed during migration to also match any
+// legacy records that were stored with mixed-case emails.
+const emailQuery = (email) => ({
+  $regex: new RegExp(
+    `^${normalizeEmail(email).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`,
+    'i'
+  )
+});
+
 // Centralized utility to send transactional emails via Brevo HTTP API
 async function sendEmail({ to, toName, subject, htmlContent }) {
   const apiKey = process.env.BREVO_API_KEY;
@@ -77,9 +91,11 @@ if (process.env.BREVO_API_KEY) {
 // 🔹 REGISTER
 router.post('/register', async (req, res) => {
   try {
-    const { name, email, phone, password, dob } = req.body;
+    const { name, phone, password, dob } = req.body;
+    const email = normalizeEmail(req.body.email);
 
-    const existing = await Customer.findOne({ email });
+    // Case-insensitive check to prevent duplicates from email casing differences
+    const existing = await Customer.findOne({ email: emailQuery(email) });
     if (existing) {
       return res.status(400).json({ error: "User already exists" });
     }
@@ -88,7 +104,7 @@ router.post('/register', async (req, res) => {
 
     const userData = {
       name,
-      email,
+      email, // always stored as lowercase
       phone,
       password: hashed,
       isVerified: true
@@ -120,9 +136,10 @@ router.post('/register', async (req, res) => {
 // 🔹 LOGIN
 router.post('/login', async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { password } = req.body;
+    const email = normalizeEmail(req.body.email);
 
-    const user = await Customer.findOne({ email });
+    const user = await Customer.findOne({ email: emailQuery(email) });
     if (!user) {
       return res.status(400).json({ error: "User not found" });
     }
@@ -236,9 +253,9 @@ router.post('/google-auth', async (req, res) => {
 // 🔹 FORGOT PASSWORD
 router.post('/forgot-password', async (req, res) => {
   try {
-    const { email } = req.body;
+    const email = normalizeEmail(req.body.email);
 
-    const user = await Customer.findOne({ email });
+    const user = await Customer.findOne({ email: emailQuery(email) });
 
     if (!user) {
       // Don't reveal whether email exists
@@ -352,7 +369,9 @@ router.post('/reset-password', async (req, res) => {
 // 🔹 SEND EMAIL OTP
 router.post('/send-otp', async (req, res) => {
   try {
-    const { name, email, phone, dob } = req.body;
+    const { name, phone, dob } = req.body;
+    // Normalize email to lowercase to prevent duplicate records from casing differences
+    const email = normalizeEmail(req.body.email);
 
     if (!email || !name || !phone) {
       return res.status(400).json({ error: "Name, email, and phone number are required" });
@@ -376,23 +395,26 @@ router.post('/send-otp', async (req, res) => {
     const otpHash = await bcrypt.hash(otpVal, 10);
     const otpExpires = Date.now() + 5 * 60 * 1000; // 5 minutes
 
-    // Find or create customer
-    let customer = await Customer.findOne({ email });
+    // Find existing customer using case-insensitive email lookup.
+    // This prevents creating a new record when the same email is submitted
+    // with different casing (e.g. "ABC@gmail.com" vs "abc@gmail.com").
+    let customer = await Customer.findOne({ email: emailQuery(email) });
 
     if (customer) {
-      // Update existing customer's details and set OTP
+      // Update existing customer: refresh name, phone, OTP, and normalize email
       customer.name = name;
       customer.phone = phone;
+      customer.email = email; // normalize stored email to lowercase
       if (dob) customer.dob = dob;
       customer.otp = otpHash;
       customer.otpExpires = otpExpires;
       customer.authProvider = customer.authProvider || 'email-otp';
       await customer.save();
     } else {
-      // Create new customer
+      // No existing customer — create a new record with normalized (lowercase) email
       const userData = {
         name,
-        email,
+        email, // already lowercase
         phone,
         otp: otpHash,
         otpExpires,
@@ -462,13 +484,14 @@ router.post('/send-otp', async (req, res) => {
 // 🔹 VERIFY EMAIL OTP
 router.post('/verify-otp', async (req, res) => {
   try {
-    const { email, otp } = req.body;
+    const { otp } = req.body;
+    const email = normalizeEmail(req.body.email);
 
     if (!email || !otp) {
       return res.status(400).json({ error: "Email and OTP are required" });
     }
 
-    const customer = await Customer.findOne({ email });
+    const customer = await Customer.findOne({ email: emailQuery(email) });
     if (!customer) {
       return res.status(400).json({ error: "User not found" });
     }
