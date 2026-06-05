@@ -316,12 +316,12 @@ const BillView = () => {
                       <span>Service Total</span><span>₹{displayOriginalAmount.toFixed(2)}</span>
                     </div>
 
-                    {bill.discountAmount && bill.discountAmount > 0 && (
+                    {bill.discountAmount > 0 && (
                       <div className="flex justify-between mb-2 font-cormorant text-[1rem] font-bold" style={{ color: '#4ade80' }}>
                         <span className="flex items-center gap-1.5">
                           {bill.couponCode && (
                             <span style={{ fontSize: '0.6rem', padding: '1px 6px', borderRadius: '9999px', background: 'rgba(74,222,128,0.15)', border: '1px solid rgba(74,222,128,0.3)', textTransform: 'uppercase' }}>
-                              {bill.couponCode}
+                               {bill.couponCode}
                             </span>
                           )}
                           {(bill.discountType === 'coupon' || bill.couponCode) ? 'Coupon Discount' : 'Manual Discount'}

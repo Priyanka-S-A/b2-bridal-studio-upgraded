@@ -177,7 +177,7 @@ const ViewBookings = () => {
                     <div className="font-bold text-gray-900 text-lg font-cinzel">
                       ₹{(bill.finalAmountPaid !== undefined ? bill.finalAmountPaid : bill.total).toFixed(2)}
                     </div>
-                    {bill.discountAmount && bill.discountAmount > 0 ? (
+                    {bill.discountAmount > 0 ? (
                       <div className="text-xs text-green-600 mt-1 font-medium">
                         {bill.discountType === 'manual' ? (
                           <span>💸 Manual Discount (-₹{bill.discountAmount.toFixed(2)})</span>
