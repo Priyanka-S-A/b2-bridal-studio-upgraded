@@ -81,6 +81,8 @@ function App() {
               <Route path="/courses/:category" element={<PublicLayout><Courses /></PublicLayout>} />
               <Route path="/services" element={<PublicLayout><Services /></PublicLayout>} />
               <Route path="/products" element={<PublicLayout><Products /></PublicLayout>} />
+              <Route path="/cart" element={<PublicLayout><Products /></PublicLayout>} />
+              <Route path="/product-cart" element={<PublicLayout><Products /></PublicLayout>} />
               <Route path="/gallery" element={<PublicLayout><Gallery /></PublicLayout>} />
               <Route path="/certificates" element={<PublicLayout><Certificates /></PublicLayout>} />
               <Route path="/about" element={<PublicLayout><About /></PublicLayout>} />

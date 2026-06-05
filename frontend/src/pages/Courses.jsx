@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion, useInView, AnimatePresence } from 'framer-motion';
 import { fadeUp, staggerContainer, slideUp } from '../animations/variants';
 
@@ -84,13 +84,44 @@ const Courses = () => {
   const [toast, setToast] = useState({ show: false, message: '' });
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: '-5%' });
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const triggerAuthToast = (message) => {
     setToast({ show: true, message });
     setTimeout(() => {
-      window.location.href = '/auth';
+      navigate('/login');
     }, 2500);
   };
+
+  // Handle pending course enrollment after login
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser && dbCourses.length > 0) {
+      try {
+        const parsedUser = JSON.parse(storedUser);
+        if (parsedUser && parsedUser.name && (parsedUser.email || parsedUser.phone)) {
+          const pendingEnrollment = sessionStorage.getItem('courseEnrollmentData');
+          if (pendingEnrollment) {
+            const { course, branch, categoryTitle } = JSON.parse(pendingEnrollment);
+            sessionStorage.removeItem('courseEnrollmentData');
+            
+            // Restore branch
+            if (branch) {
+              setSelectedBranch(branch);
+            }
+            
+            // Trigger enrollment window open
+            const rawMessage = `*Course Enrollment*\n\n*Customer:* ${parsedUser.name}\nPhone: ${parsedUser.phone}\nEmail: ${parsedUser.email || ''}\n\n*Category:* ${categoryTitle}\n*Course:* ${course.title}\n*Duration:* ${course.duration}\n*Branch:* ${branch === 'branch1' ? 'Chennai' : 'Madurai'}\n\nPlease send QR code for fee payment.`;
+            const message = encodeURIComponent(rawMessage);
+            window.open(`https://wa.me/919361527951?text=${message}`, '_blank');
+          }
+        }
+      } catch (e) {
+        console.error("Error restoring pending course enrollment:", e);
+      }
+    }
+  }, [dbCourses]);
 
   useEffect(() => {
     axios.get(`${API}/api/courses`).then(res => setDbCourses(res.data)).catch(() => { });
@@ -125,7 +156,13 @@ const Courses = () => {
     }
 
     if (!user) {
-      triggerAuthToast('Please login to enroll.');
+      sessionStorage.setItem('redirectAfterLogin', location.pathname);
+      sessionStorage.setItem('courseEnrollmentData', JSON.stringify({
+        course,
+        branch: selectedBranch,
+        categoryTitle: categoryData?.title || category
+      }));
+      triggerAuthToast('Please login to continue your course enrollment.');
       return;
     }
 

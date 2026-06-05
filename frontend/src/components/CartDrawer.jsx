@@ -1,20 +1,54 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '../context/CartContext';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 
 const API = import.meta.env.VITE_API_URL;
 
 const CartDrawer = () => {
-  const { items, itemCount, subtotal, total, isOpen, closeCart, removeFromCart, updateQuantity, updatePeopleCount } = useCart();
+  const { items, itemCount, subtotal, total, isOpen, closeCart, openCart, removeFromCart, updateQuantity, updatePeopleCount } = useCart();
   const [toast, setToast] = useState({ show: false, message: '' });
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const triggerAuthToast = (message) => {
     setToast({ show: true, message });
     setTimeout(() => {
-      window.location.href = '/auth';
+      navigate('/login');
     }, 2500);
   };
+
+  // Auto open cart on /cart or /product-cart
+  React.useEffect(() => {
+    if (location.pathname === '/cart' || location.pathname === '/product-cart') {
+      openCart();
+    }
+  }, [location.pathname, openCart]);
+
+  // Handle pending product enquiry after login
+  React.useEffect(() => {
+    const stored = localStorage.getItem('user');
+    const pending = sessionStorage.getItem('productEnquiryPending');
+    if (pending === 'true' && stored && items.length > 0) {
+      try {
+        const parsed = JSON.parse(stored);
+        if (parsed && parsed.name && (parsed.email || parsed.phone)) {
+          sessionStorage.removeItem('productEnquiryPending');
+          
+          let message = `*Product Enquiry*\n\n*Customer:* ${parsed.name}\nPhone: ${parsed.phone}\nEmail: ${parsed.email}\n\n*Products:*\n`;
+          items.forEach(item => {
+            message += `- ${item.name} — Qty: ${item.quantity} — ₹${item.price}\n`;
+          });
+          message += `\n*Total Amount:* ₹${total.toFixed(2)}\n\nPlease contact me regarding availability and payment.`;
+          
+          window.open(`https://wa.me/919361527951?text=${encodeURIComponent(message)}`, '_blank');
+          closeCart();
+        }
+      } catch (e) {
+        console.error("Error processing pending product enquiry:", e);
+      }
+    }
+  }, [items, total, closeCart]);
 
   React.useEffect(() => {
     if (toast.show) {
@@ -196,7 +230,9 @@ const CartDrawer = () => {
                     }
 
                     if (!user) {
-                      triggerAuthToast('Please login to enquire.');
+                      sessionStorage.setItem('redirectAfterLogin', '/cart');
+                      sessionStorage.setItem('productEnquiryPending', 'true');
+                      triggerAuthToast('Please login to continue your product enquiry.');
                       return;
                     }
                     
