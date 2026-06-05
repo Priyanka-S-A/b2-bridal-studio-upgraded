@@ -486,58 +486,6 @@ const StaffReports = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-        
-        {/* ── 🏆 STAFF RANKING LEADERBOARD ── */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 lg:col-span-3">
-          <h2 className="text-sm font-cinzel font-bold uppercase tracking-wider mb-5 pb-3 border-b border-gray-100 flex items-center gap-2">
-            <Award size={18} className="text-[#FFD700]" /> Staff Leaderboard
-          </h2>
-          {staffMetrics.length === 0 ? (
-            <p className="text-center font-cormorant italic text-gray-500 py-6">No performance statistics recorded yet.</p>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {staffMetrics.slice(0, 6).map((m, idx) => (
-                <div key={m.staffId} className="flex flex-col gap-3 p-4 rounded-xl bg-gray-50 border border-gray-100 hover:shadow-sm transition-all">
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-2.5">
-                      <span className={`w-6 h-6 rounded-full flex items-center justify-center font-mono text-[0.65rem] font-bold ${
-                        idx === 0 ? 'bg-amber-100 text-amber-800' : idx === 1 ? 'bg-slate-100 text-slate-700' : 'bg-gray-100 text-gray-500'
-                      }`}>
-                        {idx + 1}
-                      </span>
-                      <div>
-                        <h4 className="text-xs font-cinzel font-bold text-gray-900">{m.name}</h4>
-                        <span className="text-[0.62rem] text-gray-400 font-mono">{m.staffId}</span>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-xs font-bold text-amber-700 font-cinzel">₹{m.revenueGenerated.toLocaleString()}</div>
-                      <div className="text-[0.6rem] text-gray-400 uppercase tracking-widest font-cinzel">Revenue</div>
-                    </div>
-                  </div>
-                  
-                  {/* Progress bar visualizer */}
-                  <div>
-                    <div className="flex justify-between text-[0.62rem] text-gray-500 mb-1">
-                      <span>Productivity Score</span>
-                      <span className="font-bold text-gray-800">{m.productivityScore}%</span>
-                    </div>
-                    <div className="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                      <div 
-                        className="h-full bg-gradient-to-r from-amber-400 to-[#D4AF37] rounded-full transition-all duration-500" 
-                        style={{ width: `${m.productivityScore}%` }}
-                      />
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-      </div>
-
       {/* ── 📋 STAFF ANALYTICS GRID ── */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mb-8">
         <div className="p-5 border-b border-gray-100 flex justify-between items-center print:hidden">
@@ -630,14 +578,12 @@ const StaffReports = () => {
                 <th className="p-4 pl-6 text-xs font-cinzel font-bold uppercase tracking-wider">Date</th>
                 <th className="p-4 text-xs font-cinzel font-bold uppercase tracking-wider">Customer Details</th>
                 <th className="p-4 text-xs font-cinzel font-bold uppercase tracking-wider">Service Name</th>
-                <th className="p-4 text-xs font-cinzel font-bold uppercase tracking-wider">Time</th>
-                <th className="p-4 text-xs font-cinzel font-bold uppercase tracking-wider">Assigned Staff</th>
-                <th className="p-4 pr-6 text-xs font-cinzel font-bold uppercase tracking-wider text-right">Booking Status</th>
+                <th className="p-4 pr-6 text-xs font-cinzel font-bold uppercase tracking-wider text-right">Assigned Staff</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
               {serviceHistory.length === 0 ? (
-                <tr><td colSpan="6" className="p-10 text-center font-cormorant italic text-lg text-gray-500">No service history records found.</td></tr>
+                <tr><td colSpan="4" className="p-10 text-center font-cormorant italic text-lg text-gray-500">No service history records found.</td></tr>
               ) : serviceHistory.map((h) => (
                 <tr key={h._id} className="hover:bg-[#FFFCF5] transition-colors text-sm">
                   <td className="p-4 pl-6 font-cormorant text-base text-gray-600 font-medium">{h.serviceDate}</td>
@@ -648,21 +594,9 @@ const StaffReports = () => {
                   <td className="p-4">
                     <span className="font-medium text-gray-800">{h.serviceName}</span>
                   </td>
-                  <td className="p-4 font-mono text-xs text-gray-500">{h.serviceTime}</td>
-                  <td className="p-4">
+                  <td className="p-4 pr-6 text-right">
                     <div className="font-medium text-gray-900">{h.assignedStaff}</div>
                     <div className="text-[0.62rem] text-amber-700 font-mono">{h.staffCode}</div>
-                  </td>
-                  <td className="p-4 pr-6 text-right">
-                    <span className={`px-2.5 py-1 rounded-full text-[0.65rem] font-bold border uppercase tracking-wider ${
-                      h.bookingStatus === 'Approved'
-                        ? 'bg-green-50 text-green-700 border-green-200'
-                        : h.bookingStatus === 'Completed'
-                        ? 'bg-blue-50 text-blue-700 border-blue-200'
-                        : 'bg-gray-100 text-gray-600 border-gray-200'
-                    }`}>
-                      {h.bookingStatus}
-                    </span>
                   </td>
                 </tr>
               ))}
