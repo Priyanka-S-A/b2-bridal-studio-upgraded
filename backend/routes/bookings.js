@@ -7,6 +7,7 @@ const Booking = require('../models/Booking');
 const Bill = require('../models/Bill');
 const Revenue = require('../models/Revenue');
 const SlotBlock = require('../models/SlotBlock');
+const { verifyToken } = require('../middleware/auth');
 
 // Ensure uploads directory exists (required for Render and fresh environments)
 fs.mkdirSync(path.join(__dirname, '..', 'uploads'), { recursive: true });
@@ -27,7 +28,7 @@ const upload = multer({
 });
 
 // POST /api/bookings — Create a new booking
-router.post('/', upload.single('paymentProof'), async (req, res) => {
+router.post('/', verifyToken, upload.single('paymentProof'), async (req, res) => {
   try {
     const {
       name, phone, upiId, transactionId, branch, items,
@@ -79,7 +80,7 @@ router.post('/', upload.single('paymentProof'), async (req, res) => {
       }
     }
 
-    const userEmail = (email || userId || '').trim().toLowerCase();
+    const userEmail = (req.user?.email || email || userId || '').trim().toLowerCase();
 
     const booking = new Booking({
       userId: userEmail,

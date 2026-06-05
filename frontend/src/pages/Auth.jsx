@@ -14,6 +14,14 @@ const Auth = () => {
   const [step, setStep] = useState('selection');
   const [loading, setLoading] = useState(false);
   const [generalError, setGeneralError] = useState('');
+  const [authMessage, setAuthMessage] = useState('');
+
+  useEffect(() => {
+    const msg = sessionStorage.getItem('authMessage');
+    if (msg) {
+      setAuthMessage(msg);
+    }
+  }, []);
 
   // Form states
   const [form, setForm] = useState({
@@ -100,7 +108,18 @@ const Auth = () => {
       localStorage.setItem('user', JSON.stringify(res.data.user));
       if (res.data.token) localStorage.setItem('customerToken', res.data.token);
       window.dispatchEvent(new Event('userStateChange'));
-      navigate('/profile');
+      
+      const redirectTarget = sessionStorage.getItem('redirectAfterLogin');
+      const savedState = sessionStorage.getItem('bookingServiceData');
+      if (redirectTarget) {
+        sessionStorage.removeItem('redirectAfterLogin');
+        sessionStorage.removeItem('bookingServiceData');
+        sessionStorage.removeItem('authMessage');
+        const state = savedState ? { serviceData: JSON.parse(savedState) } : null;
+        navigate(redirectTarget, { state, replace: true });
+      } else {
+        navigate('/profile');
+      }
     } catch (err) {
       setGeneralError(err.response?.data?.error || 'Google authentication failed. Please try again.');
     } finally {
@@ -166,7 +185,18 @@ const Auth = () => {
       localStorage.setItem('user', JSON.stringify(res.data.user));
       if (res.data.token) localStorage.setItem('customerToken', res.data.token);
       window.dispatchEvent(new Event('userStateChange'));
-      navigate('/profile');
+      
+      const redirectTarget = sessionStorage.getItem('redirectAfterLogin');
+      const savedState = sessionStorage.getItem('bookingServiceData');
+      if (redirectTarget) {
+        sessionStorage.removeItem('redirectAfterLogin');
+        sessionStorage.removeItem('bookingServiceData');
+        sessionStorage.removeItem('authMessage');
+        const state = savedState ? { serviceData: JSON.parse(savedState) } : null;
+        navigate(redirectTarget, { state, replace: true });
+      } else {
+        navigate('/profile');
+      }
     } catch (err) {
       setGeneralError(err.response?.data?.error || 'OTP verification failed. Please try again.');
     } finally {
@@ -240,6 +270,12 @@ const Auth = () => {
           {generalError && (
             <div className="mb-6 p-4 rounded-sm text-sm font-inter text-center" style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', color: '#ef4444' }}>
               {generalError}
+            </div>
+          )}
+
+          {authMessage && (
+            <div className="mb-6 p-4 rounded-sm text-sm font-inter text-center" style={{ background: 'rgba(255,215,0,0.08)', border: '1px solid rgba(255,215,0,0.3)', color: '#FFD700' }}>
+              {authMessage}
             </div>
           )}
 

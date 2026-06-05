@@ -481,11 +481,6 @@ const Services = () => {
   };
 
   const handleProceedToPayment = async () => {
-    const userData = localStorage.getItem('user');
-    if (!userData) {
-      navigate('/login');
-      return;
-    }
     if (cart.length === 0) return;
 
     // Inline validation — no alert()

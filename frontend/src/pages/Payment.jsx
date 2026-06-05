@@ -246,7 +246,18 @@ const Payment = () => {
             </div>
 
             <button
-              onClick={() => navigate('/confirm-booking', { state: { serviceData: { ...serviceData, coupon: appliedCoupon } } })}
+              onClick={() => {
+                const user = JSON.parse(localStorage.getItem('user') || 'null');
+                const bookingState = { ...serviceData, coupon: appliedCoupon };
+                if (!user) {
+                  sessionStorage.setItem('redirectAfterLogin', '/confirm-booking');
+                  sessionStorage.setItem('bookingServiceData', JSON.stringify(bookingState));
+                  sessionStorage.setItem('authMessage', 'Please login to confirm your booking.');
+                  navigate('/login');
+                } else {
+                  navigate('/confirm-booking', { state: { serviceData: bookingState } });
+                }
+              }}
               className="btn-gold w-full justify-center mt-8 py-4"
             >
               Confirm Booking

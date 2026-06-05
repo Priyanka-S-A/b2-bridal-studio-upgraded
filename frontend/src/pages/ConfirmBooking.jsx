@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { fadeUp, staggerContainer } from '../animations/variants';
@@ -13,8 +13,31 @@ const ConfirmBooking = () => {
   const location = useLocation();
   const user = JSON.parse(localStorage.getItem('user') || 'null');
 
-  // Support only direct service flow (via serviceData)
-  const serviceData = location.state?.serviceData || null;
+  // Protect route and save state if unauthenticated
+  useEffect(() => {
+    if (!user) {
+      const serviceDataState = location.state?.serviceData || null;
+      sessionStorage.setItem('redirectAfterLogin', '/confirm-booking');
+      if (serviceDataState) {
+        sessionStorage.setItem('bookingServiceData', JSON.stringify(serviceDataState));
+      }
+      sessionStorage.setItem('authMessage', 'Please login to confirm your booking.');
+      navigate('/login', { replace: true });
+    }
+  }, [user, navigate, location.state?.serviceData]);
+
+  // Support only direct service flow (via serviceData or saved state)
+  const serviceData = useMemo(() => {
+    if (location.state?.serviceData) {
+      return location.state.serviceData;
+    }
+    const saved = sessionStorage.getItem('bookingServiceData');
+    return saved ? JSON.parse(saved) : null;
+  }, [location.state?.serviceData]);
+
+  if (!user) {
+    return null; // Don't render while redirecting
+  }
   const items = serviceData?.items || [];
   const total = serviceData?.total || 0;
   const gstTotal = items.reduce((sum, i) => {
@@ -90,8 +113,12 @@ const ConfirmBooking = () => {
       }))));
       formData.append('paymentProof', paymentProof);
 
+      const token = localStorage.getItem('customerToken');
       const response = await fetch(`${API}/api/bookings`, {
         method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
         body: formData,
       });
 
@@ -104,6 +131,9 @@ const ConfirmBooking = () => {
       localStorage.removeItem('services_bookingDate');
       localStorage.removeItem('services_bookingTime');
       localStorage.removeItem('services_bookingBranch');
+      sessionStorage.removeItem('bookingServiceData');
+      sessionStorage.removeItem('redirectAfterLogin');
+      sessionStorage.removeItem('authMessage');
       navigate('/profile');
     } catch (err) {
       alert(`Failed to submit booking: ${err.message || 'Please try again.'}`);
