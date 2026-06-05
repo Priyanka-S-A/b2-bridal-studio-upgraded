@@ -89,6 +89,20 @@ const Attendance = () => {
       if (!form.leaveReason || !form.leaveReason.trim()) {
         newErrors.leaveReason = 'Absence reason/notes are required';
       }
+      
+      // Check if an absent record already exists for the selected staff and date
+      if (form.staffId && form.date) {
+        const alreadyAbsent = records.some(
+          (r) =>
+            r.status === 'Absent' &&
+            r.staffId?._id === form.staffId &&
+            r.date &&
+            r.date.split('T')[0] === form.date
+        );
+        if (alreadyAbsent) {
+          newErrors.status = 'An absent entry has already been marked for this staff member on the selected date.';
+        }
+      }
     }
  
     setErrors(newErrors);
@@ -145,6 +159,8 @@ const Attendance = () => {
       fetchAttendance();
     } catch (err) {
       console.error('Error adding attendance', err);
+      const errMsg = err.response?.data?.error || 'Error adding attendance. Please try again.';
+      alert(errMsg);
     }
   };
 
@@ -389,7 +405,12 @@ const Attendance = () => {
               value={form.staffId}
               onChange={(e) => {
                 setForm({ ...form, staffId: e.target.value });
-                if (errors.staffId) setErrors({ ...errors, staffId: null });
+                if (errors.staffId || errors.status) {
+                  const newErrs = { ...errors };
+                  delete newErrs.staffId;
+                  delete newErrs.status;
+                  setErrors(newErrs);
+                }
               }}
               className={`w-full p-3 rounded-lg border focus:outline-none focus:ring-1 bg-gray-50 font-cormorant text-lg text-gray-800 transition-colors ${
                 errors.staffId
@@ -419,7 +440,12 @@ const Attendance = () => {
               value={form.date}
               onChange={(e) => {
                 setForm({ ...form, date: e.target.value });
-                if (errors.date) setErrors({ ...errors, date: null });
+                if (errors.date || errors.status) {
+                  const newErrs = { ...errors };
+                  delete newErrs.date;
+                  delete newErrs.status;
+                  setErrors(newErrs);
+                }
               }}
               className={`w-full p-3 rounded-lg border focus:outline-none focus:ring-1 bg-gray-50 font-cormorant text-lg text-gray-800 transition-colors ${
                 errors.date
@@ -446,11 +472,14 @@ const Attendance = () => {
                 type="button"
                 onClick={() => {
                   setForm({ ...form, status: type });
+                  const newErrs = { ...errors };
+                  delete newErrs.status;
                   if (type === 'Present') {
-                    if (errors.leaveReason) setErrors({ ...errors, leaveReason: null });
+                    delete newErrs.leaveReason;
                   } else {
-                    if (errors.entryTime) setErrors({ ...errors, entryTime: null });
+                    delete newErrs.entryTime;
                   }
+                  setErrors(newErrs);
                 }}
                 className={`flex-1 py-2.5 px-4 rounded-lg font-cinzel text-[0.65rem] font-bold uppercase tracking-widest transition-all min-w-[100px] ${
                   form.status === type
@@ -462,6 +491,9 @@ const Attendance = () => {
               </button>
             ))}
           </div>
+          {errors.status && (
+            <span className="text-red-500 text-xs font-medium mt-1.5">{errors.status}</span>
+          )}
         </div>
 
         {/* Row 3 — Present & Permission Time Fields */}

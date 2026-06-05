@@ -12,6 +12,34 @@ router.post('/', async (req, res) => {
       delete payload.entryTime;
       delete payload.exitTime;
       payload.exitLocked = false;
+
+      if (payload.status === 'Absent') {
+        if (!payload.date) {
+          return res.status(400).json({ error: 'Date is required for Absent attendance' });
+        }
+        const targetDate = new Date(payload.date);
+        if (isNaN(targetDate.getTime())) {
+          return res.status(400).json({ error: 'Invalid date format' });
+        }
+
+        const startOfDay = new Date(targetDate);
+        startOfDay.setUTCHours(0, 0, 0, 0);
+        const endOfDay = new Date(targetDate);
+        endOfDay.setUTCHours(23, 59, 59, 999);
+
+        const existingAbsent = await Attendance.findOne({
+          staffId: payload.staffId,
+          status: 'Absent',
+          date: {
+            $gte: startOfDay,
+            $lte: endOfDay
+          }
+        });
+
+        if (existingAbsent) {
+          return res.status(400).json({ error: 'An absent entry has already been marked for this staff member on the selected date.' });
+        }
+      }
     } else if (payload.status === 'Permission') {
       // Keep entryTime (From), exitTime (To), leaveReason, and exitLocked as sent (true)
     } else {
