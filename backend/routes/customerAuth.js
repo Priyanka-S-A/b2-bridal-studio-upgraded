@@ -546,7 +546,9 @@ router.get('/b2-details', verifyToken, verifyRole(['owner']), async (req, res) =
       return isNaN(d.getTime()) ? 0 : d.getTime();
     };
 
-    const addOrUpdate = (key, data) => {
+    // allowPhoneUpdateByTime: when true (online bookings), the phone is replaced
+    // with the latest booking's phone whenever a newer createdAt is encountered.
+    const addOrUpdate = (key, data, allowPhoneUpdateByTime = false) => {
       if (!key) return;
       if (customerMap.has(key)) {
         const existing = customerMap.get(key);
@@ -567,6 +569,10 @@ router.get('/b2-details', verifyToken, verifyRole(['owner']), async (req, res) =
         }
         if (data.lastBillTime && data.lastBillTime > existing.lastBillTime) {
           existing.lastBillTime = data.lastBillTime;
+          // For online bookings: update phone to the latest booking's phone number
+          if (allowPhoneUpdateByTime && data.phone) {
+            existing.phone = data.phone;
+          }
         }
       } else {
         customerMap.set(key, {
@@ -590,7 +596,9 @@ router.get('/b2-details', verifyToken, verifyRole(['owner']), async (req, res) =
       if (cleanEmail) regLookupByEmail.set(cleanEmail, c);
     });
 
-    // 1. Process bookings (real bookings)
+    // 1. Process bookings (online bookings only)
+    // Email is used as the primary unique key for online bookings to prevent
+    // duplicate entries when the same customer books again with a different phone.
     bookings.forEach(b => {
       if (b.status === 'Rejected') return;
 
@@ -598,12 +606,14 @@ router.get('/b2-details', verifyToken, verifyRole(['owner']), async (req, res) =
       const cleanEmail = getCleanEmail(b.userId);
 
       let regCust = null;
-      if (cleanPhone) regCust = regLookupByPhone.get(cleanPhone);
-      if (!regCust && cleanEmail) regCust = regLookupByEmail.get(cleanEmail);
+      if (cleanEmail) regCust = regLookupByEmail.get(cleanEmail);
+      if (!regCust && cleanPhone) regCust = regLookupByPhone.get(cleanPhone);
 
       const dob = regCust ? regCust.dob : null;
       const email = cleanEmail || (regCust ? regCust.email : '');
-      const key = cleanPhone || cleanEmail || b.phone || b.userId;
+      // For online bookings: use email as the primary key to prevent duplicates
+      // when the same customer books with a different phone number.
+      const key = cleanEmail || cleanPhone || b.userId || b.phone;
 
       let lastBillTime = getSafeTime(b.createdAt);
 
@@ -614,7 +624,7 @@ router.get('/b2-details', verifyToken, verifyRole(['owner']), async (req, res) =
         dob: dob,
         source: 'online',
         lastBillTime: lastBillTime
-      });
+      }, true); // true = update phone to the latest booking's phone for online customers
     });
 
     // 2. Process bills
