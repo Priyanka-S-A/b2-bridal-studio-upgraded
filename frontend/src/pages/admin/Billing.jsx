@@ -687,7 +687,7 @@ export default function Billing() {
                   type="button"
                   id="billing-item-select-trigger"
                   onClick={() => setIsOpen(!isOpen)}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2.5 bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-200 focus:border-amber-400 font-cormorant text-lg transition-colors flex items-center justify-between text-left"
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2.5 bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-200 focus:border-amber-400 font-cormorant text-[22px] transition-colors flex items-center justify-between text-left"
                 >
                   <span className="truncate">
                     {selectedItem
@@ -707,16 +707,16 @@ export default function Billing() {
                         placeholder={`Search ${category === 'services' ? 'services' : 'products'}...`}
                         value={searchTerm}
                         onChange={e => setSearchTerm(e.target.value)}
-                        className="w-full pl-8 pr-3 py-2 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-[#D4AF37] text-gray-900 placeholder-gray-400 bg-gray-50"
+                        className="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg text-base focus:outline-none focus:border-[#D4AF37] text-gray-900 placeholder-gray-400 bg-gray-50"
                         autoFocus
                       />
-                      <Search className="absolute left-2.5 top-2.5 text-gray-400" size={14} />
+                      <Search className="absolute left-2.5 top-3 text-gray-400" size={16} />
                     </div>
 
                     {/* Grouped Items List */}
                     <div className="overflow-y-auto flex-1 max-h-56">
                       {Object.keys(groupedItems).length === 0 ? (
-                        <div className="text-center py-4 text-xs text-gray-500 font-cormorant italic">
+                        <div className="text-center py-4 text-base text-gray-500 font-cormorant italic">
                           No matching items found.
                         </div>
                       ) : (
@@ -730,7 +730,7 @@ export default function Billing() {
                               <button
                                 type="button"
                                 onClick={() => toggleCategory(catName)}
-                                className="w-full flex items-center gap-1.5 py-1.5 px-2 text-left font-cinzel font-bold text-[0.7rem] text-gray-700 hover:bg-gray-50 rounded transition-colors uppercase tracking-wider"
+                                className="w-full flex items-center gap-1.5 py-1.5 px-2 text-left font-cinzel font-bold text-[15px] text-gray-700 hover:bg-gray-50 rounded transition-colors uppercase tracking-wider"
                               >
                                 {isCatExpanded ? (
                                   <ChevronDown size={12} className="text-[#D4AF37]" />
@@ -752,14 +752,14 @@ export default function Billing() {
                                         setIsOpen(false);
                                         setSearchTerm('');
                                       }}
-                                      className={`w-full text-left py-1.5 px-3 rounded text-sm font-cormorant text-gray-800 transition-colors flex justify-between items-center ${
+                                      className={`w-full text-left py-1.5 px-3 rounded text-lg font-cormorant text-gray-800 transition-colors flex justify-between items-center ${
                                         selectedItem === item.id
                                           ? 'bg-amber-50 font-bold text-amber-900'
                                           : 'hover:bg-[#FFFCF5] hover:text-[#D4AF37]'
                                       }`}
                                     >
                                       <span className="truncate">{item.name}</span>
-                                      <span className="font-bold text-gray-900 text-xs shrink-0 ml-2">₹{item.price}</span>
+                                      <span className="font-bold text-gray-900 text-base shrink-0 ml-2">₹{item.price}</span>
                                     </button>
                                   ))}
                                 </div>
