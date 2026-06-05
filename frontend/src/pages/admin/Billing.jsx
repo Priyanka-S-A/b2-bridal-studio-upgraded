@@ -107,13 +107,9 @@ export default function Billing() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Expand categories by default on first load or when switching categories
+  // Collapse categories by default on first load or when switching categories
   useEffect(() => {
-    const initialExpanded = {};
-    catalogueItems.forEach(item => {
-      initialExpanded[item.category] = true;
-    });
-    setExpandedCategories(initialExpanded);
+    setExpandedCategories({});
   }, [category, services, products]);
 
   const toggleCategory = (catName) => {
