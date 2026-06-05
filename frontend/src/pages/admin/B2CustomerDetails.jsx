@@ -144,7 +144,7 @@ const B2CustomerDetails = () => {
             onChange={e => setDobOption(e.target.value)}
             className="p-2 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-[#D4AF37] text-gray-900 bg-white"
           >
-            <option value="none">DOB (Birthday Filter)</option>
+            <option value="none">DOB Filter</option>
             <option value="today">Birthdays Today 🎂</option>
             <option value="thisMonth">Birthdays This Month</option>
             <option value="nextMonth">Birthdays Next Month</option>
