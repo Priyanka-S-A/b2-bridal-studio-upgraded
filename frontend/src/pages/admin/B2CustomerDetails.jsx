@@ -185,19 +185,19 @@ const B2CustomerDetails = () => {
               filtered.map((c, idx) => (
                 <tr key={idx} className="hover:bg-[#FFFCF5] transition-colors">
                   <td className="p-4 pl-6">
-                    <div className="font-bold text-gray-900 font-playfair text-base">{c.name}</div>
+                    <div className="font-bold text-gray-900 text-xs">{c.name}</div>
                   </td>
                   <td className="p-4 text-gray-700">
                     <div className="flex items-center gap-1.5 text-xs font-medium text-gray-800">
                       <Phone size={12} className="text-gray-400 shrink-0" />
                       {c.phone || 'N/A'}
                     </div>
-                    <div className="flex items-center gap-1.5 text-xs text-gray-500 font-cormorant mt-1">
+                    <div className="flex items-center gap-1.5 text-xs text-gray-500 mt-1">
                       <Mail size={12} className="text-gray-400 shrink-0" />
                       {c.email || 'N/A'}
                     </div>
                   </td>
-                  <td className="p-4 text-gray-600 font-cormorant text-lg">
+                  <td className="p-4 text-gray-600 text-xs">
                     <div className="flex items-center gap-1.5">
                       <Calendar size={14} className="text-gray-400 shrink-0" />
                       {formatDob(c.dob)}

@@ -195,24 +195,24 @@ const CustomerLogins = () => {
             ) : filtered.map(c => (
               <tr key={c._id} className="hover:bg-[#FFFCF5] transition-colors">
                 <td className="p-4 pl-6">
-                  <div className="font-bold text-gray-900 font-playfair">{c.name}</div>
+                  <div className="font-bold text-gray-900 text-xs">{c.name}</div>
                   <div className="text-[0.62rem] text-gray-400 tracking-wider font-mono">ID: {c._id}</div>
                 </td>
                 <td className="p-4 text-gray-700">
                   <div className="font-medium text-xs">{c.phone || 'N/A'}</div>
-                  <div className="text-gray-500 font-cormorant text-base mt-0.5">{c.email}</div>
+                  <div className="text-gray-500 text-xs mt-0.5">{c.email}</div>
                 </td>
-                <td className="p-4 text-gray-600 font-cormorant text-lg">
+                <td className="p-4 text-gray-600 text-xs">
                   {c.dob ? (
                     new Date(c.dob).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
                   ) : (
                     <span className="italic text-gray-300">N/A</span>
                   )}
                 </td>
-                <td className="p-4 text-gray-600 font-cormorant text-lg">
+                <td className="p-4 text-gray-600 text-xs">
                   {new Date(c.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
                 </td>
-                <td className="p-4 text-gray-600 font-cormorant text-lg">
+                <td className="p-4 text-gray-600 text-xs">
                   {c.lastLoginDate ? (
                     new Date(c.lastLoginDate).toLocaleDateString('en-IN', { 
                       day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' 
