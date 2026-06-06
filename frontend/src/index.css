@@ -750,6 +750,52 @@ body {
   font-size: 11px !important;
 }
 
+/* ─── Admin Portal Mobile Responsiveness ─────────────────── */
+@media (max-width: 640px) {
+  .admin-portal {
+    font-size: 12px;
+  }
+
+  /* Tighter padding on mobile */
+  .admin-portal .p-6 {
+    padding: 1rem !important;
+  }
+  .admin-portal .p-8 {
+    padding: 1rem !important;
+  }
+
+  /* KPI stat cards — smaller numbers */
+  .admin-portal .text-2xl:not(.font-cinzel),
+  .admin-portal .text-3xl:not(.font-cinzel) {
+    font-size: 18px !important;
+  }
+  .admin-portal .text-2xl.font-cinzel {
+    font-size: 14px !important;
+  }
+
+  /* Page title */
+  .admin-portal h1 {
+    font-size: 16px !important;
+  }
+  .admin-portal h2 {
+    font-size: 14px !important;
+  }
+
+  /* Tables: prevent overflow on any table that doesn't have explicit handling */
+  .admin-portal table {
+    font-size: 11px !important;
+  }
+  .admin-portal th,
+  .admin-portal td {
+    padding: 8px 6px !important;
+  }
+
+  /* Owner portal tab switchers — stack on mobile */
+  .admin-portal .grid-cols-2 {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
 /* Sidebar — Dark elegant contrast */
 .admin-sidebar {
   background: linear-gradient(180deg, #0c0c0e 0%, #111113 100%);

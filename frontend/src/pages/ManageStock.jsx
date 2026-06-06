@@ -286,8 +286,9 @@ const ManageStock = () => {
 
           {/* INVENTORY LIST GRID */}
           <div className="bg-white rounded-xl shadow-[0_2px_15px_rgba(0,0,0,0.04)] border border-gray-100 overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
+            {/* Desktop table */}
+            <div className="hidden sm:block overflow-x-auto">
+              <table className="w-full text-left border-collapse" style={{ minWidth: '700px' }}>
                 <thead>
                   <tr className="bg-gray-50 border-b border-gray-100">
                     <th className="p-4 pl-6 text-xs font-cinzel font-bold uppercase tracking-wider text-gray-700">Product Name</th>
@@ -301,14 +302,14 @@ const ManageStock = () => {
                 </thead>
                 <tbody className="divide-y divide-gray-100">
                   {stocks.length === 0 ? (
-                    <tr><td colSpan="7" className="p-10 text-center text-gray-500 font-cormorant italic text-lg">No products catalogued.</td></tr>
+                    <tr><td colSpan="7" className="p-10 text-center text-gray-500 text-xs">No products catalogued.</td></tr>
                   ) : stocks.map((item) => (
                     <tr key={item._id} className="hover:bg-[#FFFCF5] transition-colors">
-                      <td className="p-4 pl-6 font-medium text-gray-900 font-playfair">{item.productName}</td>
-                      <td className="p-4 text-gray-600 font-cormorant text-lg">
+                      <td className="p-4 pl-6 font-medium text-gray-900 text-xs">{item.productName}</td>
+                      <td className="p-4 text-gray-600 text-xs">
                         {new Date(item.purchaseDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
                       </td>
-                      <td className="p-4 text-gray-600 font-cormorant text-lg">{item.totalQuantity} units</td>
+                      <td className="p-4 text-gray-600 text-xs">{item.totalQuantity} units</td>
                       <td className="p-4">
                         <span className={`px-2.5 py-1 rounded-full text-xs font-bold border ${
                           item.remainingQuantity > 5 
@@ -353,6 +354,59 @@ const ManageStock = () => {
                   ))}
                 </tbody>
               </table>
+            </div>
+
+            {/* Mobile card view */}
+            <div className="sm:hidden divide-y divide-gray-100">
+              {stocks.length === 0 ? (
+                <div className="p-10 text-center text-gray-500 text-xs">No products catalogued.</div>
+              ) : stocks.map((item) => (
+                <div key={item._id} className="p-4 space-y-3">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <div className="font-bold text-gray-900 text-xs">{item.productName}</div>
+                      <div className="text-[0.65rem] text-gray-500 mt-0.5">
+                        {new Date(item.purchaseDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                        {' · '}{item.totalQuantity} units
+                      </div>
+                    </div>
+                    <span className={`px-2 py-0.5 rounded-full text-[0.65rem] font-bold border shrink-0 ${
+                      item.remainingQuantity > 5 
+                        ? 'bg-green-50 text-green-700 border-green-200' 
+                        : item.remainingQuantity > 0 
+                        ? 'bg-amber-50 text-amber-700 border-amber-200' 
+                        : 'bg-red-50 text-red-700 border-red-200'
+                    }`}>
+                      {item.remainingQuantity} left
+                    </span>
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => {
+                        setUsageModalProduct(item);
+                        setUsageForm({ quantity: '', staffId: '', serviceLinked: '' });
+                      }}
+                      className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-[0.65rem] font-cinzel font-bold uppercase tracking-wider border border-amber-200 text-amber-700 hover:bg-amber-50 transition-colors"
+                      disabled={item.remainingQuantity <= 0}
+                    >
+                      <Minus size={10} /> Consume
+                    </button>
+                    <button
+                      onClick={() => setSelectedStock(item)}
+                      className="flex-1 flex items-center justify-center gap-1 py-2 rounded-lg text-[0.65rem] font-cinzel font-bold uppercase tracking-wider border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors"
+                    >
+                      <Eye size={10} /> History
+                    </button>
+                    <button
+                      onClick={() => handleDelete(item._id)}
+                      className="p-2 rounded-md text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors"
+                      title="Delete product"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
 
@@ -456,37 +510,31 @@ const ManageStock = () => {
               {allUsageRecords.length === 0 ? (
                 <p className="text-center font-cormorant italic text-gray-500 py-12">No stock consumption logs logged yet.</p>
               ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left border-collapse text-sm" style={{ tableLayout: 'fixed' }}>
-                    <colgroup>
-                      <col style={{ width: '22%' }} />
-                      <col style={{ width: '10%' }} />
-                      <col style={{ width: '26%' }} />
-                      <col style={{ width: '18%' }} />
-                      <col style={{ width: '24%' }} />
-                    </colgroup>
+                {/* Desktop table view */}
+                <div className="hidden sm:block overflow-x-auto">
+                  <table className="w-full text-left border-collapse text-sm" style={{ minWidth: '600px' }}>
                     <thead>
                       <tr className="text-gray-500 border-b border-gray-100">
-                        <th className="py-3 px-3 text-xs font-cinzel uppercase font-bold">Product</th>
-                        <th className="py-3 px-3 text-xs font-cinzel uppercase font-bold text-center">Qty</th>
-                        <th className="py-3 px-3 text-xs font-cinzel uppercase font-bold">Staff Member</th>
-                        <th className="py-3 px-3 text-xs font-cinzel uppercase font-bold">Date Used</th>
-                        <th className="py-3 px-3 text-xs font-cinzel uppercase font-bold text-right">Linked Service</th>
+                        <th className="py-3 px-3 text-xs font-cinzel uppercase font-bold" style={{ width: '20%' }}>Product</th>
+                        <th className="py-3 px-3 text-xs font-cinzel uppercase font-bold text-center" style={{ width: '8%' }}>Qty</th>
+                        <th className="py-3 px-3 text-xs font-cinzel uppercase font-bold" style={{ width: '25%' }}>Staff Member</th>
+                        <th className="py-3 px-3 text-xs font-cinzel uppercase font-bold" style={{ width: '18%' }}>Date Used</th>
+                        <th className="py-3 px-3 text-xs font-cinzel uppercase font-bold text-right" style={{ width: '29%' }}>Linked Service</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-100 text-gray-700 font-cormorant text-base">
+                    <tbody className="divide-y divide-gray-100 text-gray-700">
                       {allUsageRecords.map(rec => (
                         <tr key={rec._id} className="hover:bg-gray-50/50">
-                          <td className="py-3 px-3 font-playfair font-bold text-gray-900 truncate">{rec.productName}</td>
-                          <td className="py-3 px-3 text-center font-mono font-bold text-amber-700">{rec.quantityUsed}</td>
-                          <td className="py-3 px-3 font-sans text-xs">
+                          <td className="py-3 px-3 font-bold text-gray-900 text-xs">{rec.productName}</td>
+                          <td className="py-3 px-3 text-center font-mono font-bold text-amber-700 text-xs">{rec.quantityUsed}</td>
+                          <td className="py-3 px-3 text-xs">
                             <div className="font-bold text-gray-800">{rec.staffName}</div>
                             <div className="text-gray-400 font-mono text-[0.65rem]">{rec.staffId}</div>
                           </td>
-                          <td className="py-3 px-3 font-sans text-xs text-gray-500">
+                          <td className="py-3 px-3 text-xs text-gray-500">
                             {new Date(rec.dateUsed).toLocaleDateString('en-IN')}
                           </td>
-                          <td className="py-3 px-3 text-right text-xs font-sans text-gray-600 font-medium">
+                          <td className="py-3 px-3 text-right text-xs text-gray-600 font-medium">
                             {rec.serviceLinked ? (
                               <span className="px-2 py-0.5 bg-green-50 text-green-600 border border-green-200/50 rounded font-semibold text-[0.65rem]">{rec.serviceLinked}</span>
                             ) : (
@@ -497,6 +545,29 @@ const ManageStock = () => {
                       ))}
                     </tbody>
                   </table>
+                </div>
+
+                {/* Mobile card view */}
+                <div className="sm:hidden space-y-3">
+                  {allUsageRecords.map(rec => (
+                    <div key={rec._id} className="bg-gray-50 rounded-lg border border-gray-100 p-4 space-y-2">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <div className="font-bold text-gray-900 text-xs">{rec.productName}</div>
+                          <div className="text-gray-400 font-mono text-[0.6rem] mt-0.5">{rec.staffName} · {rec.staffId}</div>
+                        </div>
+                        <span className="font-mono font-bold text-amber-700 text-sm bg-amber-50 border border-amber-200 rounded px-2 py-0.5">{rec.quantityUsed}</span>
+                      </div>
+                      <div className="flex justify-between items-center text-[0.65rem] text-gray-500 pt-1 border-t border-gray-200/60">
+                        <span>{new Date(rec.dateUsed).toLocaleDateString('en-IN')}</span>
+                        {rec.serviceLinked ? (
+                          <span className="px-2 py-0.5 bg-green-50 text-green-600 border border-green-200/50 rounded font-semibold">{rec.serviceLinked}</span>
+                        ) : (
+                          <span className="text-gray-300">Studio General</span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
                 </div>
               )}
             </div>
