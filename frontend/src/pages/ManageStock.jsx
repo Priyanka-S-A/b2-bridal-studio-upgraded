@@ -510,9 +510,10 @@ const ManageStock = () => {
               {allUsageRecords.length === 0 ? (
                 <p className="text-center font-cormorant italic text-gray-500 py-12">No stock consumption logs logged yet.</p>
               ) : (
-                {/* Desktop table view */}
-                <div className="hidden sm:block overflow-x-auto">
-                  <table className="w-full text-left border-collapse text-sm" style={{ minWidth: '600px' }}>
+                <>
+                  {/* Desktop table view */}
+                  <div className="hidden sm:block overflow-x-auto">
+                    <table className="w-full text-left border-collapse text-sm" style={{ minWidth: '600px' }}>
                     <thead>
                       <tr className="text-gray-500 border-b border-gray-100">
                         <th className="py-3 px-3 text-xs font-cinzel uppercase font-bold" style={{ width: '20%' }}>Product</th>
@@ -569,6 +570,7 @@ const ManageStock = () => {
                     </div>
                   ))}
                 </div>
+                </>
               )}
             </div>
 
