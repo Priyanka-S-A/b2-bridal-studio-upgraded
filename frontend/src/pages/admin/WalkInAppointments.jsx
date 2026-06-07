@@ -173,7 +173,7 @@ const WalkInAppointments = () => {
                 <th className="p-4 text-xs font-cinzel font-bold uppercase tracking-wider text-gray-700">Branch</th>
                 <th className="p-4 text-xs font-cinzel font-bold uppercase tracking-wider text-gray-700">Services</th>
                 <th className="p-4 text-xs font-cinzel font-bold uppercase tracking-wider text-gray-700">Status</th>
-                <th className="p-4 text-xs font-cinzel font-bold uppercase tracking-wider text-gray-700 text-right">Total</th>
+                <th className="p-4 text-xs font-cinzel font-bold uppercase tracking-wider text-gray-700 text-center">Total</th>
                 <th className="p-4 text-xs font-cinzel font-bold uppercase tracking-wider text-gray-700 text-center">Bill</th>
                 <th className="p-4 pr-6 text-xs font-cinzel font-bold uppercase tracking-wider text-gray-700 text-center">Action</th>
               </tr>
@@ -221,20 +221,19 @@ const WalkInAppointments = () => {
 
                   {/* Services */}
                   <td className="p-4 text-sm text-gray-600 max-w-[200px]">
-                    <ul className="list-disc pl-4 space-y-1.5">
+                    <div className="flex flex-col gap-2.5">
                       {appt.items.map((item, i) => {
                         const count = item.peopleCount || item.quantity || 1;
                         return (
-                          <li key={i} style={{ fontSize: '13px', color: '#111', fontWeight: 500 }}>
-                            <div className="font-semibold">{item.name}</div>
-                            <div className="text-xs text-gray-500 font-medium">
-                              Service For: {count} {count === 1 ? 'Person' : 'People'}
-                              <span className="ml-1 text-gray-400">(₹{item.price} each)</span>
+                          <div key={i} style={{ fontSize: '13px', color: '#111', fontWeight: 500 }}>
+                            <div className="font-semibold text-gray-900">• {item.name}</div>
+                            <div className="text-xs text-gray-500 font-medium ml-3 mt-0.5">
+                              {count} {count === 1 ? 'Person' : 'People'} @ ₹{item.price} each
                             </div>
-                          </li>
+                          </div>
                         );
                       })}
-                    </ul>
+                    </div>
                   </td>
 
                   {/* Status */}
@@ -253,7 +252,7 @@ const WalkInAppointments = () => {
                   </td>
 
                   {/* Total */}
-                  <td className="p-4 text-right">
+                  <td className="p-4 text-center">
                     <div className="font-bold text-gray-900 text-base font-cinzel">
                       ₹{Number(appt.total).toFixed(2)}
                     </div>

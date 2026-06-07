@@ -228,7 +228,7 @@ const BillView = () => {
           {/* Bill Card */}
           <div className="glass-dark rounded-sm overflow-hidden" style={{ border: '1px solid rgba(255,195,0,0.2)' }}>
             {/* Header */}
-            <div className="p-8 text-center" style={{ background: 'linear-gradient(180deg, rgba(255,215,0,0.08), transparent)', borderBottom: '1px solid rgba(255,215,0,0.15)' }}>
+            <div className="p-8 text-center" style={{ background: 'linear-gradient(180deg, rgba(255,215,0,0.08), transparent)', borderBottom: '1px solid rgba(255,255,255,0.4)' }}>
               <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3" style={{ border: '1px solid rgba(255,215,0,0.4)', boxShadow: '0 0 15px rgba(255,215,0,0.15)', background: '#050505' }}>
                 <img src="/b2-logo-transparent.svg" alt="B2 Logo" style={{ width: '40px', height: '40px', objectFit: 'contain', filter: 'drop-shadow(0 0 3px rgba(255,215,0,0.3))' }} />
               </div>
@@ -237,7 +237,7 @@ const BillView = () => {
             </div>
 
             {/* Bill Info */}
-            <div className="p-6 flex flex-wrap gap-6 justify-between" style={{ borderBottom: '1px solid rgba(255,215,0,0.08)' }}>
+            <div className="p-6 flex flex-wrap gap-6 justify-between" style={{ borderBottom: '1px solid rgba(255,255,255,0.4)' }}>
               <div>
                 <span className="font-cinzel text-[0.7rem] tracking-[0.2em] uppercase block mb-1.5 font-bold" style={{ color: '#FFD700', textShadow: '0 0 4px rgba(255,215,0,0.15)' }}>Bill No</span>
                 <span className="font-inter text-sm font-bold" style={{ color: '#F8F5F0' }}>#{bill._id.slice(-8).toUpperCase()}</span>
@@ -262,7 +262,7 @@ const BillView = () => {
 
             {/* Customer & Scheduled Appointment */}
             {bill.customerDetails?.name && (
-              <div className="px-6 py-4 flex flex-col md:flex-row md:justify-between md:items-start gap-4" style={{ borderBottom: '1px solid rgba(255,215,0,0.08)' }}>
+              <div className="px-6 py-4 flex flex-col md:flex-row md:justify-between md:items-start gap-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.4)' }}>
                 <div>
                   <span className="font-cinzel text-[0.7rem] tracking-[0.2em] uppercase block mb-1.5 font-bold" style={{ color: '#FFD700', textShadow: '0 0 4px rgba(255,215,0,0.15)' }}>Customer</span>
                   <span className="font-inter text-[0.95rem] font-bold block" style={{ color: '#F8F5F0' }}>{bill.customerDetails.name}</span>
@@ -287,13 +287,13 @@ const BillView = () => {
             )}
 
             {/* Items */}
-            <div className="px-6 py-4" style={{ borderBottom: '1px solid rgba(255,215,0,0.04)' }}>
+            <div className="px-6 py-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.4)' }}>
               <span className="font-cinzel text-[0.7rem] tracking-[0.2em] uppercase block mb-3 font-bold" style={{ color: '#FFD700', textShadow: '0 0 4px rgba(255,215,0,0.15)' }}>Items</span>
               {bill.items.map((item, i) => {
                 const count = item.peopleCount || item.quantity || 1;
                 const isService = item.itemType === 'service' || bill.type === 'service';
                 return (
-                  <div key={i} className="flex justify-between py-2.5" style={{ borderBottom: i < bill.items.length - 1 ? '1px solid rgba(255,215,0,0.04)' : 'none' }}>
+                  <div key={i} className="flex justify-between py-2.5" style={{ borderBottom: i < bill.items.length - 1 ? '1px solid rgba(255,255,255,0.2)' : 'none' }}>
                     <div>
                       <span className="font-cormorant text-[1.1rem] font-medium" style={{ color: '#F8F5F0' }}>{item.name}</span>
                       <span className="font-cinzel text-xs ml-2" style={{ color: 'rgba(248,245,240,0.4)' }}>
@@ -307,12 +307,12 @@ const BillView = () => {
             </div>
 
             {/* Totals */}
-            <div className="px-6 py-5" style={{ background: 'rgba(255,215,0,0.02)', borderTop: '1px solid rgba(255,215,0,0.1)' }}>
+            <div className="px-6 py-5" style={{ background: 'rgba(255,215,0,0.02)', borderTop: '1px solid rgba(255,255,255,0.4)' }}>
               {(() => {
                 const displayOriginalAmount = bill.originalAmount || bill.originalTotal || (bill.total + (bill.discountAmount || 0));
                 return (
                   <>
-                    <div className="flex justify-between mb-2 font-cormorant text-[1rem] font-semibold" style={{ color: 'rgba(248,245,240,0.6)' }}>
+                    <div className="flex justify-between mb-2 font-cormorant text-[1rem] font-semibold" style={{ color: '#FFFFFF' }}>
                       <span>Service Total</span><span>₹{displayOriginalAmount.toFixed(2)}</span>
                     </div>
 
@@ -332,20 +332,20 @@ const BillView = () => {
                     )}
 
                     {bill.gst && bill.gst > 0 ? (
-                      <div className="flex justify-between mb-2 font-cormorant text-[1rem] font-semibold" style={{ color: 'rgba(248,245,240,0.6)' }}>
+                      <div className="flex justify-between mb-2 font-cormorant text-[1rem] font-semibold" style={{ color: '#FFFFFF' }}>
                         <span>GST Included</span><span>₹{bill.gst.toFixed(2)}</span>
                       </div>
                     ) : null}
                   </>
                 );
               })()}
-              <div className="flex justify-between font-cinzel text-[1.15rem] pt-3.5 font-bold" style={{ borderTop: '1px solid rgba(255,215,0,0.15)', color: '#F8F5F0' }}>
+              <div className="flex justify-between font-cinzel text-[1.15rem] pt-3.5 font-bold" style={{ borderTop: '1px solid rgba(255,255,255,0.4)', color: '#F8F5F0' }}>
                 <span>Final Amount Paid</span><span style={{ color: '#FFD700', textShadow: '0 0 8px rgba(255,215,0,0.35)' }}>₹{bill.total.toFixed(2)}</span>
               </div>
             </div>
 
             {/* Footer */}
-            <div className="p-6 text-center" style={{ borderTop: '1px solid rgba(255,195,0,0.06)' }}>
+            <div className="p-6 text-center" style={{ borderTop: '1px solid rgba(255,255,255,0.4)' }}>
               <p className="font-cormorant italic text-sm mb-4" style={{ color: 'rgba(248,245,240,0.35)' }}>Thank you for choosing B2 Bridal Studio</p>
               <div className="flex gap-3 justify-center flex-wrap">
                 <button onClick={generatePDF} className="btn-gold py-3 px-8 text-xs">
