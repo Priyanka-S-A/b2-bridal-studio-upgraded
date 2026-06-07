@@ -5,17 +5,6 @@ const { verifyToken, verifyRole } = require('../middleware/auth');
 
 const router = express.Router();
 
-// ─── GET single bill by ID (Public — for BillView page) ────────────────────
-router.get('/:id', async (req, res) => {
-  try {
-    const bill = await Bill.findById(req.params.id);
-    if (!bill) return res.status(404).json({ error: 'Bill not found' });
-    res.json(bill);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
 // ─── GET all bills (Admin / Owner) ─────────────────────────────────────────
 router.get('/', verifyToken, verifyRole(['staff', 'owner']), async (req, res) => {
   try {
@@ -226,6 +215,18 @@ router.post('/offline', verifyToken, verifyRole(['staff', 'owner']), async (req,
     res.status(201).json({ success: true, billCreated: true, revenueCreated, bill });
   } catch (err) {
     res.status(400).json({ error: err.message });
+  }
+});
+
+// ─── GET single bill by ID (Public — for BillView page) ────────────────────
+// NOTE: This wildcard is intentionally placed LAST so named POST routes above are matched first.
+router.get('/:id', async (req, res) => {
+  try {
+    const bill = await Bill.findById(req.params.id);
+    if (!bill) return res.status(404).json({ error: 'Bill not found' });
+    res.json(bill);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
 

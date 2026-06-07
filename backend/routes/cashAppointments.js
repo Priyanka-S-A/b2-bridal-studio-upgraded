@@ -82,7 +82,7 @@ router.post('/', verifyToken, async (req, res) => {
 });
 
 // ─── GET /api/cash-appointments — Admin: Get all cash appointments ─────────────
-router.get('/', async (req, res) => {
+router.get('/', verifyToken, async (req, res) => {
   try {
     const appointments = await CashAppointment.find().sort({ createdAt: -1 });
     res.json(appointments);
