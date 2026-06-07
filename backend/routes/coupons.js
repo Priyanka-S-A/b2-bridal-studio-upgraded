@@ -1,9 +1,27 @@
 const express = require('express');
 const router = express.Router();
 const Coupon = require('../models/Coupon');
+const { verifyToken, verifyRole } = require('../middleware/auth');
+
+// POST /api/coupons/validate - Validate a coupon (Customer / Public)
+router.post('/validate', async (req, res) => {
+  try {
+    const { code } = req.body;
+    if (!code) return res.status(400).json({ error: 'Coupon code is required' });
+    
+    const coupon = await Coupon.findOne({ code: code.toUpperCase() });
+    if (!coupon || !coupon.isActive) {
+      return res.status(400).json({ error: 'Invalid or expired coupon code' });
+    }
+    
+    res.json({ discountPercentage: coupon.discountPercentage });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 // GET /api/coupons - Fetch all coupons (Admin)
-router.get('/', async (req, res) => {
+router.get('/', verifyToken, verifyRole(['staff', 'owner']), async (req, res) => {
   try {
     const coupons = await Coupon.find().sort({ createdAt: -1 });
     res.json(coupons);
@@ -13,7 +31,7 @@ router.get('/', async (req, res) => {
 });
 
 // POST /api/coupons - Create coupon (Admin)
-router.post('/', async (req, res) => {
+router.post('/', verifyToken, verifyRole(['owner']), async (req, res) => {
   try {
     const { code, discountPercentage } = req.body;
     
@@ -38,25 +56,8 @@ router.post('/', async (req, res) => {
   }
 });
 
-// POST /api/coupons/validate - Validate a coupon (Customer)
-router.post('/validate', async (req, res) => {
-  try {
-    const { code } = req.body;
-    if (!code) return res.status(400).json({ error: 'Coupon code is required' });
-    
-    const coupon = await Coupon.findOne({ code: code.toUpperCase() });
-    if (!coupon || !coupon.isActive) {
-      return res.status(400).json({ error: 'Invalid or expired coupon code' });
-    }
-    
-    res.json({ discountPercentage: coupon.discountPercentage });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
 // PATCH /api/coupons/:id/toggle - Toggle active status (Admin)
-router.patch('/:id/toggle', async (req, res) => {
+router.patch('/:id/toggle', verifyToken, verifyRole(['owner']), async (req, res) => {
   try {
     const coupon = await Coupon.findById(req.params.id);
     if (!coupon) return res.status(404).json({ error: 'Coupon not found' });
@@ -70,7 +71,7 @@ router.patch('/:id/toggle', async (req, res) => {
 });
 
 // DELETE /api/coupons/:id - Delete coupon (Admin)
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', verifyToken, verifyRole(['owner']), async (req, res) => {
   try {
     const coupon = await Coupon.findByIdAndDelete(req.params.id);
     if (!coupon) return res.status(404).json({ error: 'Coupon not found' });
