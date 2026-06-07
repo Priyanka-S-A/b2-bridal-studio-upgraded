@@ -165,7 +165,7 @@ const CashBooking = () => {
             <h2 className="font-cinzel text-xs tracking-[0.2em] uppercase mb-2 pb-4 font-bold" style={{ color: '#FFD700', borderBottom: '1px solid rgba(255,195,0,0.1)' }}>
               Your Details
             </h2>
-            <p className="font-cormorant italic text-sm mb-6" style={{ color: 'rgba(248,245,240,0.5)' }}>
+            <p className="font-cormorant italic text-sm mb-6" style={{ color: 'rgba(248,245,240,1)' }}>
               No payment needed now — just confirm your details and we'll reserve your slot.
             </p>
 

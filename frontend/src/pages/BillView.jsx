@@ -240,22 +240,22 @@ const BillView = () => {
             <div className="p-6 flex flex-wrap gap-6 justify-between" style={{ borderBottom: '1px solid rgba(255,215,0,0.08)' }}>
               <div>
                 <span className="font-cinzel text-[0.7rem] tracking-[0.2em] uppercase block mb-1.5 font-bold" style={{ color: '#FFD700', textShadow: '0 0 4px rgba(255,215,0,0.15)' }}>Bill No</span>
-                <span className="font-inter text-[0.95rem] font-bold" style={{ color: '#F8F5F0' }}>#{bill._id.slice(-8).toUpperCase()}</span>
+                <span className="font-inter text-sm font-bold" style={{ color: '#F8F5F0' }}>#{bill._id.slice(-8).toUpperCase()}</span>
               </div>
               <div>
                 <span className="font-cinzel text-[0.7rem] tracking-[0.2em] uppercase block mb-1.5 font-bold" style={{ color: '#FFD700', textShadow: '0 0 4px rgba(255,215,0,0.15)' }}>Date</span>
-                <span className="font-inter text-[0.95rem] font-bold" style={{ color: '#F8F5F0' }}>{new Date(bill.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+                <span className="font-inter text-sm font-bold" style={{ color: '#F8F5F0' }}>{new Date(bill.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
               </div>
               {bill.branch && (
                 <div>
                   <span className="font-cinzel text-[0.7rem] tracking-[0.2em] uppercase block mb-1.5 font-bold" style={{ color: '#FFD700', textShadow: '0 0 4px rgba(255,215,0,0.15)' }}>Branch</span>
-                  <span className="font-inter text-[0.95rem] font-bold" style={{ color: '#F8F5F0' }}>{bill.branch}</span>
+                  <span className="font-inter text-sm font-bold" style={{ color: '#F8F5F0' }}>{bill.branch}</span>
                 </div>
               )}
               {bill.paymentMethod && (
                 <div>
                   <span className="font-cinzel text-[0.7rem] tracking-[0.2em] uppercase block mb-1.5 font-bold" style={{ color: '#FFD700', textShadow: '0 0 4px rgba(255,215,0,0.15)' }}>Mode</span>
-                  <span className="font-inter text-[0.95rem] font-bold" style={{ color: '#F8F5F0' }}>{bill.paymentMethod}</span>
+                  <span className="font-inter text-sm font-bold" style={{ color: '#F8F5F0' }}>{bill.paymentMethod}</span>
                 </div>
               )}
             </div>

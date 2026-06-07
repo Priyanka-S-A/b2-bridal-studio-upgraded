@@ -504,12 +504,12 @@ export default function Billing() {
 
       {/* Pre-fill notice */}
       {prefillNotice && (
-        <div className="mb-4 bg-amber-50 border border-amber-200 text-amber-800 text-sm rounded-lg px-4 py-3 flex justify-between items-center font-medium">
-          <span className="flex items-center gap-2">
-            <Info size={15} className="text-amber-600 shrink-0" />
-            Customer details &amp; services are pre-filled from the appointment. Review and click <strong className="ml-1">Generate Bill</strong> when ready.
-          </span>
-          <button onClick={() => setPrefillNotice(false)}><X size={16} /></button>
+        <div className="mb-4 bg-amber-50 border border-amber-200 text-amber-800 text-sm rounded-lg px-4 py-3 flex items-start justify-between gap-3 font-medium">
+          <div className="flex items-start gap-2">
+            <Info size={18} className="text-amber-600 shrink-0 mt-0.5" />
+            <p>Customer details &amp; services are pre-filled from the appointment. Review and click <strong>Generate Bill</strong> when ready.</p>
+          </div>
+          <button onClick={() => setPrefillNotice(false)} className="shrink-0 mt-0.5"><X size={16} /></button>
         </div>
       )}
 

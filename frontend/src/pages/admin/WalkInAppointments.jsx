@@ -167,7 +167,7 @@ const WalkInAppointments = () => {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-gray-50 border-b border-gray-100">
+              <tr className="bg-gray-50 border-b border-white">
                 <th className="p-4 pl-6 text-xs font-cinzel font-bold uppercase tracking-wider text-gray-700">Customer</th>
                 <th className="p-4 text-xs font-cinzel font-bold uppercase tracking-wider text-gray-700">Scheduled</th>
                 <th className="p-4 text-xs font-cinzel font-bold uppercase tracking-wider text-gray-700">Branch</th>
@@ -178,7 +178,7 @@ const WalkInAppointments = () => {
                 <th className="p-4 pr-6 text-xs font-cinzel font-bold uppercase tracking-wider text-gray-700 text-center">Action</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-white">
               {filtered.length === 0 ? (
                 <tr>
                   <td colSpan="8" className="p-10 text-center text-gray-400 font-cormorant italic text-lg">

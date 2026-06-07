@@ -941,7 +941,7 @@ const Services = () => {
                       </button>
                     </div>
                     {paymentMethod === 'cash' && (
-                      <p className="mt-2 font-cormorant italic text-xs" style={{ color: 'rgba(248,245,240,0.55)' }}>
+                      <p className="mt-2 font-cormorant italic text-xs" style={{ color: 'rgba(248,245,240,1)' }}>
                         Pay when you arrive. Slot will be reserved for you.
                       </p>
                     )}

@@ -1,0 +1,10 @@
+- [x] 1. Backend: Create `CashAppointment.js` model
+- [x] 2. Backend: Create `cashAppointments.js` route
+- [x] 3. Backend: Register route in `server.js`
+- [x] 4. Backend: Update `/api/bookings/slot-check` & `/api/bookings/full-slots` to count cash appointments too
+- [x] 5. Frontend: Add payment method toggle in `Services.jsx` booking sidebar
+- [x] 6. Frontend: Create `CashBooking.jsx` page
+- [x] 7. Frontend: Update `Profile.jsx` to show cash appointments section
+- [x] 8. Admin: Create `WalkInAppointments.jsx` admin page
+- [x] 9. Admin: Add nav item + route in `AdminDashboard.jsx`
+- [x] 10. Frontend: Add `CashBooking` to App.js routes
