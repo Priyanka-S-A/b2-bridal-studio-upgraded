@@ -340,7 +340,7 @@ const AdminDashboard = () => {
     { name: 'Services', path: '/admin/services', icon: Scissors },
     { name: 'Bookings', path: '/admin/bookings', icon: Receipt },
     { name: 'Payments', path: '/admin/payments', icon: CreditCard },
-    { name: 'Walk-in Appts', path: '/admin/walkin', icon: CalendarCheck },
+    { name: 'Appointments', path: '/admin/walkin', icon: CalendarCheck },
     { name: 'Products', path: '/admin/products', icon: Package },
     { name: 'Courses', path: '/admin/courses', icon: GraduationCap },
     { name: 'Stock', path: '/admin/stock', icon: Boxes },

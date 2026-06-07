@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Calendar, User, Search, CheckCircle, Clock } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Calendar, User, Search, CheckCircle, Clock, Receipt } from 'lucide-react';
 
 const API = import.meta.env.VITE_API_URL;
 
@@ -28,6 +29,7 @@ const formatDateTime = (dateStr) => {
 };
 
 const WalkInAppointments = () => {
+  const navigate = useNavigate();
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -69,6 +71,28 @@ const WalkInAppointments = () => {
     }
   };
 
+  const handleBill = (appt) => {
+    // Build billItems from the appointment's services
+    const billItems = appt.items.map((item, i) => ({
+      id: `appt-${appt._id}-${i}`,
+      name: item.name,
+      price: item.price,
+      quantity: item.peopleCount || item.quantity || 1,
+      itemType: 'service',
+      gstPercentage: 0,
+      category: 'Services',
+    }));
+    navigate('/admin/billing', {
+      state: {
+        prefill: {
+          customer: appt.name,
+          phone: appt.phone,
+          billItems,
+        }
+      }
+    });
+  };
+
   const filtered = appointments.filter(appt => {
     const name = (appt.name || '').toLowerCase();
     const phone = (appt.phone || '').toLowerCase();
@@ -93,11 +117,11 @@ const WalkInAppointments = () => {
       <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold font-cinzel uppercase tracking-wide text-gray-900 flex items-center gap-3">
-            <span style={{ fontSize: '1.3rem' }}>💵</span>
-            Walk-in Appointments
+            <span style={{ fontSize: '1.3rem' }}>📅</span>
+            Appointments
           </h1>
           <p className="text-sm text-gray-500 mt-1 font-cormorant italic">
-            Cash payment appointments made by customers.
+            Cash walk-in appointments — click Bill to open offline billing pre-filled.
             {pendingCount > 0 && (
               <span className="ml-2 px-2 py-0.5 bg-amber-50 border border-amber-200 text-amber-700 rounded-full text-xs font-bold font-cinzel">
                 {pendingCount} Pending
@@ -150,14 +174,15 @@ const WalkInAppointments = () => {
                 <th className="p-4 text-xs font-cinzel font-bold uppercase tracking-wider text-gray-700">Services</th>
                 <th className="p-4 text-xs font-cinzel font-bold uppercase tracking-wider text-gray-700">Status</th>
                 <th className="p-4 text-xs font-cinzel font-bold uppercase tracking-wider text-gray-700 text-right">Total</th>
+                <th className="p-4 text-xs font-cinzel font-bold uppercase tracking-wider text-gray-700 text-center">Bill</th>
                 <th className="p-4 pr-6 text-xs font-cinzel font-bold uppercase tracking-wider text-gray-700 text-center">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
               {filtered.length === 0 ? (
                 <tr>
-                  <td colSpan="7" className="p-10 text-center text-gray-400 font-cormorant italic text-lg">
-                    No walk-in appointments found.
+                  <td colSpan="8" className="p-10 text-center text-gray-400 font-cormorant italic text-lg">
+                    No appointments found.
                   </td>
                 </tr>
               ) : filtered.map(appt => (
@@ -233,6 +258,23 @@ const WalkInAppointments = () => {
                       ₹{Number(appt.total).toFixed(2)}
                     </div>
                     <div className="text-xs text-gray-400 mt-0.5">💵 Cash</div>
+                  </td>
+
+                  {/* Bill */}
+                  <td className="p-4 text-center">
+                    <button
+                      onClick={() => handleBill(appt)}
+                      className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold font-cinzel uppercase tracking-wide transition-all shadow-sm"
+                      style={{
+                        background: 'linear-gradient(135deg, #1a1a1a, #2d2d2d)',
+                        color: '#FFD700',
+                        border: '1px solid rgba(255,215,0,0.3)',
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.15)'
+                      }}
+                    >
+                      <Receipt size={12} />
+                      Bill
+                    </button>
                   </td>
 
                   {/* Action */}

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { ShoppingCart, Plus, Trash2, FileText, CheckCircle, Printer, Download, X, Send, Search, ChevronDown, ChevronRight } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
+import { ShoppingCart, Plus, Trash2, FileText, CheckCircle, Printer, Download, X, Send, Search, ChevronDown, ChevronRight, Info } from 'lucide-react';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
@@ -10,6 +11,8 @@ const token = () => localStorage.getItem('adminToken');
 const authHeaders = () => ({ Authorization: `Bearer ${token()}` });
 
 export default function Billing() {
+  const location = useLocation();
+  const [prefillNotice, setPrefillNotice] = useState(false);
   /* catalogue */
   const [services, setServices] = useState([]);
   const [products, setProducts] = useState([]);
@@ -65,6 +68,21 @@ export default function Billing() {
   }, []);
 
   useEffect(() => { fetchCatalogue(); }, [fetchCatalogue]);
+
+  // ─── Pre-fill from Appointments page ────────────────────────
+  useEffect(() => {
+    const prefill = location?.state?.prefill;
+    if (prefill) {
+      if (prefill.customer) setCustomer(prefill.customer);
+      if (prefill.phone)    setPhone(prefill.phone);
+      if (prefill.billItems && prefill.billItems.length > 0) {
+        setBillItems(prefill.billItems);
+      }
+      setPrefillNotice(true);
+      // Clear the location state so a page refresh doesn't re-apply
+      window.history.replaceState({}, '');
+    }
+  }, [location?.state]);
 
   /* ─── current catalogue list ───────────────────────────────── */
   const catalogueItems = category === 'services'
@@ -481,6 +499,17 @@ export default function Billing() {
         <div className="mb-4 bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3 flex justify-between items-center font-medium">
           {error}
           <button onClick={() => setError('')}><X size={16} /></button>
+        </div>
+      )}
+
+      {/* Pre-fill notice */}
+      {prefillNotice && (
+        <div className="mb-4 bg-amber-50 border border-amber-200 text-amber-800 text-sm rounded-lg px-4 py-3 flex justify-between items-center font-medium">
+          <span className="flex items-center gap-2">
+            <Info size={15} className="text-amber-600 shrink-0" />
+            Customer details &amp; services are pre-filled from the appointment. Review and click <strong className="ml-1">Generate Bill</strong> when ready.
+          </span>
+          <button onClick={() => setPrefillNotice(false)}><X size={16} /></button>
         </div>
       )}
 
