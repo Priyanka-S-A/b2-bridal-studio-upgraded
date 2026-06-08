@@ -31,7 +31,7 @@ router.get('/', verifyToken, verifyRole(['staff', 'owner']), async (req, res) =>
 });
 
 // POST /api/coupons - Create coupon (Admin)
-router.post('/', verifyToken, verifyRole(['owner']), async (req, res) => {
+router.post('/', verifyToken, verifyRole(['staff', 'owner']), async (req, res) => {
   try {
     const { code, discountPercentage } = req.body;
     
@@ -57,7 +57,7 @@ router.post('/', verifyToken, verifyRole(['owner']), async (req, res) => {
 });
 
 // PATCH /api/coupons/:id/toggle - Toggle active status (Admin)
-router.patch('/:id/toggle', verifyToken, verifyRole(['owner']), async (req, res) => {
+router.patch('/:id/toggle', verifyToken, verifyRole(['staff', 'owner']), async (req, res) => {
   try {
     const coupon = await Coupon.findById(req.params.id);
     if (!coupon) return res.status(404).json({ error: 'Coupon not found' });
@@ -71,7 +71,7 @@ router.patch('/:id/toggle', verifyToken, verifyRole(['owner']), async (req, res)
 });
 
 // DELETE /api/coupons/:id - Delete coupon (Admin)
-router.delete('/:id', verifyToken, verifyRole(['owner']), async (req, res) => {
+router.delete('/:id', verifyToken, verifyRole(['staff', 'owner']), async (req, res) => {
   try {
     const coupon = await Coupon.findByIdAndDelete(req.params.id);
     if (!coupon) return res.status(404).json({ error: 'Coupon not found' });
