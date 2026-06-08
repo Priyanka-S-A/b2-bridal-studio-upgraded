@@ -3,6 +3,8 @@ import axios from 'axios';
 import { Tag, Plus, Trash2, Power, PowerOff } from 'lucide-react';
 
 const API = import.meta.env.VITE_API_URL;
+const token = () => localStorage.getItem('adminToken');
+const authHeaders = () => ({ Authorization: `Bearer ${token()}` });
 
 const ManageCoupons = () => {
   const [coupons, setCoupons] = useState([]);
@@ -12,7 +14,7 @@ const ManageCoupons = () => {
 
   const fetchCoupons = async () => {
     try {
-      const res = await axios.get(`${API}/api/coupons`);
+      const res = await axios.get(`${API}/api/coupons`, { headers: authHeaders() });
       setCoupons(res.data);
     } catch (err) {
       console.error('Failed to fetch coupons', err);
@@ -31,7 +33,7 @@ const ManageCoupons = () => {
     if (!form.code || !form.discountPercentage) return;
     
     try {
-      await axios.post(`${API}/api/coupons`, form);
+      await axios.post(`${API}/api/coupons`, form, { headers: authHeaders() });
       setForm({ code: '', discountPercentage: '' });
       fetchCoupons();
     } catch (err) {
@@ -41,7 +43,7 @@ const ManageCoupons = () => {
 
   const handleToggle = async (id) => {
     try {
-      await axios.patch(`${API}/api/coupons/${id}/toggle`);
+      await axios.patch(`${API}/api/coupons/${id}/toggle`, {}, { headers: authHeaders() });
       fetchCoupons();
     } catch (err) {
       alert('Failed to toggle status');
@@ -51,7 +53,7 @@ const ManageCoupons = () => {
   const handleDelete = async (id) => {
     if (!window.confirm('Delete this coupon permanently?')) return;
     try {
-      await axios.delete(`${API}/api/coupons/${id}`);
+      await axios.delete(`${API}/api/coupons/${id}`, { headers: authHeaders() });
       fetchCoupons();
     } catch (err) {
       alert('Failed to delete coupon');
