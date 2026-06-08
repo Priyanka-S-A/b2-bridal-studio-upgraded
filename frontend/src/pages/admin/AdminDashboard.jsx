@@ -542,37 +542,12 @@ const AdminDashboard = () => {
           <div className="flex-grow">
             <Routes>
               <Route path="/" element={
-                <div className="flex flex-col items-center justify-center py-16 text-center animate-fade-in">
+                <div className="flex flex-col items-center justify-center py-20 text-center animate-fade-in">
                   <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4 shadow-sm" style={{ background: 'rgba(212,175,55,0.08)', border: '1px solid rgba(212,175,55,0.15)' }}>
                     <LayoutDashboard size={28} style={{ color: '#D4AF37' }} />
                   </div>
                   <h2 className="font-cinzel text-xl font-bold tracking-wide uppercase text-gray-900 mb-2">Welcome to Admin Panel</h2>
-                  <p className="font-cormorant italic text-gray-600 text-lg mb-10">Select an option from the sidebar to get started.</p>
-
-                  {/* Handover Cleanup Card */}
-                  <div className="w-full max-w-md bg-white rounded-2xl shadow-sm border border-red-100 p-6 text-left">
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: 'rgba(239,68,68,0.08)' }}>
-                        <AlertCircle size={20} className="text-red-500" />
-                      </div>
-                      <div>
-                        <h3 className="font-cinzel font-bold text-sm uppercase tracking-wide text-gray-900">Client Handover — Clean Test Data</h3>
-                        <p className="text-xs text-gray-500 mt-0.5">Remove all test records before going live</p>
-                      </div>
-                    </div>
-                    <p className="text-xs text-gray-600 mb-4 leading-relaxed">
-                      This will permanently delete: <span className="font-semibold text-red-600">Bookings, Bills, Cash Appointments, Coupons, Customers, Expenses, Revenue, Attendance, Staff Work, Slot Blocks, Reviews, Stock</span>.
-                      <br /><br />
-                      <span className="text-green-700 font-semibold">✅ Kept:</span> Blogs, Services, Courses, Products, Staff, Admin Logins.
-                    </p>
-                    <button
-                      onClick={() => { setShowCleanupModal(true); setCleanupResult(null); setCleanupConfirmText(''); }}
-                      className="w-full py-2.5 rounded-lg text-xs font-cinzel font-bold uppercase tracking-wide text-white transition-all"
-                      style={{ background: 'linear-gradient(135deg, #dc2626, #b91c1c)' }}
-                    >
-                      🗑️ Clean All Test Data
-                    </button>
-                  </div>
+                  <p className="font-cormorant italic text-gray-600 text-lg">Select an option from the sidebar to get started.</p>
                 </div>
               } />
               <Route path="services" element={<ManageServices />} />
